@@ -96,6 +96,7 @@ const LoginScreen = ({ navigation }) => {
         //         onPress={handleLogin}
         //     />
         // </View>
+        // 
         <LinearGradient
             colors={['#050505', '#1A2A3D']}
             style={styles.container}>
