@@ -9,6 +9,7 @@ import Swiper from 'react-native-swiper';
 import ViewShot from "react-native-view-shot";
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image'
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
@@ -21,18 +22,17 @@ const EditHome = ({ route, navigation }) => {
 
   const videos = useMemo(() => items.filter((item) => item.isVideo === true), []);
   const images = useMemo(() => items.filter((item) => item.isVideo === false), []);
-  console.log(images,"image")
-  console.log(videos,"video")
 
   const [i, seti] = useState(0);
 
   useEffect(() => {
     if (i < 2) {
-      if (images[0]) {
-        setItem(images[0].todayAndTomorrowImageOrVideo)
+      if (images.length != 0) {
+        setItem(images[index ? index : 0]?.todayAndTomorrowImageOrVideo)
         seti(i + 1)
       } else {
-        setItem(images[index ? index : 0].imageUrl)
+        setItem(images[index ? index : 0]?.
+          imageUrl)
         seti(i + 1)
       }
     } else {
@@ -40,7 +40,7 @@ const EditHome = ({ route, navigation }) => {
     }
   }, [i, index, items])
 
-  const [item, setItem] = useState([images[0].todayAndTomorrowImageOrVideo]);
+  const [item, setItem] = useState();
   const [currentFrame, setCurrentFrame] = useState(0);
   const [customFrames, setCustomFrames] = useState([]);
   const viewShotRef = useRef(null);
@@ -66,9 +66,9 @@ const EditHome = ({ route, navigation }) => {
   const handleImagePress = (item) => {
     setItem(item);
   };
-  
+
   const handleImagePressV = (item) => {
-    setSelectedVideo(item.todayAndTomorrowImageOrVideo);
+    setSelectedVideo(item?.todayAndTomorrowImageOrVideo);
   };
 
   const captureAndShareImage = async () => {
@@ -95,46 +95,47 @@ const EditHome = ({ route, navigation }) => {
   const frameRef = useRef();
 
   const captureAndShareVideo = async () => {
-    try {
-      const videoURL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
+    alert('Video Sharing in Process...')
+    // try {
+    //   const videoURL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
 
-      // Download the video to a temporary directory
-      const response = await RNFetchBlob.config({
-        fileCache: true,
-        path: `${RNFetchBlob.fs.dirs.CacheDir}/sharedVideo.mp4`,
-      }).fetch('GET', videoURL);
+    //   // Download the video to a temporary directory
+    //   const response = await RNFetchBlob.config({
+    //     fileCache: true,
+    //     path: `${RNFetchBlob.fs.dirs.CacheDir}/sharedVideo.mp4`,
+    //   }).fetch('GET', videoURL);
 
-      const tempPath = response.path();
+    //   const tempPath = response.path();
 
-      const shareOptions = {
-        title: 'Share Video',
-        url: `file://${tempPath}`,
-        social: Share.Social.WHATSAPP, // Change to other social media if needed
-        failOnCancel: false,
-      };
+    //   const shareOptions = {
+    //     title: 'Share Video',
+    //     url: `file://${tempPath}`,
+    //     social: Share.Social.WHATSAPP, // Change to other social media if needed
+    //     failOnCancel: false,
+    //   };
 
-      // Share the video
-      Share.open(shareOptions)
-        .then((res) => console.log('Shared successfully'))
-        .catch((err) => console.log('Error sharing:', err));
-    } catch (error) {
-      console.log('Error during video sharing:', error);
-    }
+    //   // Share the video
+    //   Share.open(shareOptions)
+    //     .then((res) => console.log('Shared successfully'))
+    //     .catch((err) => console.log('Error sharing:', err));
+    // } catch (error) {
+    //   console.log('Error during video sharing:', error);
+    // }
   };
 
   const [isLoad, setIsLoad] = useState(true)
   const [FlatlistisLoad, setFlatlistIsLoad] = useState(true)
 
   const renderItem = useCallback(({ item }) => (
-    <TouchableOpacity onPress={() => handleImagePress(item.todayAndTomorrowImageOrVideo ? item.todayAndTomorrowImageOrVideo : item.imageUrl)}>
-      <FastImage source={item.todayAndTomorrowImageOrVideo ? { uri: item.todayAndTomorrowImageOrVideo } : { uri: item.imageUrl }} style={styles.image} onLoadEnd={() => Image.prefetch(item.todayAndTomorrowImageOrVideo ? item.todayAndTomorrowImageOrVideo : item.imageUrl)} />
+    <TouchableOpacity onPress={() => handleImagePress(item?.todayAndTomorrowImageOrVideo ? item?.todayAndTomorrowImageOrVideo : item.imageUrl)}>
+      <FastImage source={item?.todayAndTomorrowImageOrVideo ? { uri: item?.todayAndTomorrowImageOrVideo } : { uri: item.imageUrl }} style={styles.image} onLoadEnd={() => Image.prefetch(item?.todayAndTomorrowImageOrVideo ? item?.todayAndTomorrowImageOrVideo : item.imageUrl)} />
     </TouchableOpacity>
   ), []);
 
   const renderItemV = useCallback(({ item }) => (
     <TouchableOpacity onPress={() => handleImagePressV(item)}>
       <Video
-        source={{ uri: item.todayAndTomorrowImageOrVideo }}   // Can be a URL or a local file.
+        source={{ uri: item?.todayAndTomorrowImageOrVideo }}   // Can be a URL or a local file.
         style={styles.image}
         paused={false}               // Pauses playback entirely.
         resizeMode="cover"            // Fill the whole screen at aspect ratio.
@@ -154,26 +155,41 @@ const EditHome = ({ route, navigation }) => {
 
   const [j, setj] = useState(0)
   useEffect(() => {
-    if (videos.length > 0 && j<2) {
-      setSelectedVideo(videos[0].todayAndTomorrowImageOrVideo)
-      setj(j+1)
+    if (videos.length > 0 && j < 2) {
+      setSelectedVideo(videos[0]?.todayAndTomorrowImageOrVideo)
+      setj(j + 1)
     }
   })
 
   return (
-    <>
+    <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => { navigation.navigate('HomeScreen') }}>
-          <Icon name="angle-left" size={30} color={"black"} />
+        <TouchableOpacity style={{ width: 30 }} onPress={() => { navigation.goBack() }}>
+          <Icon name="angle-left" size={30} color={"white"} />
         </TouchableOpacity>
-        <Text style={styles.headerText} onPress={() => { navigation.navigate('HomeScreen') }}>
+        <Text style={styles.headerText} onPress={() => { navigation.goBack() }}>
           {bannername}
         </Text>
+        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
+          <View style={{
+            zIndex: 1,
+            padding: 8,
+            borderRadius: 100,
+            elevation: 30,
+            backgroundColor: 'red',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Text style={{ height: 20, width: 20 }}>
+              <Icon name="download" size={25} color={"white"} />
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.container}>
         {/* main image */}
         {!displayImage ? (
-          <ViewShot style={{ height: 250, width: 250, marginVertical: 20, elevation: 20 }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
+          <ViewShot style={{ height: 300, width: 300, marginVertical: 20, elevation: 20 }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
             <Swiper loop={false} index={currentFrame} showsPagination={false}>
               {customFrames.map((frame, index) => (
                 <TouchableOpacity key={index}>
@@ -184,7 +200,7 @@ const EditHome = ({ route, navigation }) => {
             </Swiper>
           </ViewShot>
         ) : (
-          <View style={{ height: 250, width: 250, marginVertical: 20, elevation: 20 }} >
+          <View style={{ height: 300, width: 300, marginVertical: 20, elevation: 20 }} >
             {videoPause ? (
               <View style={{ justifyContent: 'center', alignItems: "center" }}>
                 <ActivityIndicator />
@@ -195,9 +211,9 @@ const EditHome = ({ route, navigation }) => {
                   {customFrames.map((frame, index) => (
                     <View key={index}>
                       {selectedVideo == null ? (
-                        <View style={{ top: 90, left: 90 }}>
-                          <Text>
-                            No Video Found
+                        <View style={{ top: 100, left: 100 }}>
+                          <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>
+                            No Video Found!
                           </Text>
                         </View>
                       ) : (
@@ -215,25 +231,27 @@ const EditHome = ({ route, navigation }) => {
               )}
           </View>
         )}
-        <TouchableOpacity style={styles.ShareContainer} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
-          <FastImage source={require('../assets/whatsapp2.png')} style={styles.whatsappImage} />
-        </TouchableOpacity>
-        <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-          <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => {
+
+        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-start', flex: 1, width: '92%', gap: 10, marginTop: 10, marginBottom: 40 }}>
+          {/* 1 */}
+          <TouchableOpacity onPress={() => {
             setdisplayImage(false)
-          }}>
-            <Text style={{ color: !displayImage ? "black" : "gray", fontWeight: 'bold', alignSelf: 'flex-start', marginLeft: 20 }}>
-              Image
+          }}
+            style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20, }}>
+            <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+              Images
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => {
+          <TouchableOpacity onPress={() => {
             setdisplayImage(true)
-          }}>
-            <Text style={{ color: !displayImage ? "gray" : "black", fontWeight: 'bold', alignSelf: 'flex-start', marginLeft: 20 }}>
-              Video
+          }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+            <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+              Videos
             </Text>
           </TouchableOpacity>
+          {/* 2 */}
         </View>
+
         {!displayImage ? (
           images.length > 0 ? (
             <FlatList
@@ -282,12 +300,12 @@ const EditHome = ({ route, navigation }) => {
               />
             ) : (
               <View style={{ justifyContent: 'center', flex: 1 }}>
-                <Text>No videos Found!</Text>
+                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>No videos Found!</Text>
               </View>
             )
         )}
       </View>
-    </>
+    </LinearGradient>
   );
 };
 
@@ -295,21 +313,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginBottom: 50,
-    backgroundColor: 'white'
   },
   overlayImage: {
     position: 'absolute',
     opacity: 1,
-    height: 250,
-    width: 250,
+    height: 300,
+    width: 300,
     zIndex: 1,
     top: 0,
     borderRadius: 10
   },
   mainImage: {
-    height: 250,
-    width: 250,
+    height: 300,
+    width: 300,
     zIndex: -1
   },
   image: {
@@ -321,6 +337,8 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray'
   },
   flatListContainer: {
+    paddingBottom:30,
+    paddingTop:20
   },
   ShareContainer: {
     position: 'absolute',
@@ -336,18 +354,17 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerContainer: {
-    height: 50,
+    height: 60,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 20,
-    backgroundColor: 'white'
   },
   headerText: {
     fontSize: 20,
-    color: 'black',
-    fontWeight: 'bold',
+    color: 'white',
+    fontFamily: 'Manrope-Bold',
     marginLeft: 20
   }
 });

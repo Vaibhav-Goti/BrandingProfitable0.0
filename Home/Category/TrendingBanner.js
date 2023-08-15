@@ -11,14 +11,12 @@ const TodayBanner = () => {
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
-    console.log(data)
-
     const BannerComponent = ({ bannerData }) => {
         const navigation = useNavigation();
         return (
             <View style={styles.bannerContainer}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {bannerData.map((item, index) => (
+                    {bannerData.slice(0,10).map((item, index) => (
                         <TouchableOpacity
                             key={item._id}
                             onPress={() => { navigation.navigate('trending') }}
@@ -40,7 +38,7 @@ const TodayBanner = () => {
 
     useEffect(() => {
         // Define the URL for the GET request
-        const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/trending_category/trendingandnews_category';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/trending_category/trendingandnews_category';
 
         // Make the GET request using Axios
         axios
@@ -72,7 +70,7 @@ const TodayBanner = () => {
                 <Text style={styles.bannerHeaderText}>
                     Trending
                 </Text>
-                <Text style={styles.bannerHeaderText} onPress={() => { navigation.navigate('trending', { categories: data }) }}>
+                <Text style={[styles.bannerHeaderText,{width:30,height:30,textAlign:'right'}]} onPress={() => { navigation.navigate('trending', { categories: data }) }}>
                     <Icon name="angle-right" size={32} color={"white"} />
                 </Text>
             </View>

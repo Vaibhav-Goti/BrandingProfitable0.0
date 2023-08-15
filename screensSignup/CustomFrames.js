@@ -1,14 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity, BackHandler } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import data from '../apiData/CustomFrames';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 2.3; // Adjust the number of columns as needed
 
 const SavedFrames = ({ navigation, route }) => {
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+                // Do nothing when the back button is pressed
+                return true; // Return true to indicate that you've handled the event
+            });
+
+            return () => {
+                // Clean up the event listener when the screen goes out of focus
+                backHandler.remove();
+            };
+        }, [])
+    );
+
 
     const requestData = route.params;
 
@@ -34,9 +50,9 @@ const SavedFrames = ({ navigation, route }) => {
                 style={styles.container}
             >
                 <View style={styles.headerContainer}>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => { navigation.goBack() }}>
-                        <Icon name="angle-left" size={32} color={"white"} />
-                    </TouchableOpacity>
+                    <View style={styles.iconContainer} onPress={() => { navigation.goBack() }}>
+                        {/* <Icon name="angle-left" size={32} color={"white"} /> */}
+                    </View>
                     <View style={styles.iconContainer}>
                         <Text style={styles.iconText} >
                             Business Frames

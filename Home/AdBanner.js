@@ -31,7 +31,7 @@ const MyComponent = () => {
 
     useEffect(() => {
         // Define the URL for the GET request
-        const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/advertise_banner/advertise_banner';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/advertise_banner/advertise_banner';
 
         // Make the GET request using Axios
         axios

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, Alert, ActivityIndicator, Dimensions, TouchableHighlight, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TextInput, Image, Text, Alert, ActivityIndicator, Dimensions, TouchableHighlight, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -8,7 +8,8 @@ import jwtDecode from 'jwt-decode';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
 
-const { width } = Dimensions.get('window')
+
+const { width, height } = Dimensions.get('window')
 
 const LoginScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
@@ -34,7 +35,7 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert("Please enter all details");
       setIsLoader(false);
     } else {
-      const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/user/user_login';
+      const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/user/user_login';
 
       const requestData = {
         mobileNumber: phone,
@@ -72,41 +73,47 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  return (
-    <>
-      {isLoader ? (
-        <View style={styles.container}>
-          <ActivityIndicator />
-        </View>
-      ) : (
-        <LinearGradient
-          colors={['#050505', '#1A2A3D']}
-          style={styles.container}>
-          <TouchableOpacity style={{ padding: 20, alignSelf: 'flex-start', paddingBottom: 0 }} onPress={() => { navigation.goBack() }}>
-            <Text style={{ color: 'white' }}>
-              <Icon name="angle-left" size={34} />
-            </Text>
-          </TouchableOpacity>
+  if (isLoader) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    )
+  }
 
-          <View style={{ alignItems: 'center' }}>
-            <View style={styles.logoContainer}>
-              <FastImage source={require('../assets/B_Profitable_Logo.png')} style={styles.image} />
-            </View>
-            <View style={styles.textContainer}>
-              <Text style={[styles.text, { color: '#FF0000' }]} >
-                Branding
-                <Text style={styles.text}>
-                  {" Profitable"}
-                </Text>
-              </Text>
-            </View>
-            <View style={{ width: 250, alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-              <Text style={[styles.text, { fontFamily: 'Poppins-Regular', fontSize: 15, textAlign: 'center' }]}>
-                Say hello to your new desining partner app
-              </Text>
-            </View>
-          </View>
-          <View style={styles.mainContainer}>
+  return (
+    <ScrollView style={{}} keyboardShouldPersistTaps={'always'} >
+
+    <LinearGradient
+      colors={['#050505', '#1A2A3D']}>
+      <TouchableOpacity style={{ padding: 20, alignSelf: 'flex-start', paddingBottom: height/14 }} onPress={() => { navigation.goBack() }}>
+        {/* <Text style={{ color: 'white' }}>
+              <Icon name="angle-left" size={34} />
+            </Text> */}
+      </TouchableOpacity>
+
+      <View style={{ alignItems: 'center' }}>
+        <View style={styles.logoContainer}>
+          <FastImage source={require('../assets/B_Profitable_Logo.png')} style={styles.image} />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={[styles.text, { color: '#FF0000' }]} >
+            Branding
+            <Text style={styles.text}>
+              {" Profitable"}
+            </Text>
+          </Text>
+        </View>
+        <View style={{ width: 250, alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+          <Text style={[styles.text, { fontFamily: 'Poppins-Regular', fontSize: 15, textAlign: 'center' }]}>
+            Say hello to your new desining partner app
+          </Text>
+        </View>
+      </View>
+      <View style={styles.mainContainer}>
+        <ScrollView style={{ height: '100%', width: '100%' }} keyboardShouldPersistTaps={'always'}>
+          <View style={{ alignItems: 'center', marginTop: 70, }}>
+
             <View style={{ width: '70%', alignItems: 'flex-start' }}>
               <Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 15 }}>
                 Enter Mobile
@@ -115,12 +122,14 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
+                placeholderTextColor={'gray'}
                 placeholder="e.g: 8460833632"
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="numeric"
               />
             </View>
+
             <View style={{ width: '70%', alignItems: 'flex-start' }}>
               <Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 15 }}>
                 Enter Password
@@ -129,6 +138,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
+                placeholderTextColor={'gray'}
                 placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
@@ -146,9 +156,13 @@ const LoginScreen = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-        </LinearGradient>
-      )}
-    </>
+
+        </ScrollView>
+      </View>
+    </LinearGradient>
+
+
+    </ScrollView>
   );
 };
 
@@ -184,7 +198,8 @@ const styles = StyleSheet.create({
     height: 450,
     width: width,
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
     marginTop: 30,
     justifyContent: 'center',
     alignItems: 'center'

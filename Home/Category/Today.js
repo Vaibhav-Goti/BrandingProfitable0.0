@@ -23,7 +23,7 @@ const TodayBanner = () => {
         return (
             <View style={styles.bannerContainer}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {bannerData.map((item, index) => (
+                    {bannerData.slice(0,10).map((item, index) => (
                         <TouchableOpacity
                             key={item._id}
                             onPress={() => { navigation.navigate('category') }}
@@ -36,7 +36,7 @@ const TodayBanner = () => {
                                 source={{ uri: item.image }}
                                 style={styles.bannerImage}
                             />
-                            <View style={{ position: 'absolute', backgroundColor: '#1E1E1E', paddingHorizontal: 10, bottom: 7, borderRadius: 30, alignItems: 'center', paddingVertical: 3 }}>
+                            <View style={{ position: 'absolute', backgroundColor: '#1E1E1E', paddingHorizontal: 10, bottom: 7, borderRadius: 30, alignItems: 'center', paddingVertical: 3, width:80 }}>
                                 <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Regular' }}>
                                     {formatDate(item.imageDate)}
                                 </Text>
@@ -49,7 +49,7 @@ const TodayBanner = () => {
     };
     useEffect(() => {
         // Define the URL for the GET request
-        const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/today/today_category';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/today/today_category';
 
         // Make the GET request using Axios
         axios
@@ -81,7 +81,7 @@ const TodayBanner = () => {
                 <Text style={styles.bannerHeaderText}>
                     Today & Tommorrow
                 </Text>
-                <Text style={styles.bannerHeaderText} onPress={() => { navigation.navigate('category', { categories: data }) }}>
+                <Text style={[styles.bannerHeaderText,{width:30,height:30,textAlign:'right'}]} onPress={() => { navigation.navigate('category', { categories: data }) }}>
                     <Icon name="angle-right" size={32} color={"white"} />
                 </Text>
             </View>
@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontFamily: 'Manrope-Bold',
         marginBottom: 10,
-        marginTop: 5
     }
 });
 

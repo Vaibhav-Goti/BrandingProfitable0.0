@@ -1,179 +1,374 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Avatar, Text, Button, Image } from 'react-native';
-// import { Avatar, Text, Button } from '@rneui/themed';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Avatar,
+  Text,
+  Button,
+  Image,
+  ScrollView,
+  TouchableHighlight,
+  Modal,
+} from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Feather from 'react-native-vector-icons/Feather'
 
 const ProfileScreen = ({ navigation }) => {
-  // get business or profile 
-  const [businessOrPersonal, setBusinessOrPersonal] = useState('')
+  // get business or profile
+  const [businessOrPersonal, setBusinessOrPersonal] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      const businessOrPersonal = await AsyncStorage.getItem('BusinessOrPersonl')
-      setBusinessOrPersonal(businessOrPersonal)
-    }
+      const businessOrPersonal = await AsyncStorage.getItem(
+        'BusinessOrPersonl',
+      );
+      setBusinessOrPersonal(businessOrPersonal);
+    };
 
     fetchData();
-  })
+  });
 
-  if (businessOrPersonal === 'personal') {
+  const [profileData, setProfileData] = useState(null);
 
-    const [profileData, setProfileData] = useState(null);
+  // setInterval(() => {
+  //   retrieveProfileData()
+  // }, 3000);
 
+  useEffect(() => {
+    retrieveProfileData()
+  }, [retrieveProfileData])
 
-    const retrieveProfileData = async () => {
-      try {
-        const data = await AsyncStorage.getItem('profileData');
-        if (data) {
-          setProfileData(JSON.parse(data));
-        }
-      } catch (error) {
-        console.log('Error retrieving profile data:', error);
+  const retrieveProfileData = async () => {
+    try {
+      const dataString = await AsyncStorage.getItem('profileData');
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setProfileData(data);
       }
-    };
+    } catch (error) {
+      console.error('Error retrieving profile data:', error);
+    }
+  };
 
-    useEffect(() => {
-      // Call the retrieveProfileData function initially when the component mounts
-      retrieveProfileData();
+  const [isModalVisible, setModalVisible] = useState(false);
 
-      // Set up an interval to call retrieveProfileData every 3 seconds
-      const intervalId = setInterval(retrieveProfileData, 3000);
+  const showAlert = () => {
+    setModalVisible(true);
+  };
 
-      // Clear the interval when the component is unmounted
-      return () => clearInterval(intervalId);
-    }, []); // The empty dependency array ensures the effect runs only once on mount
+  const hideAlert = () => {
+    setModalVisible(false);
+  };
 
+  const reloadScreen = () => {
+    // Your refresh logic goes here
+    retrieveProfileData()
+  };
 
-    return (
-      <>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>
-            Profile
-          </Text>
-          <Text style={styles.headerText} onPress={() => { navigation.navigate('editprofile') }}>
-            <Icon name="user-edit" size={20} />
-          </Text>
+  useEffect(() => {
+    // Add a listener to the focus event to reload the screen
+    const unsubscribe = navigation.addListener('focus', reloadScreen);
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe()
+  }, [navigation])
+
+  console.log(businessOrPersonal)
+
+  return (
+    <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
+      {/* main contianer */}
+      <View style={{ justifyContent: 'space-between', flex: 1, }}>
+        {/* 1 */}
+        <View style={{ height: '45%', width: '100%', backgroundColor: '#2B353F', borderBottomRightRadius: 15, borderBottomLeftRadius: 15, justifyContent: 'space-between' }}>
+
+          {/* 1 */}
+          <View>
+
+            {/* header */}
+            <View style={styles.headerContainer}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                <View style={{ backgroundColor: 'red', borderRadius: 100, borderWidth: 1, borderColor: 'black', height: 45, width: 45, overflow: 'hidden' }}>
+                  <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
+                </View>
+                <TouchableOpacity>
+                  <Text style={styles.yourBuisness}>
+                    {businessOrPersonal ? "Business" : 'Profile'}
+                  </Text>
+                  <Text style={styles.buisnessTitle}>
+                    {profileData !== null && profileData?.fullName || "John Doe"} <Icon name="angle-down" size={25} />
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={() => { navigation.navigate('Notifications') }}>
+                <Text>
+                  <Icon name="bell" size={27} color={'#FF0000'} />
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+
+          {/* 2 */}
+          <View style={{ marginBottom: 20, height: '60%', width: '100%', alignItems: 'center', justifyContent: "center", }}>
+            {/* {
+                businessOrPersonal == 'business' ? (
+                  <Image
+                    style={{ height: 100, width: 100, borderRadius: 100 }}
+                    rounded
+                    source={profileData ? ({ uri: profileData.businessLogo }) : ({ uri: 'https://pasrc.princeton.edu/sites/g/files/toruqf431/files/styles/freeform_750w/public/2021-03/blank-profile-picture-973460_1280.jpg?itok=QzRqRVu8' })}
+                  />
+
+                ) : (
+                  <Image
+                    style={{ height: 100, width: 100, borderRadius: 100 }}
+                    rounded
+                    source={
+                      profileData && profileData?.profileImage
+                        ? { uri: profileData.profileImage }
+                        : { uri: 'https://pasrc.princeton.edu/sites/g/files/toruqf431/files/styles/freeform_750w/public/2021-03/blank-profile-picture-973460_1280.jpg?itok=QzRqRVu8' }
+                    }
+                  />
+                )
+              }  */}
+
+            <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage || 'https://pasrc.princeton.edu/sites/g/files/toruqf431/files/styles/freeform_750w/public/2021-03/blank-profile-picture-973460_1280.jpg?itok=QzRqRVu8' }} style={{ height: 100, width: 100, borderRadius: 100 }} />
+
+            <Text h4 style={styles.username}>
+              {profileData?.fullName || 'John Doe'}
+              {/* <Button title='hello' onPress={()=>{navigation.navigate('CustomFrames')}} /> */}
+            </Text>
+            <Text h4 style={styles.bio}>
+              +91 {profileData?.mobileNumber || 'John Doe'}
+            </Text>
+            <Text h4 style={[styles.bio, { fontSize: 14 }]}>
+              {profileData?.email || 'John Doe'}
+            </Text>
+
+          </View>
+
         </View>
-        <View style={styles.container}>
-          <TouchableOpacity onPress={() => { navigation.navigate('fullScreenProfile') }}>
-            <Avatar
-              size="xlarge"
-              rounded
-              source={profileData && profileData?.profileImage ? ({ uri: profileData.profileImage }) : ({ uri: 'https://www.freepik.com/free-photos-vectors/user' })}
-            />
-          </TouchableOpacity>
-          <Text h4 style={styles.username}>
-            {profileData?.fullName || 'John Doe'}
-          </Text>
-          <Text style={styles.bio}>
-            {profileData?.Designation || 'Designation'}
-          </Text>
-          <Button
-            title="Custom Frame"
-            buttonStyle={styles.editButton}
-            titleStyle={styles.editButtonText}
-            onPress={() => {
-              navigation.navigate('CustomFrames');
-            }}
-          />
-          <Button
-            title="Saved Frame"
-            buttonStyle={styles.editButton}
-            titleStyle={styles.editButtonText}
-            onPress={() => {
-              navigation.navigate('SavedFrameScreen');
-            }}
-          />
-          <Button
-            title="Logout"
-            buttonStyle={styles.editButton}
-            titleStyle={styles.editButtonText}
-            onPress={async () => {
-              navigation.navigate('StackLogin');
-              await AsyncStorage.removeItem('isLoggedIn');
-            }}
-          />
+
+        {/* 2 */}
+        <View style={{ height: '50%', width: '100%', backgroundColor: '#2B353F', borderTopRightRadius: 15, borderTopLeftRadius: 15, overflow: 'hidden' }}>
+          {/* 1 */}
+          <View style={{ height: 80, width: '100%', backgroundColor: '#414851', justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+
+              <Text style={{ color: 'red', paddingHorizontal: 10, }}>
+                <FontAwesome6 name="sack-dollar" size={30} color="#E31E25" />
+              </Text>
+              <View>
+                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: '#E31E25' }}>
+                  Red Wallet
+                </Text>
+                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
+                  ₹ 1200/-
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: 'red', paddingHorizontal: 10, flexDirection: 'row' }}>
+                <FontAwesome6 name="sack-dollar" size={30} color="#42FF00" />
+              </Text>
+              <View>
+                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: '#42FF00' }}>
+                  Green Wallet
+                </Text>
+                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
+                  ₹ 1200/-
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* 2 */}
+          <ScrollView style={{ height: '100%', width: '100%' }}>
+            <View style={{ alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingBottom: 35 }}>
+              {/*  */}
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }}>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
+                  <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                    <View style={{ backgroundColor: 'white', borderRadius: 100, height: 19, width: 19, justifyContent: 'center', alignItems: 'center' }}>
+                      <Text >
+                        <FontAwesome6 name="dollar-sign" size={13} color="#1E242D" />
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
+                    Withdrawal
+                  </Text>
+                </View>
+
+                <Text>
+                  <Icon name="angle-right" size={30} color="white" />
+                </Text>
+
+              </TouchableOpacity>
+              {/*  */}
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('editprofile') }}>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
+                  <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                    <Text >
+                      <FontAwesome5 name="edit" size={16} color="white" />
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
+                    Edit profile
+                  </Text>
+                </View>
+
+                <Text>
+                  <Icon name="angle-right" size={30} color="white" />
+                </Text>
+
+              </TouchableOpacity>
+              {/*  */}
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }}>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
+                  <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                    <Text >
+                      <MaterialIcons name="privacy-tip" size={16} color="white" />
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
+                    Privacy Policy
+                  </Text>
+                </View>
+
+                <Text>
+                  <Icon name="angle-right" size={30} color="white" />
+                </Text>
+
+              </TouchableOpacity>
+              {/*  */}
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }} onPress={showAlert}>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
+                  <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                    <Text >
+                      <Icon name="sign-out" size={20} color="white" />
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
+                    Log out
+                  </Text>
+                </View>
+
+                <Text>
+                  <Icon name="angle-right" size={30} color="white" />
+                </Text>
+
+              </TouchableOpacity>
+              {/* modal */}
+
+              <Modal
+                animationType="fade" // You can use "fade" or "none" for animation type
+                visible={isModalVisible}
+                transparent={true}
+                onRequestClose={hideAlert}
+              >
+                <View style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
+                }}>
+                  <View style={{
+                    backgroundColor: 'white',
+                    padding: 20,
+                    borderRadius: 8,
+                    height: 230,
+                    width: 300,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {/* icon */}
+                    <TouchableOpacity onPress={hideAlert} style={{
+                      backgroundColor: 'red',
+                      padding: 8,
+                      borderRadius: 8,
+                    }}>
+                      <Text style={{
+                        color: 'white',
+                        fontWeight: 'bold',
+                      }}><Feather name="log-out" size={25} color="white" /></Text>
+                    </TouchableOpacity>
+                    {/* title */}
+                    <Text style={{
+                      fontSize: 16,
+                      fontFamily: 'Manrope-Bold',
+                      marginTop: 10,
+                      color: 'red'
+                    }}>Are You Sure?</Text>
+                    {/* caption */}
+                    <Text style={{
+                      fontSize: 16,
+                      fontFamily: 'Manrope-Bold',
+                      marginTop: 5,
+                      color: 'lightgray'
+                    }}>You want to Log out your Account ?</Text>
+                    {/* another */}
+                    <View style={{ width: '80%', marginTop: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
+
+                      <TouchableOpacity onPress={hideAlert} style={{
+                        borderColor: 'lightgray',
+                        width: 70,
+                        paddingVertical: 5,
+                        alignItems: 'center',
+                        justifyContent: "center",
+                        borderRadius: 8,
+                        borderWidth: 1
+                      }}>
+                        <Text style={{
+                          color: 'lightgray',
+                          fontFamily: 'Manrope-Bold'
+                        }}>No</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={async () => {
+                          hideAlert()
+                          navigation.navigate('StackLogin');
+                          await AsyncStorage.removeItem('isLoggedIn');
+                          await AsyncStorage.removeItem('profileData');
+                          await AsyncStorage.removeItem('businessOrPersonal');
+                        }}
+                        style={{
+                          backgroundColor: 'red',
+                          width: 70,
+                          paddingVertical: 5,
+                          alignItems: 'center',
+                          justifyContent: "center",
+                          borderRadius: 8,
+                        }}>
+                        <Text style={{
+                          color: 'white',
+                          fontFamily: "Manrope-Bold"
+                        }}>Yes</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+            </View>
+          </ScrollView>
         </View>
-      </>
-
-    );
-  } else {
-
-    const [profileData, setProfileData] = useState(null);
-
-    useEffect(() => {
-      retrieveProfileData();
-    }, []);
-
-    const retrieveProfileData = async () => {
-      try {
-        const dataString = await AsyncStorage.getItem('profileData');
-        if (dataString) {
-          const data = JSON.parse(dataString);
-          setProfileData(data);
-        }
-      } catch (error) {
-        console.error('Error retrieving profile data:', error);
-      }
-    };
-
-    return (
-
-      <>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>
-            Profile
-          </Text>
-          <Text style={styles.headerText} onPress={() => { navigation.navigate('editprofile') }}>
-            <Icon name="user-edit" size={20} />
-          </Text>
-        </View>
-        <View style={styles.container}>
-          <TouchableOpacity onPress={() => { navigation.navigate('fullScreenProfile') }}>
-            <FastImage
-              style={{ height: 130, width: 130, borderRadius: 100 }}
-              rounded
-              source={profileData && profileData?.businessLogo ? ({ uri: profileData.businessLogo }) : ({ uri: 'https://www.freepik.com/free-photos-vectors/user' })}
-            />
-          </TouchableOpacity>
-          <Text h4 style={styles.username}>
-            {profileData?.fullName || 'John Doe'}
-          </Text>
-          <Text style={styles.bio}>
-            {profileData?.businessType || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed accumsan consequat leo, eu sollicitudin eros molestie et.'}
-          </Text>
-          <Button
-            title="Custom Frame"
-            buttonStyle={styles.editButton}
-            titleStyle={styles.editButtonText}
-            onPress={() => {
-              navigation.navigate('CustomFrames');
-            }}
-          />
-          <Button
-            title="Saved Frame"
-            buttonStyle={styles.editButton}
-            titleStyle={styles.editButtonText}
-            onPress={() => {
-              navigation.navigate('SavedFrameScreen');
-            }}
-          />
-          <Button
-            title="Logout"
-            buttonStyle={styles.editButton}
-            titleStyle={styles.editButtonText}
-            onPress={async () => {
-              navigation.navigate('StackLogin');
-              await AsyncStorage.removeItem('isLoggedIn');
-            }}
-          />
-        </View>
-      </>
-    );
-  }
-
+      </View>
+    </LinearGradient>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -182,42 +377,134 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    backgroundColor: 'white'
+    // backgroundColor: 'white',
   },
   username: {
-    marginTop: 16,
-    marginBottom: 8,
-    fontWeight: 'bold',
+    marginTop: 10,
+    color: 'white',
+    fontFamily: 'Manrope-Bold',
+    fontSize: 20
   },
   bio: {
-    textAlign: 'center',
-    marginBottom: 16,
+    color: '#6B7285',
+    fontFamily: 'Manrope-Bold',
+    fontSize: 16
   },
   editButton: {
     backgroundColor: '#4CAF50',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
-    marginBottom: 10
+    marginBottom: 10,
   },
   editButtonText: {
     fontWeight: 'bold',
     fontSize: 16,
   },
   headerContainer: {
-    height: 50,
+    height: 65,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 20,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    elevation: 5
   },
   headerText: {
     fontSize: 20,
     color: 'black',
     fontWeight: 'bold'
-  }
+  },
+  buisnessTitle: {
+    fontSize: 19,
+    color: 'black',
+    fontFamily: 'Manrope-Bold'
+  },
+  yourBuisness: {
+    fontSize: 12,
+    fontFamily: 'Manrope-Regular'
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 8,
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  closeModalButton: {
+    backgroundColor: 'blue',
+    padding: 12,
+    borderRadius: 8,
+    alignSelf: 'flex-end',
+  },
+  closeModalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
 
 export default ProfileScreen;
+
+
+{/* <TouchableOpacity style={{ justifyContent: 'space-between',marginTop:20, width: '80%', flexDirection:'row',alignItems:'center' }}>
+
+<View style={{flexDirection:'row',alignItems:'center', paddingVertical:7}}>
+  <Text>
+    <FontAwesome6 name="sack-dollar" size={30} color="gold" />
+
+  </Text>
+  <Text style={{fontFamily:'Manrope-Bold',fontSize:16,color:'white',marginLeft:10}}>
+    meet gohel
+  </Text>
+</View>
+
+<Text>
+  <Icon name="angle-right" size={30} color="white" />
+</Text>
+
+</TouchableOpacity>
+<TouchableOpacity style={{ justifyContent: 'space-between',marginTop:20, width: '80%', flexDirection:'row',alignItems:'center' }}>
+
+<View style={{flexDirection:'row',alignItems:'center', paddingVertical:7}}>
+  <Text>
+    <FontAwesome6 name="sack-dollar" size={30} color="gold" />
+
+  </Text>
+  <Text style={{fontFamily:'Manrope-Bold',fontSize:16,color:'white',marginLeft:10}}>
+    meet gohel
+  </Text>
+</View>
+
+<Text>
+  <Icon name="angle-right" size={30} color="white" />
+</Text>
+
+</TouchableOpacity>
+<TouchableOpacity style={{ justifyContent: 'space-between',marginTop:20, width: '80%', flexDirection:'row',alignItems:'center' }}>
+
+<View style={{flexDirection:'row',alignItems:'center', paddingVertical:7}}>
+  <Text>
+    <FontAwesome6 name="sack-dollar" size={30} color="gold" />
+
+  </Text>
+  <Text style={{fontFamily:'Manrope-Bold',fontSize:16,color:'white',marginLeft:10}}>
+    meet gohel
+  </Text>
+</View>
+
+<Text>
+  <Icon name="angle-right" size={30} color="white" />
+</Text>
+
+</TouchableOpacity> */}

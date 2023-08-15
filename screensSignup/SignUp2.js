@@ -72,7 +72,7 @@ const SignUp2Screen = ({ navigation, route }) => {
     } else {
 
 
-      const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/user/user_register';
+      const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/user/user_register';
 
       const requestData = businessOrPersonal === 'personal'
         ? {
@@ -179,7 +179,6 @@ const SignUp2Screen = ({ navigation, route }) => {
           .then((res) => {
             setImageLoader(false)
             const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
-            console.log(imagePath)
             setFileUri(imagePath);
           })
           .catch((err) => {

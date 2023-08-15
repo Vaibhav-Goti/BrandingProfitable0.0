@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Alert, StyleSheet, Text, Image, ScrollView, TextInput, TouchableHighlight, TouchableOpacity, Dimensions, } from 'react-native';
+import { View, Alert, StyleSheet, Text, Image, ScrollView, TextInput, TouchableHighlight, TouchableOpacity, Dimensions, Modal } from 'react-native';
 // import { Input, Button } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ViewShot from 'react-native-view-shot';
@@ -7,7 +7,9 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
-
+import axios from 'axios';
+import Draggable from 'react-native-draggable';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 const { width, height } = Dimensions.get('window')
 
 const CustomFrameForm = ({ navigation, route }) => {
@@ -93,23 +95,51 @@ const CustomFrameForm = ({ navigation, route }) => {
       }
     }
   };
+  const [imageLoader, setImageLoader] = useState(false)
 
-  const handleAlertFilePicker = () => {
+  const handleImagePicker = () => {
     ImageCropPicker.openPicker({
-      width: 800,
-      height: 800,
-      cropping: true,
-      mediaType: 'photo',
+        width: 1000,
+        height: 1000,
+        cropping: true,
+        includeBase64: true, // Optional, set it to true if you want to get the image as base64-encoded string
     })
-      .then(response => {
-        if (!response.cancelled) {
-          setFileUri(response.path);
-        }
-      })
-      .catch(error => {
-        console.log('ImagePicker Error: ', error);
-      });
-  };
+        .then((response) => {
+            setImageLoader(true);
+            const dataArray = new FormData();
+            dataArray.append('b_video', {
+                uri: response.path,
+                type: response.mime,
+                name: response.path.split('/').pop(),
+            });
+
+            setFileUri(response.path)
+
+            // let url = 'https://www.sparrowgroups.com/CDN/image_upload.php/';
+            // axios
+            //     .post(url, dataArray, {
+            //         headers: {
+            //             'Content-Type': 'multipart/form-data',
+            //         },
+            //     })
+            //     .then((res) => {
+            //         setImageLoader(false)
+            //         const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
+            //         console.log(imagePath)
+            //         setFileUri(imagePath);
+            //     })
+            //     .catch((err) => {
+            //         setImageLoader(false)
+            //         setFileUri(response.path)
+            //         console.log('Error uploading image:', err);
+            //     });
+        })
+        .catch((error) => {
+            setImageLoader(false)
+
+            console.log('ImagePicker Error:', error);
+        });
+};
 
   const viewShotRef = useRef(null);
 
@@ -122,6 +152,7 @@ const CustomFrameForm = ({ navigation, route }) => {
   const loadCustomFrames = async () => {
     try {
       const framesData = await AsyncStorage.getItem('customFrames');
+      const profile = await AsyncStorage.getItem('profileData');
       if (framesData) {
         const frames = JSON.parse(framesData);
         setCustomFrames(frames);
@@ -139,7 +170,7 @@ const CustomFrameForm = ({ navigation, route }) => {
       frames.push(frame);
       await AsyncStorage.setItem('customFrames', JSON.stringify(frames));
       setCustomFrames(frames);
-      Alert.alert('Saved!');
+      showAlert3()
     } catch (error) {
       console.error('Error saving custom frame:', error);
     }
@@ -153,8 +184,19 @@ const CustomFrameForm = ({ navigation, route }) => {
       console.error('Error saving image to local storage:', error);
     }
     Alert.alert("Your frame saved!")
-    navigation.navigate('LoginScreen');
+    navigation.navigate('StackMain');
+    
   };
+
+  const [isModalVisible3, setModalVisible3] = useState(false);
+
+    const showAlert3 = () => {
+        setModalVisible3(true);
+    };
+
+    const hideAlert3 = () => {
+        setModalVisible3(false);
+    };
 
   return (
     <ScrollView>
@@ -175,17 +217,19 @@ const CustomFrameForm = ({ navigation, route }) => {
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20, }}>
           <View style={{ borderWidth: 1, borderColor: 'white', borderRadius: 10, overflow: 'hidden', backgroundColor: 'white', }}>
             <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1 }}>
-              <FastImage source={imageUrl} />
-              <FastImage source={{ uri: fileUri }} style={{
+              <Image source={imageUrl} />
+              <Draggable>
+
+              <Image source={{ uri: fileUri }} style={{
                 height: 60,
                 width: 60,
-                position: 'absolute',
                 top: imgPosition.top,
                 left: imgPosition.left,
                 borderRadius: 50,
                 borderWidth: 1,
                 borderColor: 'black'
               }} />
+              </Draggable>
               <View style={{ width: 153, position: 'absolute', top: namePosition.top, left: namePosition.left, height: 23, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={[styles.companyName, { fontSize: 17, color: 'white' }]}>{companyName}</Text>
               </View>
@@ -226,9 +270,9 @@ const CustomFrameForm = ({ navigation, route }) => {
           <ScrollView style={{ width: '100%', maxHeight: 350 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <View style={[styles.inputContainer, { justifyContent: 'space-between', flexDirection: 'row', marginBottom: 10, marginTop: 50 }]}>
-                <View>
-                  {renderFileUri()}
-                </View>
+              <TouchableHighlight style={styles.logoContainer} onPress={handleImagePicker}>
+                    {renderFileUri()}
+                </TouchableHighlight>
                 <View style={{ alignItems: 'center' }}>
                   <View>
                     <TouchableOpacity onPress={() => {
@@ -292,13 +336,79 @@ const CustomFrameForm = ({ navigation, route }) => {
               </View>
               <TouchableHighlight onPress={handleSaveToLocal} style={{ backgroundColor: '#FF0000', borderRadius: 8, margin: 15, width: "70%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5, marginBottom: 50 }} >
                 <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
-                  Sign Up
+                  Save Frame
                 </Text>
               </TouchableHighlight>
             </View>
 
           </ScrollView>
         </View>
+        <Modal
+                    animationType="fade" // You can use "fade" or "none" for animation type
+                    visible={isModalVisible3}
+                    transparent={true}
+                    onRequestClose={hideAlert3}
+                >
+                    <View style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
+                    }}>
+                        <View style={{
+                            backgroundColor: 'white',
+                            padding: 20,
+                            borderRadius: 8,
+                            height: 230,
+                            width: 300,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            {/* icon */}
+                            <TouchableOpacity onPress={hideAlert3} style={{
+                                backgroundColor: 'darkgreen',
+                                padding: 8,
+                                borderRadius: 8,
+                            }}>
+                                <Text style={{
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                }}><MaterialIcons name="check" size={25} color="white" /></Text>
+                            </TouchableOpacity>
+                            {/* title */}
+                            <Text style={{
+                                fontSize: 16,
+                                fontFamily: 'Manrope-Bold',
+                                marginTop: 10,
+                                color: 'darkgreen'
+                            }}>Your Frame Saved!</Text>
+                            {/* caption */}
+                            <Text style={{
+                                fontSize: 16,
+                                fontFamily: 'Manrope-Bold',
+                                marginTop: 5,
+                                color: 'lightgray'
+                            }}>... Thank You ...</Text>
+                            {/* another */}
+
+                            <TouchableOpacity onPress={hideAlert3} style={{
+                                width: 70,
+                                paddingVertical: 5,
+                                alignItems: 'center',
+                                justifyContent: "center",
+                                borderRadius: 8,
+                                marginTop: 30,
+                                backgroundColor: 'darkgreen'
+                            }}>
+                                <Text style={{
+                                    color: 'white',
+                                    fontFamily: 'Manrope-Bold'
+                                }}>OK</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
       </ LinearGradient >
     </ScrollView>
   );
@@ -393,6 +503,14 @@ const styles = StyleSheet.create({
     width: '70%',
     marginTop: 20,
   },
+  logoContainer: {
+    height: 80,
+    width: 80,
+    backgroundColor: '#9FA2A6',
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center'
+},
 });
 
 export default CustomFrameForm;

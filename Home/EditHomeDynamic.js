@@ -10,27 +10,25 @@ import ViewShot from "react-native-view-shot";
 import Video from 'react-native-video';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image'
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
 
 const EditHome = ({ route, navigation }) => {
-  const { bannername } = route.params;
+  const { bannername } = route.params; i
 
   const { items, index } = route.params
-  console.log(items, 'items')
 
   const videos = useMemo(() => items.filter((item) => item.isVideo === true));
   const images = useMemo(() => items.filter((item) => item.isVideo === false));
-  console.log(images, "image")
-  console.log(videos, "video")
 
   const [i, seti] = useState(0);
 
   useEffect(() => {
     if (i < 2) {
       if (items.length > 0) {
-        setItem(items[0].imageUrl)
+        setItem(items[index ? index : 0].imageUrl)
         seti(i + 1)
       }
     } else {
@@ -42,8 +40,6 @@ const EditHome = ({ route, navigation }) => {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [customFrames, setCustomFrames] = useState([]);
   const viewShotRef = useRef(null);
-
-  console.log(item, 'item')
 
   const [displayImage, setdisplayImage] = useState(false)
 
@@ -167,25 +163,40 @@ const EditHome = ({ route, navigation }) => {
   }, 2000);
 
   return (
-    <>
+    <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => { navigation.navigate('HomeScreen') }}>
-          <Icon name="angle-left" size={30} color={"black"} />
+        <TouchableOpacity style={{ width: 30 }} onPress={() => { navigation.goBack() }}>
+          <Icon name="angle-left" size={30} color={"white"} />
         </TouchableOpacity>
-        <Text style={styles.headerText} onPress={() => { navigation.navigate('HomeScreen') }}>
+        <Text style={styles.headerText} onPress={() => { navigation.goBack() }}>
           {bannername}
         </Text>
+        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
+          <View style={{
+            zIndex: 1,
+            padding: 8,
+            borderRadius: 100,
+            elevation: 30,
+            backgroundColor: 'red',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Text style={{ height: 20, width: 20 }}>
+              <Icon name="download" size={25} color={"white"} />
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.container}>
         {/* main image */}
         {!displayImage ? (
           load ? (<View style={{
-            height: 250, width: 250, marginVertical: 20,borderWidth:0.5, borderColor:'black',borderRadius:10,justifyContent:'center',alignItems:'center'
+            height:300, width:300, marginVertical: 20, borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, justifyContent: 'center', alignItems: 'center'
           }}>
             <ActivityIndicator />
           </View>) :
 
-            (<ViewShot style={{ height: 250, width: 250, marginVertical: 20, elevation: 20 }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
+            (<ViewShot style={{ height:300, width:300, marginVertical: 20, elevation: 20, borderWidth: 1, borderColor: 'white', borderRadius: 10, overflow: 'hidden' }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
               <Swiper loop={false} index={currentFrame} showsPagination={false}>
                 {customFrames.map((frame, index) => (
                   <TouchableOpacity key={index}>
@@ -197,7 +208,7 @@ const EditHome = ({ route, navigation }) => {
             </ViewShot>)
 
         ) : (
-          <View style={{ height: 250, width: 250, marginVertical: 20, elevation: 20 }} >
+          <View style={{ height:300, width:300, marginVertical: 20, elevation: selectedVideo == null ? 1 : 20, borderColor: 'white', borderWidth: selectedVideo == null ? 1 : 0, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} >
             {videoPause ? (
               <View style={{ justifyContent: 'center', alignItems: "center" }}>
                 <ActivityIndicator />
@@ -208,8 +219,8 @@ const EditHome = ({ route, navigation }) => {
                   {customFrames.map((frame, index) => (
                     <View key={index}>
                       {selectedVideo == null ? (
-                        <View style={{ top: 90, left: 90 }}>
-                          <Text>
+                        <View style={{ position: 'relative', top: width - 200, left: width - 240 }}>
+                          <Text style={{ color: 'white' }}>
                             No Video Found
                           </Text>
                         </View>
@@ -228,25 +239,51 @@ const EditHome = ({ route, navigation }) => {
               )}
           </View>
         )}
-        <TouchableOpacity style={styles.ShareContainer} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
+        {/* <TouchableOpacity style={styles.ShareContainer} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
           <FastImage source={require('../assets/whatsapp2.png')} style={styles.whatsappImage} />
-        </TouchableOpacity>
-        <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+        </TouchableOpacity> */}
+
+
+
+        {/* <View style={{flexDirection:'row',alignSelf:'center',justifyContent:'flex-start',flex:1,width:'92%', gap:10, marginBottom:10}}>
           <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => {
             setdisplayImage(false)
-          }}>
-            <Text style={{ color: !displayImage ? "black" : "gray", fontWeight: 'bold', alignSelf: 'flex-start', marginLeft: 20 }}>
+          }}   >
+            <Text style={{ color: !displayImage ? "white" : "gray", fontWeight: 'bold', alignSelf: 'flex-start', marginLeft: 20,  }}>
               Image
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => {
             setdisplayImage(true)
           }}>
-            <Text style={{ color: !displayImage ? "gray" : "black", fontWeight: 'bold', alignSelf: 'flex-start', marginLeft: 20 }}>
+            <Text style={{ color: !displayImage ? "gray" : "white", fontWeight: 'bold', alignSelf: 'flex-start', marginLeft: 20 }}>
               Video
             </Text>
           </TouchableOpacity>
+        </View> */}
+
+
+
+        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-start', flex: 1, width: '92%', gap: 10, marginBottom: 40 }}>
+          {/* 1 */}
+          <TouchableOpacity onPress={() => {
+            setdisplayImage(false)
+          }}
+            style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+            <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+              Images
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            setdisplayImage(true)
+          }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+            <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+              Videos
+            </Text>
+          </TouchableOpacity>
+          {/* 2 */}
         </View>
+
         {!displayImage ? (
           items.length > 0 ? (
             <FlatList
@@ -294,13 +331,13 @@ const EditHome = ({ route, navigation }) => {
                 windowSize={10}
               />
             ) : (
-              <View style={{ justifyContent: 'center', flex: 1 }}>
-                <Text>No videos Found!</Text>
+              <View style={{ justifyContent: 'flex-start', flex: 1, }}>
+                <Text style={{ color: 'white' }}>No videos Found!</Text>
               </View>
             )
         )}
       </View>
-    </>
+    </LinearGradient>
   );
 };
 
@@ -308,21 +345,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginBottom: 50,
-    backgroundColor: 'white'
   },
   overlayImage: {
     position: 'absolute',
     opacity: 1,
-    height: 250,
-    width: 250,
+    height:300,
+    width:300,
     zIndex: 1,
     top: 0,
     borderRadius: 10
   },
   mainImage: {
-    height: 250,
-    width: 250,
+    height:300,
+    width:300,
     zIndex: -1
   },
   image: {
@@ -349,19 +384,18 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerContainer: {
-    height: 50,
+    height: 60,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 20,
-    backgroundColor: 'white'
   },
   headerText: {
     fontSize: 20,
-    color: 'black',
-    fontWeight: 'bold',
-    marginLeft: 20
+    color: 'white',
+    marginLeft: 20,
+    fontFamily: 'Manrope-Bold'
   }
 });
 

@@ -4,6 +4,7 @@ import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import Video from 'react-native-video'
 import FastImage from 'react-native-fast-image'
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
@@ -13,7 +14,7 @@ const CategoriesScreen = ({ route, navigation }) => {
 
     useEffect(() => {
         // Define the URL for the GET request
-        const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/trending_section/trendingandnews_item';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/trending_section/trendingandnews_item';
 
         // Make the GET request using Axios
         axios
@@ -32,6 +33,7 @@ const CategoriesScreen = ({ route, navigation }) => {
     }, []);
 
     const [data, setData] = useState([])
+    
 
     // render images
     // onPress={() => { navigation.navigate('EditHomeScreen', { 'bannername': item.categoryName }) }} 
@@ -42,9 +44,9 @@ const CategoriesScreen = ({ route, navigation }) => {
                 <Text style={styles.bannerHeaderText}>
                     {item.categoryName}
                 </Text>
-                <Text style={styles.bannerHeaderText}>
-                    <Icon name="angle-right" size={32} color={"black"} />
-                </Text>
+                {/* <Text style={styles.bannerHeaderText}>
+                    <Icon name="angle-right" size={32} color={"white"} />
+                </Text> */}
             </View>
             <FlatList
                 data={item.items}
@@ -91,13 +93,14 @@ const CategoriesScreen = ({ route, navigation }) => {
     // }
 
     return (
-        <>
+        <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
+
             <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => { navigation.navigate('HomeScreen') }}>
-                    <Icon name="angle-left" size={30} color={"black"} />
+                <TouchableOpacity style={{width:40, alignItems:'center'}} onPress={() => { navigation.navigate('HomeScreen') }}>
+                    <Icon name="angle-left" size={30} color={"white"} />
                 </TouchableOpacity>
                 <Text style={styles.headerText} onPress={() => { navigation.navigate('HomeScreen') }}>
-                    All Sections
+                    Trending
                 </Text>
             </View>
             {/* container */}
@@ -117,7 +120,7 @@ const CategoriesScreen = ({ route, navigation }) => {
                     windowSize={10}
                 />
             </View>
-        </>
+        </LinearGradient>
     )
 }
 
@@ -129,20 +132,18 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         flexDirection: 'row',
-        paddingHorizontal: 20,
-        backgroundColor: 'white'
+        paddingHorizontal: 10,
     },
     headerText: {
         fontSize: 20,
-        color: 'black',
-        fontWeight: 'bold',
-        marginLeft: 20
+        color: 'white',
+        fontFamily:'Manrope-Bold',
+        marginLeft: 10
     },
     container: {
         flex: 1,
         justifyContent: 'flex-start',
         alignItems: "center",
-        backgroundColor: 'white',
         paddingTop: 10
     },
     image: {
@@ -165,8 +166,8 @@ const styles = StyleSheet.create({
     },
     bannerHeaderText: {
         fontSize: 18,
-        color: 'black',
-        fontWeight: 'bold'
+        color: 'white',
+        fontFamily:'Manrope-Bold'
     },
     flatListContainer: {
         width: width,

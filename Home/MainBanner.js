@@ -39,7 +39,7 @@ const MyComponent = () => {
 
     useEffect(() => {
         // Define the URL for the GET request
-        const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/mainbanner/mainbanner';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/mainbanner/mainbanner';
 
         // Make the GET request using Axios
         axios
@@ -59,7 +59,7 @@ const MyComponent = () => {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="white" />
             </View>
         );
     }

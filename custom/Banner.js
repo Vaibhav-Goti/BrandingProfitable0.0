@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import axios from 'axios';
-import FastImage from 'react-native-fast-image';
 
 const BannerComponent = ({ bannerData }) => {
     return (
@@ -9,6 +8,7 @@ const BannerComponent = ({ bannerData }) => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {bannerData.map((item, index) => (
                     <TouchableOpacity
+                    activeOpacity={1}
                         key={item._id}
                         onPress={() => alert(`You clicked on ${item.cds_bannerName}!`)}
                         style={[
@@ -16,7 +16,7 @@ const BannerComponent = ({ bannerData }) => {
                             { marginLeft: index === 0 ? 20 : 0 }, // Apply different margin to the first item
                         ]}
                     >
-                        <FastImage
+                        <Image
                             source={{ uri: item.cds_bannerImage }}
                             style={styles.bannerImage}
                         />
@@ -38,7 +38,7 @@ const CustomBanner = () => {
     }, []);
 
     const fetchBannerData = () => {
-        const apiUrl = 'https://branding-profitable-de8df13d081b.herokuapp.com/cd_banner/cd_banner';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/cd_banner/cd_banner';
 
         // Make the GET request using Axios
         axios
@@ -58,7 +58,7 @@ const CustomBanner = () => {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="white" />
             </View>
         );
     }

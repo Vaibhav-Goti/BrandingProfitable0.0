@@ -9,14 +9,13 @@ import FastImage from 'react-native-fast-image';
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
 
-const DynamicSection = ({ route }) => {
+const DynamicCustom = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const navigation = useNavigation();
-
   useEffect(() => {
     // Define the URL for the GET request
-    const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/ds_item/ds_item';
+    const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/cd_section/cds_category_with_image';
 
     // Make the GET request using Axios
     axios
@@ -28,16 +27,17 @@ const DynamicSection = ({ route }) => {
       })
       .catch(error => {
         // Handle errors
-        console.error('Error fetching data:', error)
+        console.error('Error fetching response.data.data:', error)
         setLoading(false);
       });
 
   }, []);
 
   const handleImagePress = (item, index) => {
-    navigation.navigate('EditHomeDynamic', {
+    console.log("first")
+    navigation.navigate('EditCustomChoice', {
       items: item.items,
-      bannername: item.ds_category,
+      bannername: item.cds_categoryName,
       index: index?index:''
     });
   };
@@ -56,11 +56,11 @@ const DynamicSection = ({ route }) => {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContainer}>
           {data.map((item) => (
-            <View key={item.ds_category} style={styles.BannerItem}>
+            <View key={item.cds_categoryName} style={styles.BannerItem}>
               <View>
                 <View style={styles.bannerHeader}>
                   <Text style={styles.bannerHeaderText}>
-                    {item.ds_category}
+                    {item.cds_categoryName}
                   </Text>
                   <TouchableOpacity onPress={() => handleImagePress(item)}>
                     <Text style={[styles.bannerHeaderText,{width:30,height:30,textAlign:'right',}]}>
@@ -153,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DynamicSection;
+export default DynamicCustom;

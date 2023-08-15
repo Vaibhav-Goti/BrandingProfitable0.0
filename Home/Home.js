@@ -14,15 +14,28 @@ import FastImage from 'react-native-fast-image';
 const Home = ({ navigation }) => {
 
   const [businessOrPersonal, setBusinessOrPersonal] = useState('');
+  const fetchData = async () => {
+    const businessOrPersonal = await AsyncStorage.getItem('BusinessOrPersonl');
+    setBusinessOrPersonal(businessOrPersonal);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const businessOrPersonal = await AsyncStorage.getItem('BusinessOrPersonl');
-      setBusinessOrPersonal(businessOrPersonal);
-    };
 
     fetchData();
   }, []);
+
+  const reloadScreen = () => {
+    // Your refresh logic goes here
+    retrieveProfileData()
+  };
+
+  useEffect(() => {
+    // Add a listener to the focus event to reload the screen
+    const unsubscribe = navigation.addListener('focus', reloadScreen);
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, [navigation]);
 
   const handleImagePress = (item) => {
     navigation.navigate('EditHomeScreen', { item: item });
@@ -45,7 +58,38 @@ const Home = ({ navigation }) => {
       }
     } catch (error) {
       console.error('Error retrieving profile data:', error);
+    } finally {
+      setLoading(false); // Mark data retrieval as completed (whether successful or not)
     }
+  };
+
+  const [loading, setLoading] = useState(true);
+
+  const renderProfileDetails = () => {
+    if (loading) {
+      // Show a loading indicator or return null while data is being retrieved
+      return null;
+    }
+
+    if (profileData) {
+      // Show the profile details if available
+      return (
+        <>
+          <Text style={styles.buisnessTitle}>
+            {profileData.fullName} <Icon name="angle-down" size={25} />
+          </Text>
+        </>
+      );
+    }
+
+    // Show a default value or placeholder if profileData is null (data not available)
+    return (
+      <>
+        <Text style={styles.buisnessTitle}>
+          John Doe <Icon name="angle-down" size={25} />
+        </Text>
+      </>
+    );
   };
 
   return (
@@ -58,16 +102,15 @@ const Home = ({ navigation }) => {
             <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
           </View>
           <TouchableOpacity>
-            <Text style={styles.yourBuisness}>
-              {businessOrPersonal ? "Business" : 'Profile'}
-            </Text>
-            <Text style={styles.buisnessTitle}>
-              {profileData !== null && profileData.fullName}  <Icon name="angle-down" size={25} />
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.yourBuisness}>
+            {businessOrPersonal ? 'Business' : 'Profile'}
+          </Text>
+          {/* Render the profile details conditionally */}
+          {renderProfileDetails()}
+        </TouchableOpacity>
         </View>
         <View>
-          <Text>
+          <Text onPress={()=>{navigation.navigate('Notifications')}}>
             <Icon name="bell" size={27} color={'#FF0000'} />
           </Text>
         </View>
