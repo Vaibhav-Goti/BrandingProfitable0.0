@@ -1,61 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import ViewShot from 'react-native-view-shot';
-import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity, BackHandler } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import data from '../apiData/CustomFrames';
+// import data from '../apiData/CustomFrames';
+import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
-const itemWidth = width / 3.5; // Adjust the number of columns as needed
+const itemWidth = width / 2.3; // Adjust the number of columns as needed
 
-const SavedFrames = ({ navigation, route }) => {
+const SavedFrames = ({ navigation }) => {
 
-    const [item, setItem] = useState(data.length > 0 ? data[0].imageUrl : null);
-
-    const [selectedImageData, setSelectedImageData] = useState([data.length > 0 ? data[0] : null])
-
-    const handleSelect = () => {
-        navigation.navigate('CustomFrameScreen', { "imageData": selectedImageData, })
+    const handleSelect = (item) => {
+        navigation.navigate('CustomFrameFormProfile', { 'itemId': item._id })
     }
 
-    const handleImagePress = (item) => {
-        setItem(item.imageUrl);
-        setSelectedImageData(item)
+    const renderItem = ({ item }) => {
+        console.log('Rendering item:', item.image);
+        return (
+            <TouchableOpacity
+                style={styles.imageContainer}
+                onPress={() => handleSelect(item)}
+            >
+
+                <View style={{ backgroundColor: 'white', borderRadius: 10, overflow: 'hidden' }}>
+                    <FastImage source={{ uri: item.image }} style={styles.image} />
+                </View>
+            </TouchableOpacity>
+        );
     };
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.imageContainer}
-            onPress={() => handleImagePress(item)}
-        >
-            <FastImage source={item.imageUrl} style={styles.image} />
-            <Text style={styles.name}>{item.title}</Text>
-        </TouchableOpacity>
-    );
 
-    // custome frame 2 
-    
+    // data 
+
+    const [data, setData] = useState([]);
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+
+        setRefreshing(true);
+        try {
+            const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/frame/frameimage');
+            const result = response.data;
+            console.log(result);
+            setData(result.data); // Assuming 'data' property contains the array of images
+        } catch (error) {
+            console.log('Error fetching data:', error);
+        }
+        setRefreshing(false); // Make sure to set refreshing to false even if there's an error
+    };
+
+    const [refreshing, setRefreshing] = useState(false);
 
     return (
-
-            <View style={styles.container}>
-                <View style={styles.headerContainer}>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => { navigation.navigate('ProfileScreen') }}>
-                        <Icon name="angle-left" size={32} color={"black"} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleSelect} style={styles.iconContainer}>
-                        <Text style={styles.iconText} >
-                            Select
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.mainImageContainer}>
-                    {item && <FastImage source={item} style={styles.mainImage} />}
-                </View>
+        <>
+            <LinearGradient
+                colors={['#20AE5C', 'black']}
+                style={styles.container}
+                locations={[0.1, 1]}
+            >
                 <FlatList
                     data={data}
-                    numColumns={3} // Adjust the number of columns as needed
-                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={2} // Adjust the number of columns as needed
+                    keyExtractor={(item) => item._id.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={styles.flatListContainer}
                     shouldComponentUpdate={() => false}
@@ -63,35 +73,40 @@ const SavedFrames = ({ navigation, route }) => {
                     initialNumToRender={30}
                     maxToRenderPerBatch={30}
                     windowSize={10}
+                    refreshing={refreshing}
+                    onRefresh={fetchData}
                 />
-            </View>
-            
-
-
+            </LinearGradient>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'flex-start',
     },
     flatListContainer: {
-        marginTop: 30,
+        marginTop: 10,
+        paddingTop: 20
     },
     imageContainer: {
         alignItems: 'center',
-        margin: 5,
+        margin: 7,
+        borderColor: "white",
+        borderWidth: 0.5,
+        borderRadius: 10
     },
     image: {
         height: itemWidth,
         width: itemWidth,
-        borderRadius: 10,
     },
     name: {
         marginTop: 5,
         textAlign: 'center',
+        color: 'white',
+        borderTopWidth: 1
     },
     mainImage: {
         height: 300,
@@ -100,14 +115,14 @@ const styles = StyleSheet.create({
     },
     mainImageContainer: {
         borderWidth: 1,
-        borderColor: 'black',
+        borderColor: 'white',
+        borderRadius: 10
     },
     headerContainer: {
-        height: 50,
-        width: '100%',
+        height: 60,
+        width: width,
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        flex: 1,
+        alignItems: 'center',
         flexDirection: 'row',
         paddingHorizontal: 20
     },
@@ -115,10 +130,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: 50,
+        color: "white"
     },
     iconText: {
-        color: 'black',
-        fontSize: 18
+        color: 'white',
+        fontSize: 18,
+        fontFamily: 'DMSans_18pt-Bold'
     }
 });
 

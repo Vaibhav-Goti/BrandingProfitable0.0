@@ -16,28 +16,28 @@ const { width } = Dimensions.get('window')
 const ChooseCustomFrame = ({ navigation, route }) => {
   const viewShotRef = useRef(null);
 
-  const {capturedImage} = route.params;
+  const { capturedImage } = route.params;
 
-  console.log(capturedImage,"capturedImage")
+  console.log(capturedImage, "capturedImage")
 
   // capture viewshot 
 
   const captureAndShareImage = async () => {
     try {
       const uri = await viewShotRef.current.capture();
-  
+
       const fileName = 'sharedImage.jpg';
       const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
-  
+
       await RNFS.copyFile(uri, destPath);
-  
+
       console.log('File copied to:', destPath); // Add this log to check the destination path
-  
+
       const shareOptions = {
         type: 'image/jpeg',
         url: `file://${destPath}`,
       };
-  
+
       await Share.open(shareOptions);
 
       navigation.navigate('EditCustomChoice');
@@ -45,7 +45,7 @@ const ChooseCustomFrame = ({ navigation, route }) => {
       console.error('Error sharing image:', error);
     }
   };
-  
+
 
   const [isOpenFrame, setIsOpenFrame] = useState(false)
 
@@ -126,27 +126,38 @@ const ChooseCustomFrame = ({ navigation, route }) => {
         {
           isOpenFrame &&
           <View style={{ height: 70, backgroundColor: 'white', width, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-            <TouchableOpacity activeOpacity={1} style={{ borderWidth: 1, borderRadius: 10, overflow: 'hidden', width: 50, height: 50, alignItems:'center', justifyContent:'center', marginLeft:10 }}
-                  onPress={() => {
-                    setOverlayImage(null)
-                  }}
-                >
-                  <Image source={require('../assets/NoneImage.png')} style={{ width: 30, height: 30 }} />
-                </TouchableOpacity>
+            <TouchableOpacity activeOpacity={1} style={{ borderWidth: 1, borderRadius: 10, overflow: 'hidden', width: 50, height: 50, alignItems: 'center', justifyContent: 'center', marginLeft: 10 }}
+              onPress={() => {
+                setOverlayImage(null)
+              }}
+            >
+              <Image source={require('../assets/NoneImage.png')} style={{ width: 30, height: 30 }} />
+            </TouchableOpacity>
+            {/* Frames list */}
             <FlatList
               data={customFrames}
               horizontal
-              keyExtractor={(item) => item}
+              keyExtractor={(item) => item.image}
               renderItem={({ item }) => (
-                <TouchableOpacity activeOpacity={1} style={{ borderWidth: 1, borderRadius: 10, overflow: 'hidden' }}
-                  onPress={() => {
-                    setOverlayImage(item.image)
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={{
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    marginRight: 5,
                   }}
-                >
+                  onPress={() => {
+                    setOverlayImage(item.image);
+                  }}>
                   <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
                 </TouchableOpacity>
               )}
-              contentContainerStyle={{ justifyContent: 'flex-start', alignItems: 'center', width: '100%', height: '100%', paddingHorizontal: 10 }}
+              contentContainerStyle={{
+                paddingHorizontal: 10,
+                alignItems: 'center', // Center all children vertically
+              }}
+              showsHorizontalScrollIndicator={false}
             />
           </View>
         }

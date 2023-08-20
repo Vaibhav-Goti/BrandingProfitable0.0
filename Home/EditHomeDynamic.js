@@ -11,9 +11,10 @@ import Video from 'react-native-video';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const { width } = Dimensions.get('window');
-const itemWidth = width / 3.5; // Adjust the number of columns as needed
+const itemWidth = width / 3.5;
 
 const EditHome = ({ route, navigation }) => {
   const { bannername } = route.params; i
@@ -39,6 +40,7 @@ const EditHome = ({ route, navigation }) => {
   const [item, setItem] = useState([]);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [customFrames, setCustomFrames] = useState([]);
+  console.log(customFrames, " - frames che!")
   const viewShotRef = useRef(null);
 
   const [displayImage, setdisplayImage] = useState(false)
@@ -162,6 +164,65 @@ const EditHome = ({ route, navigation }) => {
     setisload(false)
   }, 2000);
 
+  const [selectedLanguage, setSelectedLanguage] = useState('');
+
+  console.log(selectedLanguage, " - select kreli language!")
+
+  const showDatePicker = () => {
+    setDatePickerVisible(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisible(false);
+  };
+
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  // fetch languages 
+
+  const [languages, setLanguages] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/language/languages',
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+      const result = response.data.data;
+
+      setLanguages(result);
+    } catch (error) {
+      console.log('Error fetching data:', error);
+    }
+  };
+
+  const [userToken, setUserToken] = useState()
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    retrieveProfileData()
+  }, [retrieveProfileData])
+
+  const retrieveProfileData = async () => {
+    try {
+      const dataString = await AsyncStorage.getItem('profileData');
+      const userToken = await AsyncStorage.getItem('userToken');
+      setUserToken(userToken)
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setProfileData(data);
+      }
+    } catch (error) {
+      console.error('Error retrieving profile data:', error);
+    }
+  };
+
+  const filteredItems = items.filter((item) => (item.languageName == selectedLanguage))
+
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
@@ -187,16 +248,17 @@ const EditHome = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
       </View>
+
       <View style={styles.container}>
         {/* main image */}
         {!displayImage ? (
           load ? (<View style={{
-            height:300, width:300, marginVertical: 20, borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, justifyContent: 'center', alignItems: 'center'
+            height: 300, width: 300, marginVertical: 20, borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, justifyContent: 'center', alignItems: 'center'
           }}>
             <ActivityIndicator />
           </View>) :
 
-            (<ViewShot style={{ height:300, width:300, marginVertical: 20, elevation: 20, borderWidth: 1, borderColor: 'white', borderRadius: 10, overflow: 'hidden' }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
+            (<ViewShot style={{ height: 300, width: 300, marginVertical: 20, elevation: 20, borderWidth: 1, borderColor: 'white', borderRadius: 10, overflow: 'hidden' }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
               <Swiper loop={false} index={currentFrame} showsPagination={false}>
                 {customFrames.map((frame, index) => (
                   <TouchableOpacity key={index}>
@@ -208,9 +270,9 @@ const EditHome = ({ route, navigation }) => {
             </ViewShot>)
 
         ) : (
-          <View style={{ height:300, width:300, marginVertical: 20, elevation: selectedVideo == null ? 1 : 20, borderColor: 'white', borderWidth: selectedVideo == null ? 1 : 0, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} >
+          <View style={{ height: 300, width: 300, marginVertical: 20, elevation: selectedVideo == null ? 1 : 20, borderColor: 'white', borderWidth: selectedVideo == null ? 1 : 0, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} >
             {videoPause ? (
-              <View style={{ justifyContent: 'center', alignItems: "center" }}>
+              <View style={{ justifyContent: 'flex-start', alignItems: "center", flex: 1 }}>
                 <ActivityIndicator />
               </View>
             )
@@ -264,65 +326,70 @@ const EditHome = ({ route, navigation }) => {
 
 
 
-        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-start', flex: 1, width: '92%', gap: 10, marginBottom: 40 }}>
-          {/* 1 */}
-          <TouchableOpacity onPress={() => {
-            setdisplayImage(false)
-          }}
-            style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
-            <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
-              Images
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            setdisplayImage(true)
-          }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
-            <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
-              Videos
-            </Text>
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-between', flex: 1, width: '92%', gap: 10, marginBottom: 65, height: 60 }}>
           {/* 2 */}
+
+          <View style={{ width: 120, zIndex: 1, alignSelf: 'flex-end', height: '100%' }}>
+            <DropDownPicker
+              open={open}
+              value={selectedLanguage}
+              items={languages.map((language) => ({
+                label: language.languageName,
+                value: language.languageName, // Assuming languageName can be used as a value
+              }))}
+              setOpen={setOpen}
+              setValue={(value) => setSelectedLanguage(value)}
+              style={{
+                backgroundColor: 'white', // Set the background color to white
+                borderColor: 'black', // You can adjust the border color as needed
+                borderWidth: 1,
+                borderRadius: 20,
+                height: 30, // Set a fixed height here
+              }}
+              dropDownStyle={{
+                backgroundColor: 'white', // Set the background color to white
+                borderColor: 'black', // You can adjust the border color as needed
+                borderWidth: 1,
+                borderRadius: 20,
+                maxHeight: 150, // Set the maximum height of the dropdown
+                height: 30, // Set the same height as the container
+              }}
+              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }} // Set the text color to gray
+              placeholder="Language"
+              placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+            />
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            {/* 1 */}
+            <TouchableOpacity onPress={() => {
+              setdisplayImage(false)
+            }}
+              style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+              <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+                Images
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              setdisplayImage(true)
+            }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+              <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+                Videos
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+
         </View>
 
-        {!displayImage ? (
-          items.length > 0 ? (
-            <FlatList
-              data={items}
-              numColumns={3} // Adjust the number of columns as needed
-              // keyExtractor={(item) => item._id.toString()}
-              renderItem={renderItem}
-              contentContainerStyle={styles.flatListContainer}
-              shouldComponentUpdate={() => false}
-              removeClippedSubviews
-              initialNumToRender={30}
-              maxToRenderPerBatch={30}
-              windowSize={10}
-            />
-          ) : (
-            <FlatList
-              data={items}
-              numColumns={3} // Adjust the number of columns as needed
-              renderItem={renderItem}
-              contentContainerStyle={styles.flatListContainer}
-              shouldComponentUpdate={() => false}
-              removeClippedSubviews
-              initialNumToRender={30}
-              maxToRenderPerBatch={30}
-              windowSize={10}
-            />
-          )
-        ) : (
-          FlatlistisLoad ? (
-            <View>
-              <ActivityIndicator />
-            </View>
-          ) :
-            videos.length > 0 ? (
+        <View>
+          {!displayImage ? (
+            items.length > 0 ? (
               <FlatList
-                data={videos}
+                data={selectedLanguage == 'All' || selectedLanguage == [] ? items : filteredItems}
                 numColumns={3} // Adjust the number of columns as needed
-                // keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItemV}
+                // keyExtractor={(item) => item._id.toString()}
+                renderItem={renderItem}
                 contentContainerStyle={styles.flatListContainer}
                 shouldComponentUpdate={() => false}
                 removeClippedSubviews
@@ -331,11 +398,45 @@ const EditHome = ({ route, navigation }) => {
                 windowSize={10}
               />
             ) : (
-              <View style={{ justifyContent: 'flex-start', flex: 1, }}>
-                <Text style={{ color: 'white' }}>No videos Found!</Text>
-              </View>
+              <FlatList
+                data={selectedLanguage == 'All' || selectedLanguage == [] ? items : filteredItems}
+                numColumns={3} // Adjust the number of columns as needed
+                renderItem={renderItem}
+                contentContainerStyle={styles.flatListContainer}
+                shouldComponentUpdate={() => false}
+                removeClippedSubviews
+                initialNumToRender={30}
+                maxToRenderPerBatch={30}
+                windowSize={10}
+              />
             )
-        )}
+          ) : (
+            FlatlistisLoad ? (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
+                <ActivityIndicator />
+              </View>
+            ) :
+              videos.length > 0 ? (
+                <FlatList
+                  data={videos}
+                  numColumns={3} // Adjust the number of columns as needed
+                  // keyExtractor={(item) => item.id.toString()}
+                  renderItem={renderItemV}
+                  contentContainerStyle={styles.flatListContainer}
+                  shouldComponentUpdate={() => false}
+                  removeClippedSubviews
+                  initialNumToRender={30}
+                  maxToRenderPerBatch={30}
+                  windowSize={10}
+                />
+              ) : (
+                <View style={{ justifyContent: 'flex-start', flex: 1, }}>
+                  <Text style={{ color: 'white' }}>No videos Found!</Text>
+                </View>
+              )
+          )}
+        </View>
+
       </View>
     </LinearGradient>
   );
@@ -349,15 +450,15 @@ const styles = StyleSheet.create({
   overlayImage: {
     position: 'absolute',
     opacity: 1,
-    height:300,
-    width:300,
+    height: 300,
+    width: 300,
     zIndex: 1,
     top: 0,
     borderRadius: 10
   },
   mainImage: {
-    height:300,
-    width:300,
+    height: 300,
+    width: 300,
     zIndex: -1
   },
   image: {
@@ -396,7 +497,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 20,
     fontFamily: 'Manrope-Bold'
-  }
+  },
 });
 
 export default EditHome;

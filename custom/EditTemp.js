@@ -22,26 +22,36 @@ const staticImageUrl =
 
 const colors = ['black', 'red', 'blue', 'green', 'purple'];
 
-const ImageItem = React.memo(({ uri, isSelected, onDelete, onSelect, width, height, rotation, top, left }) => {
+const ImageItem = React.memo(({ uri, isSelected, onDelete, onSelect, width, height, rotation, top, left, scaleX, scaleY, flipX, flipY }) => {
+    const transformStyles = [];
+
+    if (flipX) {
+        transformStyles.push({ scaleX: -1 });
+    }
+
+    if (flipY) {
+        transformStyles.push({ scaleY: -1 });
+    }
+
     return (
         <TouchableOpacity onPress={onSelect} activeOpacity={0.7}>
             <View style={{ position: 'relative', top, left, transform: [{ rotate: `${rotation || 0}deg` }] }}>
                 <Image
                     source={{ uri }}
                     style={{
-                        width,
-                        height,
-                        marginBottom: 10,
+                        width: width * scaleX || 100,
+                        height: height * scaleY || 100,
                         borderColor: isSelected ? 'black' : 'transparent',
                         borderWidth: isSelected ? 2 : 0,
                         top: 0,
-                        left: 0
+                        left: 0,
+                        transform: transformStyles // Apply the flip transformations here
                     }}
                 />
                 {isSelected && (
                     <TouchableOpacity
                         onPress={onDelete}
-                        style={{ position: 'absolute', top: -10, right: -10, backgroundColor: 'red', padding: 5, borderRadius: 10, width: 25, alignItems: 'center' }}
+                        style={{ position: 'absolute', top: -10, right: -10, backgroundColor: 'red', padding: 5, borderRadius: 10, width: 25, alignItems: 'center', zIndex:100 }}
                     >
                         <Icon name="trash" size={17} color={"white"} />
                     </TouchableOpacity>
@@ -53,6 +63,7 @@ const ImageItem = React.memo(({ uri, isSelected, onDelete, onSelect, width, heig
 
 
 
+
 const App = ({ navigation, route }) => {
     const viewShotRef = useRef(null);
     const [capturedImage, setCapturedImage] = useState(null);
@@ -60,7 +71,7 @@ const App = ({ navigation, route }) => {
     const [images, setImages] = useState([]);
     const [selectedImageIndex, setSelectedImageIndex] = useState(-1);
     const [selectedImageSize, setSelectedImageSize] = useState({ width: 150, height: 150 });
-    const [isImageSelected, setIsImageSelected] = useState(false);
+    const [isImageSelected, setIsImageSelected] = useState(false)
 
     const [textItems, setTextItems] = useState([]);
     const [selectedTextIndex, setSelectedTextIndex] = useState(-1);
@@ -75,7 +86,6 @@ const App = ({ navigation, route }) => {
     const [fileUri, setFileUri] = useState('https://img.freepik.com/premium-vector/white-texture-round-striped-surface-white-soft-cover_547648-928.jpg');
 
     const { imageId } = route.params;
-    console.log(imageId)
 
     useEffect(() => {
         // Define the URL for the GET request
@@ -89,8 +99,9 @@ const App = ({ navigation, route }) => {
                 const data = {
                     data: imageData
                 };
-                console.log(data, "data");
                 setJsonData(data);
+
+                console.log(imageData)
 
             })
             .catch(error => {
@@ -131,6 +142,10 @@ const App = ({ navigation, route }) => {
                             top: layer.top,
                             width: layer.width,
                             height: layer.height,
+                            scaleX: layer.scaleX,
+                            scaleY: layer.scaleY,
+                            flipX: layer.flipX,
+                            flipY: layer.flipY
                         };
                         items.push(newItem);
                     } else if (layer.type === "StaticText") {
@@ -146,6 +161,8 @@ const App = ({ navigation, route }) => {
                             fontSize: layer.fontSize,
                             fill: layer.fill,
                             textAlign: layer.textAlign,
+                            scaleX: layer.scaleX,
+                            scaleY: layer.scaleY
                         };
                         items.push(newItem);
                     }
@@ -165,6 +182,7 @@ const App = ({ navigation, route }) => {
 
         scenes.forEach((scene) => {
             const layers = scene.layers;
+            console.log(layers)
             layers.forEach((layer) => {
                 if (layer.type === "StaticText") {
                     const newItem = {
@@ -175,6 +193,9 @@ const App = ({ navigation, route }) => {
                         left: layer.left || 0,
                         top: layer.top || 0,
                         rotation: layer.angle || 0,
+                        scaleX: layer.scaleX || 1,
+                        scaleY: layer.scaleY || 1,
+                        textAlign: layer.textAlign || 'left'
                     };
                     textItems.push(newItem);
                 }
@@ -423,7 +444,6 @@ const App = ({ navigation, route }) => {
     }, [textItems, editingTextIndex])
 
     const handleCanvasTap = () => {
-        console.log("first")
         const updatedTextItems = textItems.map((item) => ({
             ...item,
             isSelected: false,
@@ -451,34 +471,70 @@ const App = ({ navigation, route }) => {
         }).start();
     }, [rotationValue]);
 
+    const TextItem = ({
+        text,
+        isSelected,
+        onDelete,
+        onSelect,
+        onEdit,
+        width,
+        height,
+        rotation,
+        fontSize,
+        color,
+        top,
+        left,
+        scaleX,
+        scaleY,
+        textAlign
+    }) => {
+        const scaledWidth = width;
+        const scaledHeight = height;
 
-    const TextItem = ({ text, isSelected, onDelete, onSelect, onEdit, width, height, rotation, fontSize, color, top, left }) => {
         return (
             <TouchableOpacity onPress={onSelect} activeOpacity={0.7}>
-                <View style={{
-                    top, left, transform: [{ rotate: `${rotation || 0}deg` }], borderColor: isSelected ? 'black' : 'transparent',
-                    borderWidth: isSelected ? 2 : 0,
-                }}>
-
+                <View
+                    style={{
+                        transform: [
+                            { rotate: `${rotation || 0}deg` },
+                        ],
+                        borderColor: isSelected ? 'black' : 'transparent',
+                        borderWidth: isSelected ? 2 : 0,
+                        top,
+                        left,
+                        justifyContent: 'center'
+                    }}
+                >
                     <Text
                         style={{
+                            width: scaledWidth,
                             fontSize,
                             color,
-                            marginBottom: 10,
                         }}
                     >
-                        {'  '} {text} {'  '}
+                        {text}
                     </Text>
                     {isSelected && (
                         <>
                             <TouchableOpacity
                                 onPress={onDelete}
-                                style={{ position: 'absolute', top: -13, right: -13, backgroundColor: 'red', borderRadius: 10, height: 25, width: 25, alignItems: 'center', justifyContent: "center" }}
+                                style={{
+                                    position: 'absolute',
+                                    top: -13,
+                                    right: -13,
+                                    backgroundColor: 'red',
+                                    borderRadius: 10,
+                                    height: 25,
+                                    width: 25,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    zIndex:100
+                                }}
                             >
-                                <Icon name="trash" size={17} color={"white"} />
+                                <Icon name="trash" size={17} color={'white'} />
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={onEdit} // Call the onEdit function passed from the parent
+                                onPress={onEdit}
                                 style={{
                                     position: 'absolute',
                                     top: -10,
@@ -487,10 +543,11 @@ const App = ({ navigation, route }) => {
                                     padding: 5,
                                     borderRadius: 10,
                                     height: 25,
-                                    width: 25
+                                    width: 25,
+                                    zIndex:100
                                 }}
                             >
-                                <Icon name="edit" size={15} color={"white"} />
+                                <Icon name="edit" size={15} color={'white'} />
                             </TouchableOpacity>
                         </>
                     )}
@@ -498,6 +555,8 @@ const App = ({ navigation, route }) => {
             </TouchableOpacity>
         );
     };
+
+
 
     // console.log(textItems[0]?.text)
     // console.log(editText)
@@ -591,6 +650,8 @@ const App = ({ navigation, route }) => {
 
     const [isModalVisible5, setModalVisible5] = useState(false);
 
+    const [imageLoader, setImageLoader] = useState(false)
+
     const showAlert5 = () => {
         setModalVisible5(true);
     };
@@ -599,30 +660,29 @@ const App = ({ navigation, route }) => {
         setModalVisible5(false);
     };
 
-    // handle image picker 
-
-    console.log(fileUri)
+    // handle image picker
 
     const handleImagePicker = (bg) => {
         ImageCropPicker.openPicker({
             width: 1000,
             height: 1000,
             cropping: true,
-            includeBase64: true, // Optional, set it to true if you want to get the image as base64-encoded string
+            includeBase64: true,
         })
-            .then((response) => {
-                if (bg == 'Image') {
-                    setImages([...images, { uri: response.path, isSelected: false }]);
-                } else {
-                    setFileUri(response.path)
-                }
-            })
-            .catch((error) => {
-                setImageLoader(false)
-
-                console.log('ImagePicker Error:', error);
-            });
-    };
+        .then((response) => {
+            if (bg === 'Image') {
+                const newImage = { uri: response.path, isSelected: false };
+                setImages((prevImages) => [...prevImages, newImage]);
+            } else {
+                setFileUri(response.path);
+            }
+        })
+        .catch((error) => {
+            setImageLoader(false);
+            console.log('ImagePicker Error:', error);
+        });
+    };    
+    
 
     return (
         <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1 }}>
@@ -685,6 +745,10 @@ const App = ({ navigation, route }) => {
                                                 handleImageSelect(index);
                                             }}
                                             onDelete={() => handleImageDelete(index)}
+                                            scaleX={image.scaleX}
+                                            scaleY={image.scaleY}
+                                            flipX={image.flipX}
+                                            flipY={image.flipY}
                                         />
                                     </Draggable>
                                 ))}
@@ -706,7 +770,10 @@ const App = ({ navigation, route }) => {
                                             top={textItem.top || 0}
                                             left={textItem.left || 0}
                                             onDelete={() => handleTextDelete(index, textItem.text)}
-                                            onEdit={() => handleEdit(index, textItem.text)} // Pass the onEdit function to the TextItem
+                                            onEdit={() => handleEdit(index, textItem.text)} // Pass the onEdit function to the 
+                                            scaleX={textItem.scaleX}
+                                            scaleY={textItem.scaleY}
+                                            textAlign={textItem.textAlign}
                                         />
                                     </Draggable>
                                 ))}
@@ -1076,7 +1143,6 @@ const TextInputModal = React.memo(({ visible, initialValue, initialColor, onSave
 
     useEffect(() => {
         setTextValue(initialValue);
-        console.log(initialValue);
     }, [initialValue]);
 
     const handleSave = () => {

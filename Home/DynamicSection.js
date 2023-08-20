@@ -35,6 +35,7 @@ const DynamicSection = ({ route }) => {
   }, []);
 
   const handleImagePress = (item, index) => {
+    console.log(item, "adfdksjkdlfadksjdsldasldfsdalsdf")
     navigation.navigate('EditHomeDynamic', {
       items: item.items,
       bannername: item.ds_category,

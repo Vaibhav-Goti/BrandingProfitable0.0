@@ -20,6 +20,8 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather'
+import Header from '../Header';
+
 
 const ProfileScreen = ({ navigation }) => {
   // get business or profile
@@ -81,8 +83,6 @@ const ProfileScreen = ({ navigation }) => {
     return () => unsubscribe()
   }, [navigation])
 
-  console.log(businessOrPersonal)
-
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
       {/* main contianer */}
@@ -94,26 +94,8 @@ const ProfileScreen = ({ navigation }) => {
           <View>
 
             {/* header */}
-            <View style={styles.headerContainer}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                <View style={{ backgroundColor: 'red', borderRadius: 100, borderWidth: 1, borderColor: 'black', height: 45, width: 45, overflow: 'hidden' }}>
-                  <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
-                </View>
-                <TouchableOpacity>
-                  <Text style={styles.yourBuisness}>
-                    {businessOrPersonal ? "Business" : 'Profile'}
-                  </Text>
-                  <Text style={styles.buisnessTitle}>
-                    {profileData !== null && profileData?.fullName || "John Doe"} <Icon name="angle-down" size={25} />
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity onPress={() => { navigation.navigate('Notifications') }}>
-                <Text>
-                  <Icon name="bell" size={27} color={'#FF0000'} />
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <Header />
+
 
           </View>
 
@@ -234,6 +216,29 @@ const ProfileScreen = ({ navigation }) => {
                 </Text>
 
               </TouchableOpacity>
+
+              {/*  */}
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }} onPress={()=>{
+                navigation.navigate('Frames')
+              }}>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
+                  <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                    <Text >
+                      <Icon name="expand" size={20} color="white" />
+                    </Text>
+                  </View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
+                    Custom Frames
+                  </Text>
+                </View>
+
+                <Text>
+                  <Icon name="angle-right" size={30} color="white" />
+                </Text>
+
+              </TouchableOpacity>
+              
               {/*  */}
               <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }}>
 
@@ -272,6 +277,7 @@ const ProfileScreen = ({ navigation }) => {
                 </Text>
 
               </TouchableOpacity>
+              
               {/* modal */}
 
               <Modal
@@ -291,6 +297,7 @@ const ProfileScreen = ({ navigation }) => {
                     backgroundColor: 'white',
                     padding: 20,
                     borderRadius: 8,
+                    height: "40%",
                     height: 230,
                     width: 300,
                     alignItems: 'center',
@@ -345,6 +352,7 @@ const ProfileScreen = ({ navigation }) => {
                           await AsyncStorage.removeItem('isLoggedIn');
                           await AsyncStorage.removeItem('profileData');
                           await AsyncStorage.removeItem('businessOrPersonal');
+                          await AsyncStorage.removeItem('userToken');
                         }}
                         style={{
                           backgroundColor: 'red',

@@ -268,9 +268,6 @@ const EditItem = ({ route, navigation }) => {
               )}
           </View>
         )}
-        <TouchableOpacity style={styles.ShareContainer} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
-          <FastImage source={require('../assets/whatsapp2.png')} style={styles.whatsappImage} />
-        </TouchableOpacity>
         <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-start', flex: 1, width: '92%', gap: 10, marginTop: 10, marginBottom: 40 }}>
           {/* 1 */}
           <TouchableOpacity onPress={() => {
@@ -313,7 +310,7 @@ const EditItem = ({ route, navigation }) => {
             )
           ) : (
             FlatlistisLoad ? (
-              <View>
+              <View style={{flex:1,alignItems:'center',justifyContent:'flex-start'}}>
                 <ActivityIndicator />
               </View>
             ) :

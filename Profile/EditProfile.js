@@ -29,18 +29,18 @@ const FullScreenProfile = ({ navigation }) => {
   const handleDateChange = (_, date) => {
     hideDatePicker();
     if (date) {
-        setSelectedDate(date);
-        setDob(date.toISOString().split('T')[0]);
+      setSelectedDate(date);
+      setDob(date.toISOString().split('T')[0]);
     }
-};
+  };
 
-const showDatePicker = () => {
-  setDatePickerVisible(true);
-};
+  const showDatePicker = () => {
+    setDatePickerVisible(true);
+  };
 
-const hideDatePicker = () => {
-  setDatePickerVisible(false);
-};
+  const hideDatePicker = () => {
+    setDatePickerVisible(false);
+  };
 
   const index = [...index, ...Array.from({ length: 50 }, (_, i) => i + 1)];
 
@@ -252,7 +252,7 @@ const hideDatePicker = () => {
               style={styles.input}
               textStyle={
                 businessOrPersonal === 'business'
-                  ? styles.dropdownText
+                  ? { fontFamily: 'Manrope-Regular' }
                   : { fontFamily: 'Manrope-Regular' }
               }
               placeholder={
@@ -266,9 +266,9 @@ const hideDatePicker = () => {
 
 
           {renderTextInput('Email', profileData?.email, (text) => setProfileData({ ...profileData, email: text }))}
-          {renderTextInput('Mobile Number', profileData?.mobileNumber.toString(), (text) =>
+          {/* {renderTextInput('Mobile Number', profileData?.mobileNumber.toString(), (text) =>
             setProfileData({ ...profileData, mobileNumber: text })
-          )}
+          )} */}
           {renderTextInput('Address', profileData?.adress, (text) => setProfileData({ ...profileData, adress: text }))}
           {/* {renderTextInput(
             businessOrPersonal === 'business' ? 'Business Start Date' : 'Date of Birth',
@@ -281,49 +281,31 @@ const hideDatePicker = () => {
                   : { dob: text }),
               })
           )} */}
-          {businessOrPersonal === 'business' && (
-            <View style={styles.infoContainer}>
-              <View style={[styles.labelContainer, { marginTop: 20 }]}>
-                <Text style={styles.label}>
-                  Business Type
-                </Text>
-              </View>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  value={profileData?.businessType}
-                  onChangeText={(text) => setProfileData({ ...profileData, businessType: text })}
-                  autoCapitalize="none"
-                />
-              </View>
-            </View>
-          )}
           {/* DOB */}
-          <View style={[styles.labelContainer,{marginTop:20}]}>
-                            <Text style={styles.label}>
-                                Enter {businessOrPersonal === 'business' ? ('Buisness Start Date') : ('Date of Birth')}
-                            </Text>
-                        </View>
-                        {isDatePickerVisible && (
-                            <DateTimePicker
-                                value={selectedDate}
-                                mode="date"
-                                display="default"
-                                onChange={handleDateChange}
-                            />
-                        )}
-                        <View style={styles.inputContainer}>
-                            <TouchableOpacity onPress={showDatePicker}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder={businessOrPersonal == 'business' ? ('Business Start Date') : ("Date of Birth")}
-                                    value={dob}
-                                    editable={false}
-                                    placeholderTextColor={'gray'}
-                                />
-                            </TouchableOpacity>
-                        </View>
+          <View style={[styles.labelContainer, { marginTop: 20 }]}>
+            <Text style={styles.label}>
+              Enter {businessOrPersonal === 'business' ? ('Buisness Start Date') : ('Date of Birth')}
+            </Text>
+          </View>
+          {isDatePickerVisible && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
+          <View style={styles.inputContainer}>
+            <TouchableOpacity onPress={showDatePicker}>
+              <TextInput
+                style={styles.input}
+                placeholder={businessOrPersonal == 'business' ? ('Business Start Date') : ("Date of Birth")}
+                value={dob}
+                editable={false}
+                placeholderTextColor={'gray'}
+              />
+            </TouchableOpacity>
+          </View>
           <TouchableHighlight onPress={onUpdate} style={{ backgroundColor: '#FF0000', borderRadius: 8, margin: 15, width: "80%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5, marginTop: 40 }} >
             <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
               Save

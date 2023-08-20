@@ -281,7 +281,7 @@ const EditHome = ({ route, navigation }) => {
           )
         ) : (
           FlatlistisLoad ? (
-            <View>
+            <View style={{flex:1,alignItems:'center',justifyContent:'flex-start'}}>
               <ActivityIndicator />
             </View>
           ) :

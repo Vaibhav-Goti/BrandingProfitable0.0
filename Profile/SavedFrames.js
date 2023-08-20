@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
+import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity, Alert, Button, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
@@ -26,7 +27,6 @@ const SavedFrames = ({ navigation }) => {
       if (framesData) {
         const frames = JSON.parse(framesData);
         setCustomFrames(frames);
-        setItem(frames[0]?.image || null);
       }
     } catch (error) {
       console.error('Error loading custom frames:', error);
@@ -48,6 +48,16 @@ const SavedFrames = ({ navigation }) => {
 
     saveCustomFrames();
   }, [customFrames]);
+
+  const [i, seti] = useState(true)
+
+  if (customFrames && i) {
+    setTimeout(() => {
+      setLoader(false)
+      setItem(customFrames[0]?.image);
+      seti(false)
+    }, 1000);
+  }
 
   const handleImageLongPress = (item) => {
     Alert.alert(
@@ -73,30 +83,33 @@ const SavedFrames = ({ navigation }) => {
       onLongPress={() => handleImageLongPress(item)}
     >
       <FastImage source={{ uri: item.image }} style={styles.image} />
-      <Text style={styles.name}>{item.name}</Text>
     </TouchableOpacity>
   );
 
+  const [loader, setLoader] = useState(true)
+
+  if (loader) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={'black'} />
+      </View>
+    )
+  }
+
   return (
     <>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.iconContainer} onPress={() => { navigation.navigate('ProfileScreen') }}>
-          <Icon name="angle-left" size={32} color={"black"} />
-        </TouchableOpacity>
-      </View>
       {customFrames.length == 0 ? (
         <View style={styles.container}>
-          <Text>
+          <Text style={{ color: 'white', fontFamily: 'Manrope-Regular' }}>
             No frames Found
           </Text>
-          <Button title="Let's Create Frame" onPress={
-            () => {
-              navigation.navigate('CustomFrames')
-            }
-          } />
         </View>
       ) : (
-        <View style={styles.container}>
+        <LinearGradient
+          colors={['#20AE5C', 'black']}
+          style={styles.container}
+          locations={[0.1, 1]}
+        >
 
           <View style={styles.mainImageContainer}>
             {item && <FastImage source={{ uri: item }} style={styles.mainImage} />}
@@ -113,7 +126,7 @@ const SavedFrames = ({ navigation }) => {
             maxToRenderPerBatch={30}
             windowSize={10}
           />
-        </View>
+        </LinearGradient>
       )}
     </>
   );
@@ -125,9 +138,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 50,
+    paddingTop: 20,
+    backgroundColor: 'black'
   },
   flatListContainer: {
     marginTop: 30,
+    paddingBottom:60
   },
   imageContainer: {
     alignItems: 'center',
@@ -150,6 +166,7 @@ const styles = StyleSheet.create({
   mainImageContainer: {
     borderWidth: 1,
     borderColor: 'black',
+    borderRadius: 15
   },
   headerContainer: {
     height: 50,

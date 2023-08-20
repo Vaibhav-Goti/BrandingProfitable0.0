@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, BackHandler, Alert, TouchableOpacity, Image, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, Text, BackHandler, Modal, TouchableOpacity, Image, ScrollView, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
+import { Badge } from '@rneui/themed';
+
+import { useNavigation } from '@react-navigation/native';
 
 import MainBanner from './MainBanner';
 import AdBanner from './AdBanner';
@@ -10,6 +13,7 @@ import TrendingBanner from './Category/TrendingBanner';
 import TodayBanner from './Category/Today';
 import DynamicSection from './DynamicSection';
 import FastImage from 'react-native-fast-image';
+import Feather from 'react-native-vector-icons/Feather'
 
 const Home = ({ navigation }) => {
 
@@ -82,6 +86,8 @@ const Home = ({ navigation }) => {
       );
     }
 
+    // if custom frames not found then navigate to custom screen!
+
     // Show a default value or placeholder if profileData is null (data not available)
     return (
       <>
@@ -92,9 +98,152 @@ const Home = ({ navigation }) => {
     );
   };
 
+  const loadCustomFrames = async () => {
+    try {
+      const framesData = await AsyncStorage.getItem('customFrames');
+      if (framesData) {
+        const frames = JSON.parse(framesData);
+      } else {
+        showAlert()
+      }
+    } catch (error) {
+      console.error('Error loading custom frames:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadCustomFrames()
+  }, [])
+
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const showAlert = () => {
+    setModalVisible(true);
+  };
+
+  const hideAlert = () => {
+    setModalVisible(false);
+  };
+
+  const [notificationCount, setNotificationCount] = useState(1)
+    const [notifications, setNotifications] = useState([])
+
+    const getNotificationCounts = async () => {
+        try {
+            const notificationsData = await AsyncStorage.getItem('notificationData');
+
+            const parsedNotifications = JSON.parse(notificationsData || '[]'); // Parse the JSON data
+
+            setNotifications(parsedNotifications?.notifications);
+            setNotificationCount(parsedNotifications?.counts.unreadCount);
+        } catch (error) {
+            console.log('Error getting notification counts:', error);
+        }
+    }
+
+    useEffect(() => {
+        getNotificationCounts();
+    }, []);
+
+  // console.log(notificationCount, "noti counts!")
+
+  // // notification count 
+
+  // async function getNotificationCounts() {
+  //   try {
+  //     const unreadCount = await AsyncStorage.getItem('unreadCount')
+  //     const readCount = await AsyncStorage.getItem('readCount');   
+  //     const notifications = await AsyncStorage.getItem('notifications')
+
+  //     console.log("aa notification che! - ", notifications)
+  //     console.log(unreadCount, "unread message!")
+  //     setNotificationCount(unreadCount)
+  //   } catch (error) {
+  //     console.error('Error getting notification counts:', error);
+  //   }
+  // }
+
+  // setTimeout(() => {
+  //   getNotificationCounts()
+  //   console.log("noti count function call thyu!")
+  // }, 5000);
+
   return (
     <View
       style={styles.container}>
+      <Modal
+        animationType="fade" // You can use "fade" or "none" for animation type
+        visible={isModalVisible}
+        transparent={true}
+        onRequestClose={hideAlert}
+      >
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
+        }}>
+          <View style={{
+            backgroundColor: 'white',
+            padding: 20,
+            borderRadius: 8,
+            height: "40%",
+            height: 230,
+            width: 300,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* icon */}
+            <TouchableOpacity onPress={hideAlert} style={{
+              backgroundColor: 'red',
+              padding: 8,
+              borderRadius: 8,
+            }}>
+              <Text style={{
+                color: 'white',
+                fontWeight: 'bold',
+              }}><Feather name="log-out" size={25} color="white" /></Text>
+            </TouchableOpacity>
+            {/* title */}
+            <Text style={{
+              fontSize: 16,
+              fontFamily: 'Manrope-Bold',
+              marginTop: 10,
+              color: 'red'
+            }}>Let's Create Awesome Frames!</Text>
+            {/* caption */}
+            <Text style={{
+              fontSize: 16,
+              fontFamily: 'Manrope-Bold',
+              marginTop: 5,
+              color: 'lightgray',
+              textAlign: 'center'
+            }}>Now don't have any frames let's create!</Text>
+            {/* another */}
+            <View style={{ width: '80%', marginTop: 30, flexDirection: 'row', justifyContent: 'center' }}>
+              <TouchableOpacity
+                onPress={() => {
+                  hideAlert()
+                  navigation.navigate('StackProfileScreen');
+                }}
+                style={{
+                  backgroundColor: 'red',
+                  width: 70,
+                  paddingVertical: 5,
+                  alignItems: 'center',
+                  justifyContent: "center",
+                  borderRadius: 8,
+                }}>
+                <Text style={{
+                  color: 'white',
+                  fontFamily: "Manrope-Bold"
+                }}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
       {/* header */}
       <View style={styles.headerContainer}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
@@ -102,18 +251,41 @@ const Home = ({ navigation }) => {
             <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
           </View>
           <TouchableOpacity>
-          <Text style={styles.yourBuisness}>
-            {businessOrPersonal ? 'Business' : 'Profile'}
-          </Text>
-          {/* Render the profile details conditionally */}
-          {renderProfileDetails()}
+            <Text style={styles.yourBuisness}>
+              {businessOrPersonal ? 'Business' : 'Profile'}
+            </Text>
+            {/* Render the profile details conditionally */}
+            {renderProfileDetails()}
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={() => { navigation.navigate('Notifications') }} style={{ position: 'relative' }}>
+          <Icon name="bell" size={27} color={'#FF0000'} />
+          {notificationCount > 0 && (
+            <View style={{
+              position: 'absolute',
+              top: -4,
+              right: -4,
+              padding: 3,
+              borderRadius: 100,
+              backgroundColor: 'red',
+              borderColor: 'white',
+              borderWidth: 0.2,
+              elevation:2,
+              borderColor:'white',
+              borderWidth:0.2
+            }}>
+              <Text style={{
+                color: 'white',
+                fontSize: 7,
+                fontFamily: 'Manrope-Bold',
+                textAlign: 'center',
+                minWidth: 10,
+              }}>
+                {notificationCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
-        </View>
-        <View>
-          <Text onPress={()=>{navigation.navigate('Notifications')}}>
-            <Icon name="bell" size={27} color={'#FF0000'} />
-          </Text>
-        </View>
       </View>
 
       <LinearGradient
@@ -139,6 +311,7 @@ const Home = ({ navigation }) => {
           <DynamicSection />
         </ScrollView>
       </LinearGradient>
+
     </View>
   );
 };

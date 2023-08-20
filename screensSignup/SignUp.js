@@ -23,6 +23,7 @@ const LoginScreen = ({ navigation }) => {
     const [Cpassword, setCPassword] = useState('')
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
+    const [adhaar, setAadhar] = useState('');
     const [designation, setDesignation] = useState('');
     const [fileUri, setFileUri] = useState('');
     const [dob, setDob] = useState('');
@@ -100,6 +101,7 @@ const LoginScreen = ({ navigation }) => {
             email: email,
             adress: address,
             password: password,
+            adhaar: adhaar
         }
         : {
             businessLogo: fileUri || localimage,
@@ -109,7 +111,8 @@ const LoginScreen = ({ navigation }) => {
             fullName: fullName,
             email: email,
             adress: address,
-            password: password
+            password: password,
+            adhaar: adhaar
         };
 
     const handleSave = async () => {
@@ -139,6 +142,7 @@ const LoginScreen = ({ navigation }) => {
                         email: email,
                         adress: address,
                         password: password,
+                        adhaar: adhaar
                     }
                     : {
                         businessLogo: fileUri || localimage,
@@ -148,8 +152,11 @@ const LoginScreen = ({ navigation }) => {
                         fullName: fullName,
                         email: email,
                         adress: address,
-                        password: password
+                        password: password,
+                        adhaar: adhaar
                     };
+
+                    console.log(requestData)
 
                 try {
                     const response = await axios.post(apiUrl, requestData, {
@@ -158,6 +165,8 @@ const LoginScreen = ({ navigation }) => {
                         },
                     });
 
+                    console.log(response.data.statusCode)
+
                     if (response.data.statusCode === 200) {
 
                         showAlert3()
@@ -165,6 +174,8 @@ const LoginScreen = ({ navigation }) => {
                     } else if (response.data.statusCode === 402) {
                         showAlert2()
                     } else if (response.data.statusCode === 401) {
+                        showAlert2()
+                    } else if (response.data.statusCode === 403) {
                         showAlert2()
                     } else if (response.data.statusCode === 500) {
                     } else {
@@ -184,15 +195,12 @@ const LoginScreen = ({ navigation }) => {
     }
 
     const saveandnavigate = async () => {
-        try {
-            await AsyncStorage.setItem('BusinessOrPersonl', businessOrPersonal);
-            const profileData = JSON.stringify(requestData)
-            await AsyncStorage.setItem('profileData', profileData);
-            await AsyncStorage.setItem('isLoggedIn', 'true');
-        } catch (error) {
-            console.error('Error saving businessOrPersonal:', error);
-        }
-        navigation.navigate('CustomScreen', requestData)
+        // try {
+        //     await AsyncStorage.setItem('BusinessOrPersonl', businessOrPersonal)
+        // } catch (error) {
+        //     console.error('Error saving businessOrPersonal:', error);
+        // }
+        navigation.navigate('LoginScreen')
     }
 
     const renderFileUri = () => {
@@ -545,6 +553,24 @@ const LoginScreen = ({ navigation }) => {
                             />
                         </View>
 
+                        {/* address */}
+                        <View style={styles.labelContainer}>
+                            <Text style={styles.label}>
+                                Enter Aadhar
+                            </Text>
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholderTextColor={'gray'}
+                                placeholder="Aadhar Number"
+                                value={adhaar}
+                                maxLength={12}
+                                onChangeText={setAadhar}
+                                autoCapitalize="sentences"
+                            />
+                        </View>
+
                         {/* dropdown */}
                         <View style={styles.labelContainer}>
                             <Text style={styles.label}>
@@ -702,7 +728,7 @@ const LoginScreen = ({ navigation }) => {
                             fontFamily: 'Manrope-Bold',
                             marginTop: 5,
                             color: 'lightgray'
-                        }}>Please enter same password ?</Text>
+                        }}>Please enter same password</Text>
                         {/* another */}
                         <TouchableOpacity onPress={hideAlert} style={{
                             width: 70,
@@ -741,7 +767,7 @@ const LoginScreen = ({ navigation }) => {
                         backgroundColor: 'white',
                         padding: 20,
                         borderRadius: 8,
-                        height: 230,
+                        height: "40%",
                         width: 300,
                         alignItems: 'center',
                         justifyContent: 'center'
@@ -762,14 +788,16 @@ const LoginScreen = ({ navigation }) => {
                             fontSize: 16,
                             fontFamily: 'Manrope-Bold',
                             marginTop: 10,
-                            color: 'red'
-                        }}>Email or Mobile is Already Used!</Text>
+                            color: 'red',
+                            textAlign: 'center'
+                        }}>Email or Mobile or Aadhar is Already Used!</Text>
                         {/* caption */}
                         <Text style={{
                             fontSize: 16,
                             fontFamily: 'Manrope-Bold',
                             marginTop: 5,
-                            color: 'lightgray'
+                            color: 'lightgray',
+                            textAlign: 'center'
                         }}>Mobile Or Email Already Used... please Log In with Mobile or Email</Text>
                         {/* another */}
 
@@ -809,7 +837,7 @@ const LoginScreen = ({ navigation }) => {
                         backgroundColor: 'white',
                         padding: 20,
                         borderRadius: 8,
-                        height: 230,
+                        height: "40%",
                         width: 300,
                         alignItems: 'center',
                         justifyContent: 'center'
@@ -837,8 +865,9 @@ const LoginScreen = ({ navigation }) => {
                             fontSize: 16,
                             fontFamily: 'Manrope-Bold',
                             marginTop: 5,
-                            color: 'lightgray'
-                        }}>Let's Create Awesome Frames...</Text>
+                            color: 'lightgray',
+                            textAlign:'center'
+                        }}>Account is Created, Please Login Now!</Text>
                         {/* another */}
 
                         <TouchableOpacity onPress={hideAlert3} style={{
@@ -877,7 +906,7 @@ const LoginScreen = ({ navigation }) => {
                         backgroundColor: 'white',
                         padding: 20,
                         borderRadius: 8,
-                        height: 230,
+                        height: "40%",
                         width: 300,
                         alignItems: 'center',
                         justifyContent: 'center'
@@ -946,7 +975,7 @@ const LoginScreen = ({ navigation }) => {
                         backgroundColor: 'white',
                         padding: 20,
                         borderRadius: 8,
-                        height: 230,
+                        height: "40%",
                         width: 300,
                         alignItems: 'center',
                         justifyContent: 'center'

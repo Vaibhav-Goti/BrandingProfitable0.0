@@ -18,6 +18,9 @@ import ChooseCustomFrame from './custom/ChooseCustomFrame';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EditCustomChoice from './custom/EditCustomChoice';
 
+
+import { requestUserPermission } from "./src/utils/notificationHeloper";
+
 const Stack = createNativeStackNavigator();
 
 // const SplashScreen = () => (
@@ -28,6 +31,12 @@ const Stack = createNativeStackNavigator();
 console.log(process.env.REACT__APP_URL)
 
 const MyStack = () => {
+
+  useEffect(() => {
+    requestUserPermission()
+  }, [])
+
+
   const [loader, setLoader] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -71,12 +80,12 @@ const MyStack = () => {
                 animation: 'slide_from_right',
               }}
             />
-        <Stack.Screen name="EditHomeScreen" component={EditHome} options={{ headerShown: false, animation: 'slide_from_right', }} />
-        <Stack.Screen name="EditHomeDynamic" component={EditHomeDynamic} options={{ headerShown: false, animation: 'slide_from_right', }} />
-        <Stack.Screen name="EditBusiness" component={EditBusiness} options={{ headerShown: false, animation: 'slide_from_right', }} />
-        <Stack.Screen name="EditTempFromCustom" component={EditTempFromCustom} options={{ headerShown: false, animation: 'slide_from_right', }} />
-        <Stack.Screen name="EditCustomChoice" component={EditCustomChoice} options={{ headerShown: false, animation: 'slide_from_right', }} />
-        <Stack.Screen name="ChooseCustomFrame" component={ChooseCustomFrame} options={{ headerShown: false, animation: 'slide_from_right', }} />
+            <Stack.Screen name="EditHomeScreen" component={EditHome} options={{ headerShown: false, animation: 'slide_from_right', }} />
+            <Stack.Screen name="EditHomeDynamic" component={EditHomeDynamic} options={{ headerShown: false, animation: 'slide_from_right', }} />
+            <Stack.Screen name="EditBusiness" component={EditBusiness} options={{ headerShown: false, animation: 'slide_from_right', }} />
+            <Stack.Screen name="EditTempFromCustom" component={EditTempFromCustom} options={{ headerShown: false, animation: 'slide_from_right', }} />
+            <Stack.Screen name="EditCustomChoice" component={EditCustomChoice} options={{ headerShown: false, animation: 'slide_from_right', }} />
+            <Stack.Screen name="ChooseCustomFrame" component={ChooseCustomFrame} options={{ headerShown: false, animation: 'slide_from_right', }} />
 
             <Stack.Screen
               name="Notifications"

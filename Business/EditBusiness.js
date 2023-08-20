@@ -146,42 +146,44 @@ const EditHome = ({ route, navigation }) => {
         <Text style={[styles.headerText,]} onPress={() => { navigation.navigate('HomeScreen') }}>
           {bannername}
         </Text>
-        <TouchableOpacity style={{padding:4,backgroundColor: 'rgba(255, 0, 0, 0.5)',borderRadius:100, marginLeft:10}} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
-                    <View style={{zIndex: 1,
-        padding: 8,
-        borderRadius: 100,
-        elevation: 30,
-        backgroundColor:'red',
-        alignItems:'center',
-        justifyContent:'center',}}>
-                    <Text style={{height:20,width:20}}>
-                    <Icon name="download" size={25} color={"white"} />
-                    </Text>
-                    </View>
+        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
+          <View style={{
+            zIndex: 1,
+            padding: 8,
+            borderRadius: 100,
+            elevation: 30,
+            backgroundColor: 'red',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Text style={{ height: 20, width: 20 }}>
+              <Icon name="download" size={25} color={"white"} />
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
         {/* main image */}
         {!displayImage ? (
           load ? (<View style={{
-            height:300, width:300, marginVertical: 20, borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, justifyContent: 'center', alignItems: 'center'
+            height: 300, width: 300, marginVertical: 20, borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, justifyContent: 'center', alignItems: 'center'
           }}>
             <ActivityIndicator />
           </View>) :
 
-            (<ViewShot style={{ height:300, width:300, marginVertical: 20, elevation: 20, borderWidth: 1, borderColor: 'white', borderRadius: 10, overflow: 'hidden' }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
+            (<ViewShot style={{ height: 300, width: 300, marginVertical: 20, elevation: 20, borderWidth: 1, borderColor: 'white', borderRadius: 10, overflow: 'hidden' }} ref={viewShotRef} options={{ format: 'jpg', quality: 1 }}>
               <Swiper loop={false} index={currentFrame} showsPagination={false}>
                 {customFrames.map((frame, index) => (
                   <TouchableOpacity key={index}>
                     <FastImage source={{ uri: frame.image }} style={styles.overlayImage} />
-                    <FastImage source={{ uri: item }} style={[styles.mainImage, { borderRadius: 10 }]} />
+                    <Image source={{ uri: item }} style={[styles.mainImage, { borderRadius: 10 }]} />
                   </TouchableOpacity>
                 ))}
               </Swiper>
             </ViewShot>)
 
         ) : (
-          <View style={{ height:300, width:300, marginVertical: 20, elevation: selectedVideo == null ? 1 : 20, borderColor: 'white', borderWidth: selectedVideo == null ? 1 : 0, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} >
+          <View style={{ height: 300, width: 300, marginVertical: 20, elevation: selectedVideo == null ? 1 : 20, borderColor: 'white', borderWidth: selectedVideo == null ? 1 : 0, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} >
             {videoPause ? (
               <View style={{ justifyContent: 'center', alignItems: "center" }}>
                 <ActivityIndicator />
@@ -192,7 +194,7 @@ const EditHome = ({ route, navigation }) => {
                   {customFrames.map((frame, index) => (
                     <View key={index}>
                       {selectedVideo == null ? (
-                        <View style={{ position:'absolute',top:width-(width/1.7),left:width-(width/1.4) }}>
+                        <View style={{ position: 'absolute', top: width - (width / 1.7), left: width - (width / 1.4) }}>
                           <Text style={{ color: 'white' }}>
                             No Video Found
                           </Text>
@@ -256,46 +258,14 @@ const EditHome = ({ route, navigation }) => {
           </TouchableOpacity>
           {/* 2 */}
         </View>
-<View style={{justifyContent:'center',alignItems:'center'}}>
-        {!displayImage ? (
-          items.length > 0 ? (
-            <FlatList
-              data={items}
-              numColumns={3} // Adjust the number of columns as needed
-              // keyExtractor={(item) => item._id.toString()}
-              renderItem={renderItem}
-              contentContainerStyle={styles.flatListContainer}
-              shouldComponentUpdate={() => false}
-              removeClippedSubviews
-              initialNumToRender={30}
-              maxToRenderPerBatch={30}
-              windowSize={10}
-            />
-          ) : (
-            <FlatList
-              data={items}
-              numColumns={3} // Adjust the number of columns as needed
-              renderItem={renderItem}
-              contentContainerStyle={styles.flatListContainer}
-              shouldComponentUpdate={() => false}
-              removeClippedSubviews
-              initialNumToRender={30}
-              maxToRenderPerBatch={30}
-              windowSize={10}
-            />
-          )
-        ) : (
-          FlatlistisLoad ? (
-            <View>
-              <ActivityIndicator />
-            </View>
-          ) :
-            videos.length > 0 ? (
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          {!displayImage ? (
+            items.length > 0 ? (
               <FlatList
-                data={videos}
+                data={items}
                 numColumns={3} // Adjust the number of columns as needed
-                // keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItemV}
+                // keyExtractor={(item) => item._id.toString()}
+                renderItem={renderItem}
                 contentContainerStyle={styles.flatListContainer}
                 shouldComponentUpdate={() => false}
                 removeClippedSubviews
@@ -304,11 +274,43 @@ const EditHome = ({ route, navigation }) => {
                 windowSize={10}
               />
             ) : (
-              <View style={{ justifyContent: 'flex-start', flex: 1, marginTop:30 }}>
-                <Text style={{ color: 'white' }}>No videos Found!</Text>
-              </View>
+              <FlatList
+                data={items}
+                numColumns={3} // Adjust the number of columns as needed
+                renderItem={renderItem}
+                contentContainerStyle={styles.flatListContainer}
+                shouldComponentUpdate={() => false}
+                removeClippedSubviews
+                initialNumToRender={30}
+                maxToRenderPerBatch={30}
+                windowSize={10}
+              />
             )
-        )}
+          ) : (
+            FlatlistisLoad ? (
+              <View style={{flex:1,alignItems:'center',justifyContent:'flex-start'}}>
+                <ActivityIndicator />
+              </View>
+            ) :
+              videos.length > 0 ? (
+                <FlatList
+                  data={videos}
+                  numColumns={3} // Adjust the number of columns as needed
+                  // keyExtractor={(item) => item.id.toString()}
+                  renderItem={renderItemV}
+                  contentContainerStyle={styles.flatListContainer}
+                  shouldComponentUpdate={() => false}
+                  removeClippedSubviews
+                  initialNumToRender={30}
+                  maxToRenderPerBatch={30}
+                  windowSize={10}
+                />
+              ) : (
+                <View style={{ justifyContent: 'flex-start', flex: 1, marginTop: 30 }}>
+                  <Text style={{ color: 'white' }}>No videos Found!</Text>
+                </View>
+              )
+          )}
         </View>
       </View>
     </LinearGradient>
@@ -323,15 +325,15 @@ const styles = StyleSheet.create({
   overlayImage: {
     position: 'absolute',
     opacity: 1,
-    height:300,
-    width:300,
+    height: 300,
+    width: 300,
     zIndex: 1,
     top: 0,
     borderRadius: 10
   },
   mainImage: {
-    height:300,
-    width:300,
+    height: 300,
+    width: 300,
     zIndex: -1
   },
   image: {

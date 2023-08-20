@@ -1,71 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, Dimensions, StyleSheet, TouchableOpacity, BackHandler } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import data from '../apiData/CustomFrames';
+// import data from '../apiData/CustomFrames';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 2.3; // Adjust the number of columns as needed
 
-const SavedFrames = ({ navigation, route }) => {
-
-    useFocusEffect(
-        React.useCallback(() => {
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-                // Do nothing when the back button is pressed
-                return true; // Return true to indicate that you've handled the event
-            });
-
-            return () => {
-                // Clean up the event listener when the screen goes out of focus
-                backHandler.remove();
-            };
-        }, [])
-    );
-
-
-    const requestData = route.params;
+const SavedFrames = ({ navigation }) => {
 
     const handleSelect = (item) => {
-        navigation.navigate('CustomFrameForm', { 'imageData': item, 'requestData': requestData })
+        navigation.navigate('CustomFrameForm', { 'itemId': item._id })
     }
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.imageContainer}
-            onPress={() => handleSelect(item)}
-        >
-            <View style={{ backgroundColor: 'white', borderRadius: 10, overflow: "hidden" }}>
-                <FastImage source={item.imageUrl} style={styles.image} />
-            </View>
-        </TouchableOpacity>
-    );
+    const renderItem = ({ item }) => {
+        console.log('Rendering item:', item.image);
+        return (
+            <TouchableOpacity
+                style={styles.imageContainer}
+                onPress={() => handleSelect(item)}
+            >
+
+                <View style={{ backgroundColor: 'white', borderRadius: 10, overflow: 'hidden' }}>
+                    <FastImage source={{ uri: item.image }} style={styles.image} />
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
+
+    // data 
+
+    const [data, setData] = useState([]);
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/frame/frameimage');
+            const result = response.data;
+            console.log(result);
+            setData(result.data); // Assuming 'data' property contains the array of images
+        } catch (error) {
+            console.log('Error fetching data:', error);
+        }
+    };
+
 
     return (
         <>
             <LinearGradient
-                colors={['#050505', '#1A2A3D']}
+                colors={['#20AE5C', 'black']}
                 style={styles.container}
+                locations={[0.1, 1]}
             >
-                <View style={styles.headerContainer}>
-                    <View style={styles.iconContainer} onPress={() => { navigation.goBack() }}>
-                        {/* <Icon name="angle-left" size={32} color={"white"} /> */}
-                    </View>
-                    <View style={styles.iconContainer}>
-                        <Text style={styles.iconText} >
-                            Business Frames
-                        </Text>
-                    </View>
-                    <View>
-
-                    </View>
-                </View>
                 <FlatList
                     data={data}
                     numColumns={2} // Adjust the number of columns as needed
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item._id.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={styles.flatListContainer}
                     shouldComponentUpdate={() => false}
@@ -87,6 +83,7 @@ const styles = StyleSheet.create({
     },
     flatListContainer: {
         marginTop: 10,
+        paddingTop: 20
     },
     imageContainer: {
         alignItems: 'center',
@@ -132,7 +129,7 @@ const styles = StyleSheet.create({
     iconText: {
         color: 'white',
         fontSize: 18,
-        fontFamily:'DMSans_18pt-Bold'
+        fontFamily: 'DMSans_18pt-Bold'
     }
 });
 

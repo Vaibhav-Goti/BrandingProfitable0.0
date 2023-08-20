@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Octicons from 'react-native-vector-icons/Octicons';
 import axios from 'axios';
-
+import Header from '../Header';
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
 
@@ -52,6 +52,7 @@ const BusinessScreen = ({ navigation, route }) => {
 		setLoading(true)
 		try {
 			const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness||MyBusiness}`);
+			console.log(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness||MyBusiness}`)
 			const result = response.data.data;
 			setData(result);
 		} catch (error) {
@@ -86,27 +87,9 @@ const BusinessScreen = ({ navigation, route }) => {
 
 		return (
 			<LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
-				{/* header */}
-				<View style={styles.headerContainer}>
-					<View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-						<View style={{ backgroundColor: 'red', borderRadius: 100, borderWidth: 1, borderColor: 'black', height: 45, width: 45, overflow: 'hidden' }}>
-							<FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
-						</View>
-						<TouchableOpacity>
-							<Text style={styles.yourBuisness}>
-								{businessOrPersonal ? "Business" : 'Profile'}
-							</Text>
-							<Text style={styles.buisnessTitle}>
-								{profileData !== null && profileData?.fullName || "John Doe"} <Icon name="angle-down" size={25} />
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<TouchableOpacity onPress={() => { navigation.navigate('Notifications') }}>
-						<Text>
-							<Icon name="bell" size={27} color={'#FF0000'} />
-						</Text>
-					</TouchableOpacity>
-				</View>
+				
+				<Header />
+				
 				<View style={{ paddingHorizontal: 15, paddingTop: 20, flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
 					<View style={{ borderRadius: 30, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: 'red', height: 30, }}>
 						<Text style={{ color: 'white', fontFamily:'Manrope-Regular' }}>
