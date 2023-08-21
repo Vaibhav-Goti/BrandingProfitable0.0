@@ -10,6 +10,8 @@ import ViewShot from "react-native-view-shot";
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
@@ -161,6 +163,73 @@ const EditHome = ({ route, navigation }) => {
     }
   })
 
+  // languages
+  const [userToken, setUserToken] = useState()
+  const [profileData, setProfileData] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('');
+  const [languages, setLanguages] = useState([
+    { languageName: 'English' },
+    { languageName: 'ગુજરાતી' },
+    { languageName: 'हिंदी' }
+  ])
+  
+  useEffect(() => {
+    retrieveProfileData()
+  }, [retrieveProfileData])
+
+  const retrieveProfileData = async () => {
+    try {
+      const dataString = await AsyncStorage.getItem('profileData');
+      const userToken = await AsyncStorage.getItem('userToken');
+      setUserToken(userToken)
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setProfileData(data);
+      }
+    } catch (error) {
+      console.error('Error retrieving profile data:', error);
+    }
+  };
+
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/language/languages',
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+      const result = response.data.data;
+
+      setLanguages(result);
+    } catch (error) {
+      console.log('Error fetching data:', error);
+    }
+  };
+
+  const [callLanguageFunc, setCallLanguageFunc] = useState(true)
+  const [isLoader, setIsLoader] = useState(true)
+
+  useEffect(() => {
+    setInterval(() => {
+      if (callLanguageFunc) {
+        fetchData()
+        setIsLoader(false)
+        setCallLanguageFunc(false)
+      }
+    }, 1000);
+  })
+  if (isLoader) {
+    return (
+      <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={'white'} />
+      </LinearGradient >
+    )
+  }
+
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
@@ -232,24 +301,65 @@ const EditHome = ({ route, navigation }) => {
           </View>
         )}
 
-        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-start', flex: 1, width: '92%', gap: 10, marginTop: 10, marginBottom: 40 }}>
-          {/* 1 */}
-          <TouchableOpacity onPress={() => {
-            setdisplayImage(false)
-          }}
-            style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20, }}>
-            <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
-              Images
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            setdisplayImage(true)
-          }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
-            <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
-              Videos
-            </Text>
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-between', flex: 1, width: '92%', gap: 10, marginBottom: 65, height: 60 }}>
           {/* 2 */}
+
+          <View style={{ width: 120, zIndex: 1, alignSelf: 'flex-end', height: '100%' }}>
+            <DropDownPicker
+              open={open}
+              value={selectedLanguage}
+              items={languages.map((language) => ({
+                label: language.languageName,
+                value: language.languageName,
+              }))}
+              setOpen={setOpen}
+              setValue={(value) => setSelectedLanguage(value)}
+              style={{
+                backgroundColor: 'white',
+                borderColor: 'black',
+                borderWidth: 1,
+                borderRadius: 20,
+                height: 30,
+              }}
+              dropDownStyle={{
+                backgroundColor: 'white',
+                borderColor: 'black',
+                borderWidth: 1,
+                borderRadius: 20,
+                maxHeight: 150,
+              }}
+              containerStyle={{ height: 30 }} // Set a fixed height for the container
+              listItemContainerStyle={{ height: 30 }} // Set a fixed height for each item in the dropdown
+              scrollViewProps={{ // Enable scrolling for the dropdown
+                nestedScrollEnabled: true,
+              }}
+              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+              placeholder="Language"
+              placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+            />
+          </View>
+
+
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            {/* 1 */}
+            <TouchableOpacity onPress={() => {
+              setdisplayImage(false)
+            }}
+              style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+              <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+                Images
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              setdisplayImage(true)
+            }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+              <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+                Videos
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+
         </View>
 
         {!displayImage ? (
@@ -281,7 +391,7 @@ const EditHome = ({ route, navigation }) => {
           )
         ) : (
           FlatlistisLoad ? (
-            <View style={{flex:1,alignItems:'center',justifyContent:'flex-start'}}>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
               <ActivityIndicator />
             </View>
           ) :
@@ -337,8 +447,8 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray'
   },
   flatListContainer: {
-    paddingBottom:30,
-    paddingTop:20
+    paddingBottom: 30,
+    paddingTop: 20
   },
   ShareContainer: {
     position: 'absolute',

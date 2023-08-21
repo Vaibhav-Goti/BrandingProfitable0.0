@@ -42,25 +42,33 @@ const Custom = ({ navigation }) => {
     }
   };
 
-  const [notificationCount, setNotificationCount] = useState(1)
+  const [notificationCount, setNotificationCount] = useState(0)
   const [notifications, setNotifications] = useState([])
 
   const getNotificationCounts = async () => {
-      try {
-          const notificationsData = await AsyncStorage.getItem('notificationData');
+    try {
+      const notificationsData = await AsyncStorage.getItem('notificationData');
 
-          const parsedNotifications = JSON.parse(notificationsData || '[]'); // Parse the JSON data
+      const parsedNotifications = JSON.parse(notificationsData || '[]'); // Parse the JSON data
 
-          setNotifications(parsedNotifications?.notifications);
-          setNotificationCount(parsedNotifications?.counts.unreadCount);
-      } catch (error) {
-          console.log('Error getting notification counts:', error);
-      }
+      setNotifications(parsedNotifications?.notifications);
+      setNotificationCount(parsedNotifications?.counts.unreadCount);
+    } catch (error) {
+      console.log('Error getting notification counts:', error);
+    }
   }
 
   useEffect(() => {
-      getNotificationCounts();
+    getNotificationCounts();
   }, []);
+
+  useEffect(() => {
+    // Add a listener to the focus event to reload the screen
+    const unsubscribe = navigation.addListener('focus', getNotificationCounts);
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe()
+  }, [navigation])
 
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
@@ -110,10 +118,10 @@ const Custom = ({ navigation }) => {
         </TouchableOpacity>
       </View> */}
 
-<Header />
+      <Header />
 
       <ScrollView style={{ flex: 1, }}>
-        <View style={{marginTop:20}}>
+        <View style={{ marginTop: 20 }}>
           <Banner />
 
           <DynamicCustom />

@@ -8,7 +8,7 @@ import jwtDecode from 'jwt-decode';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
 import auth from '@react-native-firebase/auth';
-
+import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
 
 const { width, height } = Dimensions.get('window')
 
@@ -27,6 +27,62 @@ const LoginScreen = ({ navigation }) => {
 
     fetchData();
   }, []); // Add [] as a second argument to execute this effect only once
+
+  const [fcmToken, setFcmToken] = useState('')
+
+
+  function getFCMToken() {
+    return AsyncStorage.getItem("fcmtoken").then((token) => {
+      console.log('FCM Token:', token); // Log the FCM token here
+      setFcmToken(token)
+      return token;
+    });
+  }
+  useEffect(() => {
+    getFCMToken();
+  })
+
+  const handleSuccessLogin = async (response) => {
+    Alert.alert("Login Successfully...");
+    const dataAfterDecode = jwtDecode(response.data.token)
+
+    console.log(dataAfterDecode)
+
+    navigation.navigate('StackMain');
+
+    const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/user/token/${dataAfterDecode._id}`
+    const requestData = {
+      token: fcmToken
+    }
+
+    try {
+      const response = await axios.put(apiUrl, requestData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response.data.statusCode)
+    } catch (error) {
+      console.log(error)
+    }
+
+    const saveProfiledatatoLocal = JSON.stringify(dataAfterDecode);
+    console.log(dataAfterDecode.isPersonal)
+    if (dataAfterDecode.isPersonal) {
+      console.log('personal set karyu!')
+      await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
+    } else {
+      console.log('business set karyu!')
+      await AsyncStorage.setItem('BusinessOrPersonl', 'business')
+    }
+    try {
+      await AsyncStorage.setItem("isLoggedIn", "true");
+      await AsyncStorage.setItem("profileData", saveProfiledatatoLocal);
+      await AsyncStorage.setItem("userToken", response.data.token);
+    } catch (error) {
+      console.log('Error saving profile data:', error);
+    }
+  }
 
 
   const handleLogin = async () => {
@@ -51,24 +107,7 @@ const LoginScreen = ({ navigation }) => {
         });
 
         if (response.data.statusCode === 200) {
-          Alert.alert("Login Successfully...");
-          navigation.navigate('StackMain');
-          const dataAfterDecode = jwtDecode(response.data.token)
-          const saveProfiledatatoLocal = JSON.stringify(dataAfterDecode);
-
-
-          if (saveProfiledatatoLocal.Designation) {
-            await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
-          } else {
-            await AsyncStorage.setItem('BusinessOrPersonl', 'business')
-          }
-          try {
-            await AsyncStorage.setItem("isLoggedIn", "true");
-            await AsyncStorage.setItem("profileData", saveProfiledatatoLocal);
-            await AsyncStorage.setItem("userToken", response.data.token);
-          } catch (error) {
-            console.log('Error saving profile data:', error);
-          }
+          handleSuccessLogin(response);
         } else {
           Alert.alert("User Not Exist!");
         }
@@ -90,13 +129,58 @@ const LoginScreen = ({ navigation }) => {
     )
   }
 
-  // firebase otp
+  // firebase login with google
+
+  //  {"idToken": null, "scopes": ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"], "serverAuthCode": null, "user": {"email": "gohelmeet1212@gmail.com", "familyName": "Meet", "givenName": "Gohel", "id": "101768662035041948455", "name": "Gohel Meet", "photo": "https://lh3.googleusercontent.com/a/AAcHTtdNmTiYoIB87fMluxBvtmAno8g6QbUIJ4xfFweWWaTOCyo"}}
+
+  const handleSuccessGoogleLogin = async (details) => {
+    // setIsLoader(true)
+    // console.log(details.user.email)
+    const profileData = {
+      "email": details.user.email,
+      "profileImage": details.user.photo,
+      "fullName": details.user.name,
+    }
+    const setData = JSON.stringify(profileData)
+    try {
+      Alert.alert("Login Successfully...");
+      navigation.navigate('StackMain');
+      await AsyncStorage.setItem('profileData', setData)
+      await AsyncStorage.setItem("isLoggedIn", "true")
+      await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
+      console.log("google login details save thai gyi bapu! - ", setData)
+    } catch (error) {
+      console.log("google login ma error - ", error)
+    }
+    // setIsLoader(false)
+  }
+
+  const signIn = async () => {
+    GoogleSignin.configure({
+      androidClientId: 'ADD_YOUR_ANDROID_CLIENT_ID_HERE',
+      iosClientId: 'ADD_YOUR_iOS_CLIENT_ID_HERE',
+    });
+    GoogleSignin.hasPlayServices().then((hasPlayService) => {
+      if (hasPlayService) {
+        GoogleSignin.signOut();
+
+        GoogleSignin.signIn().then((userInfo) => {
+          console.log(JSON.stringify(userInfo))
+          handleSuccessGoogleLogin(userInfo)
+        }).catch((e) => {
+          console.log("ERROR IS: " + JSON.stringify(e));
+        })
+      }
+    }).catch((e) => {
+      console.log("ERROR IS: " + JSON.stringify(e));
+    })
+  };
 
   return (
     <ScrollView style={{}} keyboardShouldPersistTaps={'always'} >
 
       <LinearGradient
-        colors={['#050505', '#1A2A3D']}>
+        colors={['#050505', '#1A2A3D']} >
         <TouchableOpacity style={{ padding: 20, alignSelf: 'flex-start', paddingBottom: height / 14 }} onPress={() => { navigation.goBack() }}>
           {/* <Text style={{ color: 'white' }}>
               <Icon name="angle-left" size={34} />
@@ -123,7 +207,8 @@ const LoginScreen = ({ navigation }) => {
         </View>
         <View style={styles.mainContainer}>
           <ScrollView style={{ height: '100%', width: '100%' }} keyboardShouldPersistTaps={'always'}>
-            <View style={{ alignItems: 'center', marginTop: 70, }}>
+
+            <View style={{ alignItems: 'center', marginTop: 40, marginBottom: 30 }}>
 
               <View style={{ width: '70%', alignItems: 'flex-start' }}>
                 <Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 15 }}>
@@ -161,6 +246,12 @@ const LoginScreen = ({ navigation }) => {
                   Login
                 </Text>
               </TouchableHighlight>
+              <GoogleSigninButton
+                style={{ width: '71%', height: 48, marginVertical: 10 }}
+                size={GoogleSigninButton.Size.Wide}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={signIn}
+              />
               <TouchableOpacity onPress={() => { navigation.push('SignUpStack') }} style={{ padding: 5, marginTop: 0 }}>
                 <Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 14, textDecorationLine: 'underline' }}>
                   Create an Account
@@ -213,7 +304,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     marginTop: 30,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   input: {
     height: 50,

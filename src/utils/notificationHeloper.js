@@ -2,6 +2,7 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 function GetFCMToken() {
     return AsyncStorage.getItem("fcmtoken").then((token) => {
@@ -12,6 +13,7 @@ function GetFCMToken() {
 
 export async function requestUserPermission() {
     let fcmtoken = await GetFCMToken();
+    const navigation = useNavigation(); // Get the navigation object
 
     // Initialize counts and notifications
     let counts = {
@@ -67,6 +69,7 @@ export async function requestUserPermission() {
         // Save counts and notifications to AsyncStorage
         await AsyncStorage.setItem('notificationData', JSON.stringify({ counts, notifications }));
         console.log("set Thai gyu Bapu!")
+        
     });
 
     // Handle notification opened while the app is in the background
@@ -81,6 +84,25 @@ export async function requestUserPermission() {
 
         // Save counts and notifications to AsyncStorage
         await AsyncStorage.setItem('notificationData', JSON.stringify({ counts, notifications }));
+        
+        // Show an alert and navigate to the 'Notifications' screen
+        Alert.alert(
+            'Notification!',
+            'Click ok to show Notification!',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        navigation.navigate('Notifications'); // Use the 'navigation' object to navigate
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     });
 
     // Handle initial notification while the app is not running

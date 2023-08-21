@@ -181,7 +181,11 @@ const EditHome = ({ route, navigation }) => {
 
   // fetch languages 
 
-  const [languages, setLanguages] = useState([]);
+  const [languages, setLanguages] = useState([
+    { languageName: 'English' },
+    { languageName: 'ગુજરાતી' },
+    { languageName: 'हिंदी' }
+  ])
 
   const fetchData = async () => {
     try {
@@ -199,6 +203,19 @@ const EditHome = ({ route, navigation }) => {
       console.log('Error fetching data:', error);
     }
   };
+
+  const [callLanguageFunc, setCallLanguageFunc] = useState(true)
+  const [isLoader, setIsLoader] = useState(true)
+
+  useEffect(() => {
+    setInterval(() => {
+      if (callLanguageFunc) {
+        fetchData()
+        setIsLoader(false)
+        setCallLanguageFunc(false)
+      }
+    }, 1000);
+  })
 
   const [userToken, setUserToken] = useState()
   const [profileData, setProfileData] = useState(null);
@@ -223,8 +240,17 @@ const EditHome = ({ route, navigation }) => {
 
   const filteredItems = items.filter((item) => (item.languageName == selectedLanguage))
 
+  if (isLoader) {
+    return (
+      <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={'white'} />
+      </LinearGradient >
+    )
+  }
+
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
+
       <View style={styles.headerContainer}>
         <TouchableOpacity style={{ width: 30 }} onPress={() => { navigation.goBack() }}>
           <Icon name="angle-left" size={30} color={"white"} />
@@ -335,30 +361,35 @@ const EditHome = ({ route, navigation }) => {
               value={selectedLanguage}
               items={languages.map((language) => ({
                 label: language.languageName,
-                value: language.languageName, // Assuming languageName can be used as a value
+                value: language.languageName,
               }))}
               setOpen={setOpen}
               setValue={(value) => setSelectedLanguage(value)}
               style={{
-                backgroundColor: 'white', // Set the background color to white
-                borderColor: 'black', // You can adjust the border color as needed
+                backgroundColor: 'white',
+                borderColor: 'black',
                 borderWidth: 1,
                 borderRadius: 20,
-                height: 30, // Set a fixed height here
+                height: 30,
               }}
               dropDownStyle={{
-                backgroundColor: 'white', // Set the background color to white
-                borderColor: 'black', // You can adjust the border color as needed
+                backgroundColor: 'white',
+                borderColor: 'black',
                 borderWidth: 1,
                 borderRadius: 20,
-                maxHeight: 150, // Set the maximum height of the dropdown
-                height: 30, // Set the same height as the container
+                maxHeight: 150,
               }}
-              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }} // Set the text color to gray
+              containerStyle={{ height: 30 }} // Set a fixed height for the container
+              listItemContainerStyle={{ height: 30 }} // Set a fixed height for each item in the dropdown
+              scrollViewProps={{ // Enable scrolling for the dropdown
+                nestedScrollEnabled: true,
+              }}
+              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
               placeholder="Language"
               placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
             />
           </View>
+
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
             {/* 1 */}

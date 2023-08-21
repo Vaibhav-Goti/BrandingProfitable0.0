@@ -218,7 +218,7 @@ const ProfileScreen = ({ navigation }) => {
               </TouchableOpacity>
 
               {/*  */}
-              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }} onPress={()=>{
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }} onPress={() => {
                 navigation.navigate('Frames')
               }}>
 
@@ -238,7 +238,7 @@ const ProfileScreen = ({ navigation }) => {
                 </Text>
 
               </TouchableOpacity>
-              
+
               {/*  */}
               <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }}>
 
@@ -277,7 +277,7 @@ const ProfileScreen = ({ navigation }) => {
                 </Text>
 
               </TouchableOpacity>
-              
+
               {/* modal */}
 
               <Modal

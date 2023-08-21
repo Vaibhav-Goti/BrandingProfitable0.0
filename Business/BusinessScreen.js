@@ -63,10 +63,7 @@ const BusinessScreen = ({ navigation, route }) => {
 
 	useEffect(() => {
 		retrieveProfileData();
-		const fetchDataAndProfile = async () => {
-			await fetchData();
-		};
-		fetchDataAndProfile();
+		fetchData()
 	}, [businessFromAll, businessOrPersonal]);
 
 	if (loading) {

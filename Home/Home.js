@@ -35,7 +35,7 @@ const Home = ({ navigation }) => {
 
   useEffect(() => {
     // Add a listener to the focus event to reload the screen
-    const unsubscribe = navigation.addListener('focus', reloadScreen);
+    const unsubscribe = navigation.addListener('focus', getNotificationCounts);
 
     // Clean up the listener when the component unmounts
     return () => unsubscribe();
@@ -125,7 +125,7 @@ const Home = ({ navigation }) => {
     setModalVisible(false);
   };
 
-  const [notificationCount, setNotificationCount] = useState(1)
+  const [notificationCount, setNotificationCount] = useState(0)
     const [notifications, setNotifications] = useState([])
 
     const getNotificationCounts = async () => {
@@ -167,6 +167,8 @@ const Home = ({ navigation }) => {
   //   getNotificationCounts()
   //   console.log("noti count function call thyu!")
   // }, 5000);
+
+  console.log(businessOrPersonal)
 
   return (
     <View
@@ -252,7 +254,7 @@ const Home = ({ navigation }) => {
           </View>
           <TouchableOpacity>
             <Text style={styles.yourBuisness}>
-              {businessOrPersonal ? 'Business' : 'Profile'}
+              {businessOrPersonal == 'business' ? 'Business' : 'Profile'}
             </Text>
             {/* Render the profile details conditionally */}
             {renderProfileDetails()}
@@ -368,7 +370,8 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   searchText: {
-    marginRight: 10
+    marginRight: 10,
+    color:'lightgray'
   }
 });
 

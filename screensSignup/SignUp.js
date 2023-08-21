@@ -101,7 +101,7 @@ const LoginScreen = ({ navigation }) => {
             email: email,
             adress: address,
             password: password,
-            adhaar: adhaar
+            adhaar: adhaar,
         }
         : {
             businessLogo: fileUri || localimage,
@@ -112,7 +112,7 @@ const LoginScreen = ({ navigation }) => {
             email: email,
             adress: address,
             password: password,
-            adhaar: adhaar
+            adhaar: adhaar,
         };
 
     const handleSave = async () => {
@@ -142,7 +142,8 @@ const LoginScreen = ({ navigation }) => {
                         email: email,
                         adress: address,
                         password: password,
-                        adhaar: adhaar
+                        adhaar: adhaar,
+                        isPersonal: true,            
                     }
                     : {
                         businessLogo: fileUri || localimage,
@@ -153,7 +154,8 @@ const LoginScreen = ({ navigation }) => {
                         email: email,
                         adress: address,
                         password: password,
-                        adhaar: adhaar
+                        adhaar: adhaar,
+                        isPersonal: false,            
                     };
 
                     console.log(requestData)

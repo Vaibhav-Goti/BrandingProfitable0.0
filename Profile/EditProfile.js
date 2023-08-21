@@ -126,12 +126,20 @@ const FullScreenProfile = ({ navigation }) => {
     </View>
   );
 
+  // useEffect(()=>{
+  //   const updatedProfileData = {
+  //     ...profileData,
+  //     dob: selectedDate, // Update the Designation field
+  //   };
+  // })
+
   const onUpdate = async () => {
     try {
       // Include the updated designation in profileData
       const updatedProfileData = {
         ...profileData,
         Designation: designation, // Update the Designation field
+        dob: dob,
       };
 
       const response = await axios.put(
@@ -141,6 +149,7 @@ const FullScreenProfile = ({ navigation }) => {
 
       const stringData = JSON.stringify(updatedProfileData);
       await AsyncStorage.setItem('profileData', stringData); // Use 'await' to wait for AsyncStorage to complete the operation
+      console.log("save krelo data! - ", stringData)
       Alert.alert('Your Profile Updated!');
       navigation.navigate('ProfileScreen');
 

@@ -133,6 +133,7 @@ const SearchScreen = ({ navigation }) => {
               placeholder="Search"
               onSubmitEditing={fetchData}
               style={[styles.searchText, { fontSize: 17, fontFamily: 'Inter-Med', width: '100%' }]}
+              placeholderTextColor={'lightgray'}
             />
           </View>
         </View>
