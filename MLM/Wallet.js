@@ -91,7 +91,7 @@ const Wallet = ({ navigation }) => {
             {/* 2 */}
             <View style={{marginBottom:40}}>
                 {/* Content for the second part */}
-                <TouchableOpacity style={[styles.frame, { marginTop: 8 }]}>
+                <TouchableOpacity style={[styles.frame, { marginTop: 8 }]} onPress={()=>{navigation.navigate('WithdrawWallet')}}>
                     <View style={styles.iconContainer}>
                         <View style={styles.circleAvatar}>
                             <MaterialCommunityIcons

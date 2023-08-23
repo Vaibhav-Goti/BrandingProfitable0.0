@@ -110,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
 	// navigate to signup
 
 	const handleLogin = () => {
-		if (fullName == '' && phone == "", password == '') {
+		if (fullName == '' && phone == "") {
 			Alert.alert("PLease Enter All details")
 		} else {
 			if (password == Cpassword) {
@@ -131,7 +131,7 @@ const LoginScreen = ({ navigation }) => {
 			fullName: fullName,
 			email: email,
 			adress: address,
-			password: password,
+			// password: password,
 			adhaar: adhaar,
 		}
 		: {
@@ -142,7 +142,7 @@ const LoginScreen = ({ navigation }) => {
 			fullName: fullName,
 			email: email,
 			adress: address,
-			password: password,
+			// password: password,
 			adhaar: adhaar,
 		};
 
@@ -172,7 +172,7 @@ const LoginScreen = ({ navigation }) => {
 						fullName: fullName,
 						email: email,
 						adress: address,
-						password: password,
+						// password: password,
 						adhaar: adhaar,
 						isPersonal: true, 
 					}
@@ -184,7 +184,7 @@ const LoginScreen = ({ navigation }) => {
 						fullName: fullName,
 						email: email,
 						adress: address,
-						password: password,
+						// password: password,
 						adhaar: adhaar,
 						isPersonal: false, 
 					};
@@ -669,7 +669,7 @@ const LoginScreen = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
 
-                        {/*  */}
+{/*                         
                         <View style={styles.labelContainer}>
                             <Text style={styles.label}>
                                 Enter Password
@@ -699,7 +699,7 @@ const LoginScreen = ({ navigation }) => {
                                 onChangeText={setCPassword}
                                 secureTextEntry
                             />
-                        </View>
+                        </View> */}
                         <TouchableHighlight onPress={handleSave} style={{ backgroundColor: '#FF0000', borderRadius: 8, margin: 15, width: "80%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5 }} >
 					<Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
 						Sign Up

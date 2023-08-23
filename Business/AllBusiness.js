@@ -72,6 +72,7 @@ const AllBusiness = ({ navigation }) => {
               );
               setFilteredData(filtered);
             }}
+            placeholderTextColor={'gray'}
           />
 
           <View style={{ width: 20 }}>

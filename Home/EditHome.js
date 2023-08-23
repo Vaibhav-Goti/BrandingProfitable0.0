@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, ToastAndroid } from 'react-native';
 import imageData from '../apiData/200x200';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -17,6 +17,17 @@ const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
 
 const EditHome = ({ route, navigation }) => {
+
+  const showToastWithGravity = (data) => {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+      0,
+      50,
+    );
+  };
+
   const { bannername } = route.params;
 
   const { items, index } = route.params
@@ -73,7 +84,50 @@ const EditHome = ({ route, navigation }) => {
     setSelectedVideo(item?.todayAndTomorrowImageOrVideo);
   };
 
+
+   // fetch the user team details 
+   const [userTeamDetails, setUserTeamDetails] = useState([])
+
+   console.log(userTeamDetails)
+ 
+   // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+ 
+   // all users details 
+ 
+   const fetchDetails = async () => {
+     try {
+       if (profileData) {
+ 
+         const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+         const result = response.data;
+ 
+         if (response.data.statusCode == 200) {
+           setUserTeamDetails('Purchase')
+         } else {
+           console.log("user not data aavto nathi athava purchase request ma che ")
+         }
+       } else {
+         console.log('details malti nathi!')
+       }
+     } catch (error) {
+       console.log('Error fetching data...:', error);
+     }finally{
+      setTimeout(() => {
+        setIsLoader(false)
+      }, 1000);
+    }
+   }
+ 
+   useEffect(() => {
+     fetchDetails();
+   })
+   const [isLoader, setIsLoader] = useState(true)
+ 
+
+
+
   const captureAndShareImage = async () => {
+        if (userTeamDetails === 'Purchase') {
     try {
       const uri = await viewShotRef.current.capture();
 
@@ -90,6 +144,9 @@ const EditHome = ({ route, navigation }) => {
       await Share.open(shareOptions);
     } catch (error) {
       console.error('Error sharing image:', error);
+    }
+     } else {
+      showToastWithGravity("Purchase MLM to share/download")
     }
   };
 
@@ -211,13 +268,11 @@ const EditHome = ({ route, navigation }) => {
   };
 
   const [callLanguageFunc, setCallLanguageFunc] = useState(true)
-  const [isLoader, setIsLoader] = useState(true)
 
   useEffect(() => {
     setInterval(() => {
       if (callLanguageFunc) {
         fetchData()
-        setIsLoader(false)
         setCallLanguageFunc(false)
       }
     }, 1000);

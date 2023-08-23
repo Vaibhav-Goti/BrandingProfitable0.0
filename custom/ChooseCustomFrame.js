@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList, Image, ToastAndroid, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -9,6 +9,7 @@ import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
+import axios from 'axios';
 
 
 const { width } = Dimensions.get('window')
@@ -20,31 +21,16 @@ const ChooseCustomFrame = ({ navigation, route }) => {
 
   console.log(capturedImage, "capturedImage")
 
-  // capture viewshot 
-
-  const captureAndShareImage = async () => {
-    try {
-      const uri = await viewShotRef.current.capture();
-
-      const fileName = 'sharedImage.jpg';
-      const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
-
-      await RNFS.copyFile(uri, destPath);
-
-      console.log('File copied to:', destPath); // Add this log to check the destination path
-
-      const shareOptions = {
-        type: 'image/jpeg',
-        url: `file://${destPath}`,
-      };
-
-      await Share.open(shareOptions);
-
-      navigation.navigate('EditCustomChoice');
-    } catch (error) {
-      console.error('Error sharing image:', error);
-    }
+  const showToastWithGravity = (data) => {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+      0,
+      50,
+    );
   };
+
 
 
   const [isOpenFrame, setIsOpenFrame] = useState(false)
@@ -75,6 +61,108 @@ const ChooseCustomFrame = ({ navigation, route }) => {
   };
 
   const [overLayImage, setOverlayImage] = useState('')
+
+  
+  const [isLoader, setIsLoader] = useState(true)
+  // fetch the user team details 
+  const [userTeamDetails, setUserTeamDetails] = useState([])
+
+  console.log(userTeamDetails)
+
+  // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+
+  // all users details 
+
+  const [profileData, setProfileData] = useState(null);
+
+  // setInterval(() => {
+  //   retrieveProfileData()
+  // }, 3000);
+
+  React.useEffect(() => {
+    retrieveProfileData()
+  }, [retrieveProfileData])
+
+  const retrieveProfileData = async () => {
+    try {
+      const dataString = await AsyncStorage.getItem('profileData');
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setProfileData(data);
+      }
+    } catch (error) {
+      console.error('Error retrieving profile data:', error);
+    }
+  };
+
+  const fetchDetails = async () => {
+    try {
+      if (profileData) {
+
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const result = response.data;
+
+        if (response.data.statusCode == 200) {
+          setUserTeamDetails('Purchase')
+          console.log(response.data.statusCode)
+        } else {
+          console.log("user not data aavto nathi athava purchase request ma che ")
+        }
+      } else {
+        console.log('details malti nathi!')
+      }
+    } catch (error) {
+      console.log('Error fetching data...:', error);
+    } finally {
+      setTimeout(() => {
+        setIsLoader(false)
+      }, 1000);
+    }
+  }
+
+  React.useEffect(() => {
+    fetchDetails();
+  })
+
+    // capture viewshot 
+
+    const captureAndShareImage = async () => {
+
+      if (userTeamDetails === 'Purchase') {
+        try {
+          const uri = await viewShotRef.current.capture();
+  
+          const fileName = 'sharedImage.jpg';
+          const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+  
+          await RNFS.copyFile(uri, destPath);
+  
+          console.log('File copied to:', destPath); // Add this log to check the destination path
+  
+          const shareOptions = {
+            type: 'image/jpeg',
+            url: `file://${destPath}`,
+          };
+  
+          await Share.open(shareOptions);
+  
+          navigation.navigate('EditCustomChoice');
+        } catch (error) {
+          console.error('Error sharing image:', error);
+        }
+  
+      } else {
+        showToastWithGravity("Purchase MLM to share/download")
+      }
+    };
+
+  if (isLoader) {
+    return (
+      <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={'white'} />
+      </LinearGradient >
+    )
+  }
 
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, justifyContent: 'space-between' }}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, ToastAndroid } from 'react-native';
 // import imageData from '../apiData/200x200';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -16,6 +16,17 @@ const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
 
 const EditHome = ({ route, navigation }) => {
+
+  const showToastWithGravity = (data) => {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+      0,
+      50,
+    );
+  };
+
   const { bannername } = route.params; i
 
   const { items, index } = route.params
@@ -24,6 +35,28 @@ const EditHome = ({ route, navigation }) => {
   const images = useMemo(() => items.filter((item) => item.isVideo === false));
 
   const [i, seti] = useState(0);
+
+  
+  const [userToken, setUserToken] = useState()
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    retrieveProfileData()
+  }, [retrieveProfileData])
+
+  const retrieveProfileData = async () => {
+    try {
+      const dataString = await AsyncStorage.getItem('profileData');
+      const userToken = await AsyncStorage.getItem('userToken');
+      setUserToken(userToken)
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setProfileData(data);
+      }
+    } catch (error) {
+      console.error('Error retrieving profile data:', error);
+    }
+  };
 
   useEffect(() => {
     if (i < 2) {
@@ -67,23 +100,70 @@ const EditHome = ({ route, navigation }) => {
     setSelectedVideo(item.uri);
   };
 
-  const captureAndShareImage = async () => {
+  // fetch the user team details 
+  const [userTeamDetails, setUserTeamDetails] = useState([])
+  const [isLoader, setIsLoader] = useState(true)
+
+  console.log(userTeamDetails)
+
+  // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+
+  // all users details 
+
+  const fetchDetails = async () => {
     try {
-      const uri = await viewShotRef.current.capture();
+      if (profileData) {
 
-      const fileName = 'sharedImage.jpg';
-      const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const result = response.data;
 
-      await RNFS.copyFile(uri, destPath);
-
-      const shareOptions = {
-        type: 'image/jpeg',
-        url: `file://${destPath}`,
-      };
-
-      await Share.open(shareOptions);
+        if (response.data.statusCode == 200) {
+          setUserTeamDetails('Purchase')
+        } else {
+          console.log("user not data aavto nathi athava purchase request ma che ")
+        }
+      } else {
+        console.log('details malti nathi!')
+      }
     } catch (error) {
-      console.error('Error sharing image:', error);
+      console.log('Error fetching data...:', error);
+    }finally{
+      setTimeout(() => {
+        setIsLoader(false)
+      }, 1000);
+    }
+  }
+
+  useEffect(() => {
+    fetchDetails();
+  })
+
+
+  const captureAndShareImage = async () => {
+    if (userTeamDetails === 'Purchase') {
+      try {
+        const uri = await viewShotRef.current.capture();
+
+        const fileName = 'sharedImage.jpg';
+        const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+        await RNFS.copyFile(uri, destPath);
+
+        const shareOptions = {
+          type: 'image/jpeg',
+          url: `file://${destPath}`,
+        };
+
+        await Share.open(shareOptions);
+      } catch (error) {
+        console.error('Error sharing image:', error);
+      } finally {
+        setTimeout(() => {
+          setIsLoader(false)
+        }, 1000);
+      }
+    } else {
+      showToastWithGravity("Purchase MLM to share/download")
     }
   };
 
@@ -136,6 +216,14 @@ const EditHome = ({ route, navigation }) => {
   setTimeout(() => {
     setisload(false)
   }, 2000);
+
+  if (isLoader) {
+    return (
+      <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={'white'} />
+      </LinearGradient >
+    )
+  }
 
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
@@ -288,7 +376,7 @@ const EditHome = ({ route, navigation }) => {
             )
           ) : (
             FlatlistisLoad ? (
-              <View style={{flex:1,alignItems:'center',justifyContent:'flex-start'}}>
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
                 <ActivityIndicator />
               </View>
             ) :

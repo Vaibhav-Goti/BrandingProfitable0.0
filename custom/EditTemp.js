@@ -14,6 +14,7 @@ import RNFS from 'react-native-fs';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import { ToastAndroid } from 'react-native';
 
 const { width } = Dimensions.get('window')
 
@@ -51,7 +52,7 @@ const ImageItem = React.memo(({ uri, isSelected, onDelete, onSelect, width, heig
                 {isSelected && (
                     <TouchableOpacity
                         onPress={onDelete}
-                        style={{ position: 'absolute', top: -10, right: -10, backgroundColor: 'red', padding: 5, borderRadius: 10, width: 25, alignItems: 'center', zIndex:100 }}
+                        style={{ position: 'absolute', top: -10, right: -10, backgroundColor: 'red', padding: 5, borderRadius: 10, width: 25, alignItems: 'center', zIndex: 100 }}
                     >
                         <Icon name="trash" size={17} color={"white"} />
                     </TouchableOpacity>
@@ -106,7 +107,7 @@ const App = ({ navigation, route }) => {
                 console.error('Error fetching response.data.data:', error)
             });
 
-            setImageLoader(false)
+        setImageLoader(false)
 
     }, []);
 
@@ -305,8 +306,8 @@ const App = ({ navigation, route }) => {
         if (selectedImageIndex !== null) {
             const updatedImages = [...images];
             const selectedImage = updatedImages[selectedImageIndex];
-            selectedImage.width = (selectedImage.width || 150) - 10;       
-             console.log(selectedImage)
+            selectedImage.width = (selectedImage.width || 150) - 10;
+            console.log(selectedImage)
 
             selectedImage.height = (selectedImage.height || 150) - 10;
             setImages(updatedImages);
@@ -529,7 +530,7 @@ const App = ({ navigation, route }) => {
                                     width: 25,
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    zIndex:100
+                                    zIndex: 100
                                 }}
                             >
                                 <Icon name="trash" size={17} color={'white'} />
@@ -545,7 +546,7 @@ const App = ({ navigation, route }) => {
                                     borderRadius: 10,
                                     height: 25,
                                     width: 25,
-                                    zIndex:100
+                                    zIndex: 100
                                 }}
                             >
                                 <Icon name="edit" size={15} color={'white'} />
@@ -558,6 +559,15 @@ const App = ({ navigation, route }) => {
     };
 
 
+    const showToastWithGravity = (data) => {
+        ToastAndroid.showWithGravityAndOffset(
+            data,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            0,
+            50,
+        );
+    };
 
     // console.log(textItems[0]?.text)
     // console.log(editText)
@@ -588,14 +598,117 @@ const App = ({ navigation, route }) => {
 
     // custom frames
 
+
+    // fetch the user team details 
+    const [userTeamDetails, setUserTeamDetails] = useState([])
+
+    console.log(userTeamDetails)
+
+    // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+
+    // all users details 
+
+    const [profileData, setProfileData] = useState(null);
+
+    // setInterval(() => {
+    //   retrieveProfileData()
+    // }, 3000);
+  
+    useEffect(() => {
+      retrieveProfileData()
+    }, [retrieveProfileData])
+  
+    const retrieveProfileData = async () => {
+      try {
+        const dataString = await AsyncStorage.getItem('profileData');
+        if (dataString) {
+          const data = JSON.parse(dataString);
+          setProfileData(data);
+        }
+      } catch (error) {
+        console.error('Error retrieving profile data:', error);
+      }
+    };
+
+    const fetchDetails = async () => {
+        try {
+            if (profileData) {
+
+                const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+                const result = response.data;
+
+                if (response.data.statusCode == 200) {
+                    setUserTeamDetails('Purchase')
+                } else {
+                    console.log("user not data aavto nathi athava purchase request ma che ")
+                }
+            } else {
+                console.log('details malti nathi!')
+            }
+        } catch (error) {
+            console.log('Error fetching data...:', error);
+        }finally{
+            setTimeout(() => {
+              setLoader(false)
+            }, 1000);
+          }
+    }
+
+    useEffect(() => {
+        fetchDetails();
+    })
+
+    const [loader, setLoader] = useState(false)
+
     // share 
 
     const captureAndShareImage = async () => {
-        setSelectedTextIndex(-1);
-        setIsTextSelected(false);
-        setSelectedImageIndex(-1);
-        setIsImageSelected(false);
 
+        if (userTeamDetails === 'Purchase') {
+            setSelectedTextIndex(-1);
+            setIsTextSelected(false);
+            setSelectedImageIndex(-1);
+            setIsImageSelected(false);
+
+            const updatedTextItems = textItems.map((item, i) => ({
+                ...item,
+                isSelected: false,
+            }));
+
+            // Deselect image items when a text item is selected
+            const updatedImages = images.map((image) => ({
+                ...image,
+                isSelected: false,
+            }));
+
+            setImages(updatedImages);
+            setTextItems(updatedTextItems);
+            try {
+                hideAlert5()
+
+                const uri = await viewShotRef.current.capture();
+
+                const fileName = 'sharedImage.jpg';
+                const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+                await RNFS.copyFile(uri, destPath);
+
+                const shareOptions = {
+                    type: 'image/jpeg',
+                    url: `file://${destPath}`,
+                };
+
+                await Share.open(shareOptions);
+            } catch (error) {
+                console.error('Error sharing image:', error);
+            }
+
+        } else {
+            showToastWithGravity("Purchase MLM to share/download")
+        }
+    };
+
+    const FrameAddorNot = () => {
         const updatedTextItems = textItems.map((item, i) => ({
             ...item,
             isSelected: false,
@@ -609,41 +722,6 @@ const App = ({ navigation, route }) => {
 
         setImages(updatedImages);
         setTextItems(updatedTextItems);
-        try {
-            hideAlert5()
-
-            const uri = await viewShotRef.current.capture();
-
-            const fileName = 'sharedImage.jpg';
-            const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
-
-            await RNFS.copyFile(uri, destPath);
-
-            const shareOptions = {
-                type: 'image/jpeg',
-                url: `file://${destPath}`,
-            };
-
-            await Share.open(shareOptions);
-        } catch (error) {
-            console.error('Error sharing image:', error);
-        }
-    };
-
-    const FrameAddorNot = () => {
-        const updatedTextItems = textItems.map((item, i) => ({
-            ...item,
-            isSelected: false,
-          }));
-      
-          // Deselect image items when a text item is selected
-          const updatedImages = images.map((image) => ({
-            ...image,
-            isSelected: false,
-          }));
-          
-          setImages(updatedImages);
-          setTextItems(updatedTextItems);
         showAlert5()
     }
     const YesAddFrame = async () => {
@@ -665,7 +743,6 @@ const App = ({ navigation, route }) => {
     const [isModalVisible5, setModalVisible5] = useState(false);
 
     const [imageLoader, setImageLoader] = useState(false)
-    const [loader, setLoader] = useState(false)
 
     const showAlert5 = () => {
         setModalVisible5(true);
@@ -684,26 +761,26 @@ const App = ({ navigation, route }) => {
             cropping: true,
             includeBase64: true,
         })
-        .then((response) => {
-            if (bg === 'Image') {
-                const newImage = { uri: response.path, isSelected: false };
-                setImages((prevImages) => [...prevImages, newImage]);
-            } else {
-                setFileUri(response.path);
-            }
-        })
-        .catch((error) => {
-            setImageLoader(false);
-            console.log('ImagePicker Error:', error);
-        });
-    };    
+            .then((response) => {
+                if (bg === 'Image') {
+                    const newImage = { uri: response.path, isSelected: false };
+                    setImages((prevImages) => [...prevImages, newImage]);
+                } else {
+                    setFileUri(response.path);
+                }
+            })
+            .catch((error) => {
+                setImageLoader(false);
+                console.log('ImagePicker Error:', error);
+            });
+    };
 
     if (loader) {
-        <View style={{backgroundColor:'black',flex:1,justifyContent:"center",alignItems:'center'}}>
-            <ActivityIndicator color={'white'} />
+        <View style={{ backgroundColor: 'black', flex: 1, justifyContent: "center", alignItems: 'center' }}>
+            <ActivityIndicator color={'black'} />
         </View>
     }
-    
+
 
     return (
         <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1 }}>
@@ -1187,7 +1264,7 @@ const TextInputModal = React.memo(({ visible, initialValue, initialColor, onSave
                     }}
                 >
                     <TouchableWithoutFeedback onPress={() => { }}>
-                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, height: 200, justifyContent: 'center', alignItems: 'center', width:300 }}>
+                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, height: 200, justifyContent: 'center', alignItems: 'center', width: 300 }}>
                             <TextInput
                                 value={textValue || "enter text"}
                                 onChangeText={setTextValue}
@@ -1213,7 +1290,7 @@ const TextInputModal = React.memo(({ visible, initialValue, initialColor, onSave
                             />
                             <TouchableOpacity activeOpacity={1} style={{ backgroundColor: 'black', width: '100%', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 7 }} onPress={handleSave}>
 
-                                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 17, textAlign:'center' }}>Save</Text>
+                                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 17, textAlign: 'center' }}>Save</Text>
 
                             </TouchableOpacity>
                         </View>

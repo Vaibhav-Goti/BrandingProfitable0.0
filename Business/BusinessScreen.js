@@ -9,52 +9,36 @@ import axios from 'axios';
 import Header from '../Header';
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
+import { useFocusEffect } from '@react-navigation/native';
 
 const BusinessScreen = ({ navigation, route }) => {
 	const { businessFromAll } = route.params ?? '';
 	const MyBusiness = 'Information & Technology';
 	const [userBusiness, setUserBusiness] = useState('');
 	const [profileData, setProfileData] = useState(null);
-	const [businessOrPersonal, setBusinessOrPersonal] = useState('');
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(true);
 
-	console.log(userBusiness)
-
-	const reloadScreen = () => {
-		// Your refresh logic goes here
-		retrieveProfileData()
-	};
-
-	useEffect(() => {
-		// Add a listener to the focus event to reload the screen
-		const unsubscribe = navigation.addListener('focus', reloadScreen);
-
-		// Clean up the listener when the component unmounts
-		return () => unsubscribe();
-	}, [navigation]);
-
 	const retrieveProfileData = async () => {
-		setLoading(true)
 		try {
 			const dataString = await AsyncStorage.getItem('profileData');
 			if (dataString) {
 				const data = JSON.parse(dataString);
 				setProfileData(data);
-				setUserBusiness(data.Designation || data.businessType)
+				setUserBusiness(data.Designation || data.businessType);
 			}
 		} catch (error) {
 			console.error('Error retrieving profile data:', error);
 		}
-		setTimeout(() => {
-			setLoading(false)
-		}, 1000);
 	};
+
 	const fetchData = async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
-			const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness || MyBusiness}`);
-			console.log(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness || MyBusiness}`)
+			const response = await axios.get(
+				`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness || MyBusiness
+				}`
+			);
 			const result = response.data.data;
 			setData(result);
 		} catch (error) {
@@ -63,12 +47,21 @@ const BusinessScreen = ({ navigation, route }) => {
 		setLoading(false);
 	};
 
-	useEffect(() => {
-		if (businessFromAll || userBusiness) {
+	const handleImagePress = (item, index) => {
+		navigation.navigate('EditBusiness', {
+			items: item.items,
+			bannername: item.businessCategoryName,
+			index: index ? index : '',
+		});
+	};
+
+	// Use useFocusEffect to fetch data when the screen is focused
+	useFocusEffect(
+		React.useCallback(() => {
 			retrieveProfileData();
-			fetchData()
-		}
-	}, [businessFromAll, businessOrPersonal]);
+			fetchData();
+		}, [businessFromAll, userBusiness])
+	);
 
 	if (loading) {
 		return (
@@ -77,14 +70,6 @@ const BusinessScreen = ({ navigation, route }) => {
 			</LinearGradient>
 		);
 	}
-
-	const handleImagePress = (item, index) => {
-		navigation.navigate('EditBusiness', {
-			items: item.items,
-			bannername: item.businessCategoryName,
-			index: index ? index : ''
-		});
-	};
 
 	return (
 		<LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>

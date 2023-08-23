@@ -7,10 +7,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 const OTPScreen = ({ route, navigation }) => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const retrieveData = async () => {
+        try {
+            const data = await AsyncStorage.getItem('isLoggedIn');
+            setIsLoggedIn(data === 'true');
+        } catch (error) {
+            console.log('Error retrieving login status:', error);
+        }
+    };
+
+    retrieveData();
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigation.navigate('StackMain')
+        }
+    })
 
     const { phone } = route.params
-    console.log('routes mathi aavelo phone - ', phone)
-    const [isLoader, setIsLoader] = useState(false);
+    const [isLoader, setIsLoader] = useState(false)
 
     const [otp, setOTP] = useState(['', '', '', '', '', '']); // An array to store OTP digits
     const [timer, setTimer] = useState(60); // Timer in seconds (30 minutes)
@@ -66,40 +83,42 @@ const OTPScreen = ({ route, navigation }) => {
         // Alert.alert("Login Successfully...");
         const dataAfterDecode = jwtDecode(response)
         showToastWithGravity("Login Success!")
-    
+
         // console.log(dataAfterDecode)
-    
-        navigation.navigate('StackMain');
-    
+
+        console.log(response)
+
+
         const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/user/token/${dataAfterDecode._id}`
         const requestData = {
-          token: fcmToken
+            token: fcmToken
         }
-    
+
         try {
-          const response = await axios.put(apiUrl, requestData, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+            const response = await axios.put(apiUrl, requestData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
         } catch (error) {
-          console.log(error)
+            console.log(error)
         }
-    
+
         const saveProfiledatatoLocal = JSON.stringify(dataAfterDecode);
         if (dataAfterDecode.isPersonal) {
-          await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
+            await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
         } else {
-          await AsyncStorage.setItem('BusinessOrPersonl', 'business')
+            await AsyncStorage.setItem('BusinessOrPersonl', 'business')
         }
         try {
-          await AsyncStorage.setItem("isLoggedIn", "true");
-          await AsyncStorage.setItem("profileData", saveProfiledatatoLocal);
-          await AsyncStorage.setItem("userToken", response.data.token);
+        navigation.navigate('StackMain');
+            await AsyncStorage.setItem("isLoggedIn", "true");
+            await AsyncStorage.setItem("profileData", saveProfiledatatoLocal);
+            await AsyncStorage.setItem("userToken", response);
         } catch (error) {
-          console.log('Error saving profile data:', error);
+            console.log('Error saving profile data:', error);
         }
-      }
+    }
 
     const sendDatatoVerifyOtp = async () => {
         const filledDigits = otp.filter((digit) => digit !== '');
@@ -140,13 +159,13 @@ const OTPScreen = ({ route, navigation }) => {
 
     const showToastWithGravity = (data) => {
         ToastAndroid.showWithGravityAndOffset(
-          data,
-          ToastAndroid.LONG,
-          ToastAndroid.BOTTOM,
-          0,
-          0
+            data,
+            ToastAndroid.LONG,
+            ToastAndroid.BOTTOM,
+            0,
+            0
         )
-      }
+    }
 
     // Check if all OTP digits are filled, and submit OTP
     useEffect(() => {
@@ -176,7 +195,7 @@ const OTPScreen = ({ route, navigation }) => {
 
                     if (response.data.statusCode === 200) {
                         console.log(response.data)
-                        
+
                         handleSuccessLogin(response.data.token)
 
                     } else {
@@ -215,11 +234,11 @@ const OTPScreen = ({ route, navigation }) => {
 
     if (isLoader) {
         return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator />
-          </View>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator />
+            </View>
         )
-      }
+    }
 
     return (
         <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, justifyContent: 'space-between' }} >
@@ -243,7 +262,7 @@ const OTPScreen = ({ route, navigation }) => {
 
             </View>
             <View style={{ backgroundColor: 'white', borderTopRightRadius: 20, borderTopLeftRadius: 20, height: '40%', }}>
-                
+
 
                 <KeyboardAvoidingView
                     style={styles.container}
@@ -251,7 +270,7 @@ const OTPScreen = ({ route, navigation }) => {
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
                 >
                     <View>
-                    
+
                     </View>
                     <View style={styles.otpInputContainer}>
                         {otp.map((digit, index) => (
@@ -275,7 +294,7 @@ const OTPScreen = ({ route, navigation }) => {
                         <Text style={styles.timerText}>Resend code in {formatTimer(timer)}</Text>
                     )}
                     <View>
-                    
+
                     </View>
                 </KeyboardAvoidingView>
             </View>

@@ -14,6 +14,7 @@ import EditHomeDynamic from './Home/EditHomeDynamic';
 import EditBusiness from './Business/EditBusiness';
 import EditTempFromCustom from './custom/EditTemp';
 import ChooseCustomFrame from './custom/ChooseCustomFrame';
+import WithdrawWallet from './MLM/WithdrawWallet';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EditCustomChoice from './custom/EditCustomChoice';
@@ -80,6 +81,7 @@ const MyStack = () => {
                 animation: 'slide_from_right',
               }}
             />
+            <Stack.Screen name="WithdrawWallet" component={WithdrawWallet} options={{ headerShown: false, animation: 'slide_from_right', }} />
             <Stack.Screen name="EditHomeScreen" component={EditHome} options={{ headerShown: false, animation: 'slide_from_right', }} />
             <Stack.Screen name="EditHomeDynamic" component={EditHomeDynamic} options={{ headerShown: false, animation: 'slide_from_right', }} />
             <Stack.Screen name="EditBusiness" component={EditBusiness} options={{ headerShown: false, animation: 'slide_from_right', }} />

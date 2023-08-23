@@ -179,7 +179,7 @@ const [DirectSponser, setDirectSponser] = React.useState([])
   const firstChildWithRightSide = findFirstChildBySide(treeData, 'right');
   const firstChildWithLeftSide = findFirstChildBySide(treeData, 'left');
 
-  const numberOfChildren = DirectSponser.children ? DirectSponser.children.length : 0;
+  const numberOfChildren = DirectSponser.children ? DirectSponser.children.length : 0
   console.log(numberOfChildren,"sdfjkdkf")
 
   // Count users under the first child with side 'right'
@@ -285,7 +285,7 @@ const [DirectSponser, setDirectSponser] = React.useState([])
             />
 
           </View>
-          <TouchableHighlight style={{ width: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: "#20AE5C", height: 60, borderRadius: 20, marginTop: -30 }}>
+          <TouchableHighlight style={{ width: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: "#20AE5C", height: 60, borderRadius: 20, marginTop: -30 }} onPress={()=>{navigation.navigate('WithdrawWallet')}}>
 
             <Text style={{ fontFamily: 'DMSans_18pt-Bold', fontSize: 18, color: 'white' }}>
               Withdraw Green Wallet

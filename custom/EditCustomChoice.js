@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5;
@@ -25,6 +26,8 @@ const EditHome = ({ route, navigation }) => {
     </TouchableOpacity>
   ), []);
 
+
+
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={styles.container}>
       <View style={styles.headerContainer}>
@@ -38,9 +41,9 @@ const EditHome = ({ route, navigation }) => {
       <View style={styles.imageContainer}>
         <Image source={{ uri: item.imageUrl }} style={styles.mainImage} />
         <TouchableOpacity
-        onPress={()=>{navigation.navigate('EditTempFromCustom', {'imageId':item.cds_id})}} 
-        style={{width:'100%',justifyContent:'center',alignItems:'center',backgroundColor:'white',height:30,borderTopWidth:0.3}}>
-          <Text style={{color:'black',fontFamily:'Manrope-Regular'}}>
+          onPress={() => { navigation.navigate('EditTempFromCustom', { 'imageId': item.cds_id }) }}
+          style={{ width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', height: 30, borderTopWidth: 0.3 }}>
+          <Text style={{ color: 'black', fontFamily: 'Manrope-Regular' }}>
             Edit
           </Text>
         </TouchableOpacity>
@@ -65,14 +68,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A2A3D',
   },
   imageContainer: {
-    height: width-10 ,
+    height: width - 10,
     width: width - 40,
     marginTop: 20,
     marginBottom: 30,
     elevation: 20,
     borderWidth: 1,
     borderColor: 'white',
-    borderRadius:10,
+    borderRadius: 10,
     overflow: 'hidden',
   },
   mainImage: {

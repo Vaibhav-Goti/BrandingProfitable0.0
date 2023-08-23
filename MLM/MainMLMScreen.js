@@ -48,7 +48,7 @@ const MainMLMScreen = () => {
           } finally {
             setLoader(false); // Set loader to false after handling subscription status
           }
-        }, 3000); // Run every 3 seconds
+        }, 5000); // Run every 3 seconds
       
         // Clear the interval when the component unmounts
         return () => {

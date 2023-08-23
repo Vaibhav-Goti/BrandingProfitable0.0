@@ -15,8 +15,8 @@ const Frames = () => {
         tabBarIndicatorStyle: { backgroundColor: 'white' }, // Active tab indicator color
       }}
     >
-      <Tab.Screen name="SavedFramesProfile" component={SavedFrames} options={{title:'Saved Frames'}} />
       <Tab.Screen name="CustomFramesProfile" component={MainCustomFrame} options={{title:'Custom Frames'}} />
+      <Tab.Screen name="SavedFramesProfile" component={SavedFrames} options={{title:'Saved Frames'}} />
     </Tab.Navigator>
   );
 };

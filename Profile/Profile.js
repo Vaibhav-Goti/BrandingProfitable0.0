@@ -10,6 +10,8 @@ import {
   ScrollView,
   TouchableHighlight,
   Modal,
+  ToastAndroid,
+  ActivityIndicator
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,9 +23,12 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather'
 import Header from '../Header';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = () => {
+  const navigation = useNavigation()
   // get business or profile
   const [businessOrPersonal, setBusinessOrPersonal] = useState('');
 
@@ -83,6 +88,57 @@ const ProfileScreen = ({ navigation }) => {
     return () => unsubscribe()
   }, [navigation])
 
+  // fetch the user team details 
+  const [userTeamDetails, setUserTeamDetails] = useState([])
+
+  // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+
+  // all users details 
+
+  const [loader, setLoader] = React.useState(true)
+
+  const fetchDetails = async () => {
+
+    try {
+      if (profileData) {
+        console.log('Checking subscription status...');
+
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const result = response.data;
+
+        if (response.data.statusCode == 200) {
+          setUserTeamDetails('Purchase')
+        } else {
+          setUserTeamDetails(result)
+        }
+      } else {
+        console.log('details malti nathi!')
+      }
+      setTimeout(() => {
+        setLoader(false)
+      }, 1000);
+
+    } catch (error) {
+      console.log('Error fetching data...:', error);
+      setTimeout(() => {
+        setLoader(false)
+      }, 1000);
+
+    }
+  }
+
+  useEffect(() => {
+    fetchDetails();
+  })
+
+  if (loader) {
+    return (
+      <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={'white'} />
+      </LinearGradient>
+    )
+  }
+
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
       {/* main contianer */}
@@ -135,8 +191,8 @@ const ProfileScreen = ({ navigation }) => {
               {profileData?.email || 'John Doe'}
             </Text>
 
-            <TouchableOpacity style={{marginTop:10}} onPress={()=>{navigation.navigate('ViewProfile')}}>
-              <Text style={{height:40,color:'#00D3FF',fontFamily:"Manrope-Regular",fontSize:15}}>
+            <TouchableOpacity style={{ marginTop: 10 }} onPress={() => { navigation.navigate('ViewProfile') }}>
+              <Text style={{ height: 40, color: '#00D3FF', fontFamily: "Manrope-Regular", fontSize: 15 }}>
                 View
               </Text>
             </TouchableOpacity>
@@ -148,42 +204,55 @@ const ProfileScreen = ({ navigation }) => {
         {/* 2 */}
         <View style={{ height: '50%', width: '100%', backgroundColor: '#2B353F', borderTopRightRadius: 15, borderTopLeftRadius: 15, overflow: 'hidden' }}>
           {/* 1 */}
-          <View style={{ height: 80, width: '100%', backgroundColor: '#414851', justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
 
-              <Text style={{ color: 'red', paddingHorizontal: 10, }}>
-                <FontAwesome6 name="sack-dollar" size={30} color="#E31E25" />
-              </Text>
+          {userTeamDetails !== 'Purchase' ? (
+            // not purchased by user
+            <View style={{ height: 80, width: '100%', backgroundColor: '#414851', justifyContent: 'center', alignItems: 'center' }}>
               <View>
-                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: '#E31E25' }}>
-                  Red Wallet
-                </Text>
-                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
-                  ₹ 1200/-
+                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: '#E31E25' }}>
+                  Purchase MLM Subscription!
                 </Text>
               </View>
             </View>
+          ) : (
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: 'red', paddingHorizontal: 10, flexDirection: 'row' }}>
-                <FontAwesome6 name="sack-dollar" size={30} color="#42FF00" />
-              </Text>
-              <View>
-                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: '#42FF00' }}>
-                  Green Wallet
+            <View style={{ height: 80, width: '100%', backgroundColor: '#414851', justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+
+                <Text style={{ color: 'red', paddingHorizontal: 10, }}>
+                  <FontAwesome6 name="sack-dollar" size={30} color="#E31E25" />
                 </Text>
-                <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
-                  ₹ 1200/-
+                <View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: '#E31E25' }}>
+                    Red Wallet
+                  </Text>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
+                    ₹ {userTeamDetails?.redWallet || 0}/-
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: 'red', paddingHorizontal: 10, flexDirection: 'row' }}>
+                  <FontAwesome6 name="sack-dollar" size={30} color="#42FF00" />
                 </Text>
+                <View>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: '#42FF00' }}>
+                    Green Wallet
+                  </Text>
+                  <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
+                    ₹ {userTeamDetails?.greenWallet || 0}/-
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* 2 */}
           <ScrollView style={{ height: '100%', width: '100%' }}>
             <View style={{ alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingBottom: 35 }}>
               {/*  */}
-              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center', display: userTeamDetails != 'Purchase' ? 'none' : 'flex' }} onPress={()=>{navigation.navigate('WithdrawWallet')}}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
                   <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
@@ -269,7 +338,7 @@ const ProfileScreen = ({ navigation }) => {
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
                   <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
-                    <Text >
+                    <Text>
                       <Icon name="sign-out" size={20} color="white" />
                     </Text>
                   </View>
@@ -354,7 +423,7 @@ const ProfileScreen = ({ navigation }) => {
                       <TouchableOpacity
                         onPress={async () => {
                           hideAlert()
-                          navigation.navigate('LoginScreen');
+                          navigation.navigate('StackLogin');
                           await AsyncStorage.removeItem('isLoggedIn');
                           await AsyncStorage.removeItem('profileData');
                           await AsyncStorage.removeItem('businessOrPersonal');

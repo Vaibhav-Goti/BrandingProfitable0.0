@@ -69,10 +69,10 @@ const MLMhome = ({ navigation }) => {
     // modal 
 
     const [isModalVisible, setModalVisible] = useState(false);
+    const [modalOfQr, setModalOfQr] = useState(false);
     const [isSecondModalVisible, setSecondModalVisible] = useState(false);
 
     const [errorModal, setErrorModal] = useState(false);
-
 
     // Toggle the first modal visibility
     const toggleModal = () => {
@@ -83,7 +83,6 @@ const MLMhome = ({ navigation }) => {
     const toggleSecondModal = () => {
         setSecondModalVisible(!isSecondModalVisible);
     };
-
 
     const transactionImage = fileUri;
     const currentDate = new Date();
@@ -271,14 +270,14 @@ const MLMhome = ({ navigation }) => {
                             lorem ipsum is simply dummy text the printing and cutting industry. lorem ipsum has been the text ever.
                         </Text>
                     </View>
-                    <TouchableOpacity style={{ backgroundColor: '#E31E25', borderRadius: 8, margin: 20, width: "55%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5, }} >
+                    <TouchableOpacity style={{ backgroundColor: '#E31E25', borderRadius: 8, margin: 20, width: "55%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5, }} onPress={() => { setModalOfQr(true) }} >
                         <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
-                            Join Now
+                            Pay here
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={toggleModal}>
-                        <Text style={{ color: 'white', fontSize: 15, fontFamily: 'Manrope-Bold', height: 30 }}>
-                            Pay Here
+                    <TouchableOpacity onPress={toggleModal} style={{ width: '50%' }}>
+                        <Text style={{ color: 'white', fontSize: 15, fontFamily: 'Manrope-Bold', textDecorationLine: 'underline', textAlign: 'center' }}>
+                            Upload Your Payment Screenshot
                         </Text>
                     </TouchableOpacity>
                     {/* <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2') }}>
@@ -295,6 +294,20 @@ const MLMhome = ({ navigation }) => {
                 </View>
 
             </ScrollView>
+
+            {/* qr the modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalOfQr}
+            >
+                <TouchableOpacity onPress={() => { setModalOfQr(false) }} style={{position:'absolute',zIndex:12,top:20,right:20, width:30,height:30,justifyContent:'center',alignItems:'center'}}>
+                        <Text><Icon name="close" size={27} color={'white'} /></Text>
+                    </TouchableOpacity>
+                <View style={[{flex:1,justifyContent:'center',alignItems:'center'}]}>
+                    <Image style={{ height: '100%', width: width }} source={require('../assets/paymentQR.png')} />
+                </View>
+            </Modal>
 
             {/* Define the modal */}
             <Modal
@@ -347,7 +360,7 @@ const MLMhome = ({ navigation }) => {
                 transparent={true}
                 visible={isSecondModalVisible}
             >
-                <ScrollView style={styles.modalContent} keyboardShouldPersistTaps={true}>
+                <ScrollView style={styles.modalContent} keyboardShouldPersistTaps={'always'}>
                     <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', height: height - 230 }}>
 
                         <View style={{ marginTop: 30, marginBottom: 30, height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
@@ -484,7 +497,7 @@ const styles = StyleSheet.create({
     //modal
     // Style for the modal content
     modalContent: {
-        height: "60%",
+        height:'60%',
         backgroundColor: 'white',
         padding: 20,
         position: 'absolute',

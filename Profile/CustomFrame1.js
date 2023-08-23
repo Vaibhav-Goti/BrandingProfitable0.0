@@ -24,6 +24,13 @@ const staticImageUrl =
 const colors = ['black', 'red', 'blue', 'green', 'purple'];
 
 const ImageItem = React.memo(({ id, uri, isSelected, onDelete, onSelect, width, height, rotation, top, left, scaleX, scaleY }) => {
+
+  const [profileFound, isProfileFound] = useState(false)
+  useEffect(()=>{
+    if (uri == 'https://www.sparrowgroups.com/CDN/upload/932PngItem_5040528.png?auto=compress&cs=tinysrgb&h=60') {
+      isProfileFound(true)
+    }
+  })
   return (
     <TouchableOpacity onPress={onSelect} activeOpacity={0.7}>
       <View style={{ position: 'relative', top, left, transform: [{ rotate: `${rotation || 0}deg` }] }}>
@@ -37,7 +44,7 @@ const ImageItem = React.memo(({ id, uri, isSelected, onDelete, onSelect, width, 
             borderWidth: isSelected ? 2 : 0,
             top: 0,
             left: 0,
-            borderRadius: id == 'WJXpiYZyy7AOhylqWnb05' ? 100 : 0
+            borderRadius: profileFound ? 100 : 0
           }}
         />
         {isSelected && (
@@ -287,8 +294,8 @@ const App = ({ navigation, route }) => {
     if (selectedImageIndex !== null) {
       const updatedImages = [...images];
       const selectedImage = updatedImages[selectedImageIndex];
-      selectedImage.width = (selectedImage.width || 150) + 10;
-      selectedImage.height = (selectedImage.height || 150) + 10;
+      selectedImage.width = (selectedImage.width || 150) + 20;
+      selectedImage.height = (selectedImage.height || 150) + 20;
       setImages(updatedImages);
     }
   };
@@ -297,8 +304,8 @@ const App = ({ navigation, route }) => {
     if (selectedImageIndex !== null) {
       const updatedImages = [...images];
       const selectedImage = updatedImages[selectedImageIndex];
-      selectedImage.width = (selectedImage.width || 150) - 10;
-      selectedImage.height = (selectedImage.height || 150) - 10;
+      selectedImage.width = (selectedImage.width || 150) - 20;
+      selectedImage.height = (selectedImage.height || 150) - 20;
       setImages(updatedImages);
     }
   };
@@ -660,7 +667,7 @@ const App = ({ navigation, route }) => {
   const handleProfileImageChange = () => {
     console.log("profile image nu funcation call thyu!")
     // Find the index of the image with the specified id
-    const imageIndex = images.findIndex((image) => image.id === 'WJXpiYZyy7AOhylqWnb05');
+    const imageIndex = images.findIndex((image) => image.src === 'https://www.sparrowgroups.com/CDN/upload/932PngItem_5040528.png?auto=compress&cs=tinysrgb&h=60');
 
     if (imageIndex !== -1) {
       // Open the image picker and replace the selected image with the new one

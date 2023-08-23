@@ -83,6 +83,7 @@ const Notifications = ({ navigation }) => {
           data={notifications}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{paddingBottom:20}}
         />
       )}
     </LinearGradient>
