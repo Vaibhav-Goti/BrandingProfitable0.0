@@ -38,7 +38,7 @@ const CustomBanner = () => {
     }, []);
 
     const fetchBannerData = () => {
-        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/cd_banner/cd_banner';
+        const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/cd_banner/banner/custome';
 
         // Make the GET request using Axios
         axios
@@ -50,7 +50,7 @@ const CustomBanner = () => {
             })
             .catch(error => {
                 // Handle errors
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data...:', error);
                 setLoading(false);
             });
     }

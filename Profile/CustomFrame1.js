@@ -37,7 +37,7 @@ const ImageItem = React.memo(({ id, uri, isSelected, onDelete, onSelect, width, 
             borderWidth: isSelected ? 2 : 0,
             top: 0,
             left: 0,
-            borderRadius: id == '-2UZrscLPt1tNduHQ1X7y' ? 100 : 0
+            borderRadius: id == 'WJXpiYZyy7AOhylqWnb05' ? 100 : 0
           }}
         />
         {isSelected && (
@@ -463,6 +463,7 @@ const App = ({ navigation, route }) => {
   }, [rotationValue]);
 
 
+
   const TextItem = ({
     text,
     isSelected,
@@ -478,31 +479,31 @@ const App = ({ navigation, route }) => {
     left,
     scaleX,
     scaleY,
-    textAlign
+    textAlign,
   }) => {
-    const scaledWidth = width;
-    const scaledHeight = height;
-
     return (
       <TouchableOpacity onPress={onSelect} activeOpacity={0.7}>
         <View
           style={{
             transform: [
               { rotate: `${rotation || 0}deg` },
+              { scaleX: scaleX || 1 }, // Apply X-axis scaling
+              { scaleY: scaleY || 1 }, // Apply Y-axis scaling
             ],
             borderColor: isSelected ? 'black' : 'transparent',
             borderWidth: isSelected ? 2 : 0,
             top,
             left,
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}
         >
           <Text
             style={{
-              width: scaledWidth,
+              width: width * (scaleX || 1), // Scale the width based on scaleX
+              height: height * (scaleY || 1), // Scale the height based on scaleY
               fontSize,
               color,
-              textAlign
+              textAlign,
             }}
           >
             {text}
@@ -546,7 +547,6 @@ const App = ({ navigation, route }) => {
       </TouchableOpacity>
     );
   };
-
 
 
   // console.log(textItems[0]?.text)
@@ -655,9 +655,12 @@ const App = ({ navigation, route }) => {
 
   // [{"height": 60, "id": "-2UZrscLPt1tNduHQ1X7y", "left": 20.54000000000002, "scaleX": 1, "scaleY": 1, "src": "https://www.livedesimall.com/CDN/upload/400face-icon-user-icon-design-user-profile-share-icon-avatar-black-and-white-silhouette-png-clipart-removebg-preview_2_optimized.png?auto=compress&cs=tinysrgb&h=60", "top": 21.900000000000006, "type": "image", "width": 60}]
 
+  console.log(images)
+
   const handleProfileImageChange = () => {
+    console.log("profile image nu funcation call thyu!")
     // Find the index of the image with the specified id
-    const imageIndex = images.findIndex((image) => image.id === '-2UZrscLPt1tNduHQ1X7y');
+    const imageIndex = images.findIndex((image) => image.id === 'WJXpiYZyy7AOhylqWnb05');
 
     if (imageIndex !== -1) {
       // Open the image picker and replace the selected image with the new one
@@ -678,6 +681,8 @@ const App = ({ navigation, route }) => {
         .catch((error) => {
           console.log('ImagePicker Error:', error);
         });
+    }else{
+      console.log("first")
     }
   };
 
@@ -785,9 +790,8 @@ const App = ({ navigation, route }) => {
               justifyContent: 'center',
               alignItems: 'center',
               overflow: 'hidden',
-              borderRadius: 10,
               borderWidth: 1,
-              borderColor: 'gray'
+              borderColor: 'gray',
             }}
             onPress={handleCanvasTap}
           >
@@ -804,7 +808,7 @@ const App = ({ navigation, route }) => {
                     width={image.width || 150}
                     height={image.height || 150}
                     rotation={image.rotation || 0}
-                    top={image.top || 0}
+                    top={image.top || 0}  
                     left={image.left || 0}
                     onSelect={() => {
                       setSelectedImageIndex(index);

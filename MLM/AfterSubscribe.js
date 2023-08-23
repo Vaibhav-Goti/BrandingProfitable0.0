@@ -1,6 +1,6 @@
 // change the fontawesome 5 to fontawesome 6
 
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, ActivityIndicator, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, ActivityIndicator, Modal, ScrollView, ToastAndroid } from 'react-native';
 import React, { useState, useEffect } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -16,17 +16,27 @@ import Header from '../Header';
 const { height, width } = Dimensions.get('window')
 
 const AfterSubscribe = () => {
-
-    const handleCopyToClipboard = () => {
-        const textToCopy = profileData?.adhaar; // Text you want to copy
-        Clipboard.setString(textToCopy);
-        alert('Text copied to clipboard!');
-    };
-
     const navigation = useNavigation();
 
     const [profileData, setProfileData] = useState(null);
     const [businessOrPersonal, setBusinessOrPersonal] = useState('');
+
+    const showToastWithGravity = (data) => {
+        ToastAndroid.showWithGravityAndOffset(
+            data,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            0,
+            50,
+        );
+    };
+
+    const handleCopyToClipboard = () => {
+        const textToCopy = profileData?.adhaar; // Text you want to copy
+        const stringText = JSON.stringify(textToCopy)
+        Clipboard.setString(stringText);
+        showToastWithGravity("Referal is Copied to ClipBoard")
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -74,7 +84,7 @@ const AfterSubscribe = () => {
                 console.log('details malti nathi!')
             }
         } catch (error) {
-            console.log('Error fetching data:', error);
+            console.log('Error fetching data...:', error);
         }
     }
 
@@ -291,7 +301,7 @@ const AfterSubscribe = () => {
                                 </Text>
                             </View>
                             <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
-                                Help
+                                Privacy Policy
                             </Text>
                         </View>
 
@@ -305,16 +315,16 @@ const AfterSubscribe = () => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
                             <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
                                 <Text >
-                                    <MaterialIcons name="privacy-tip" size={16} color="white" />
+                                    <MaterialIcons name="privacy-tip" size={16} color="#E31E25" />
                                 </Text>
                             </View>
-                            <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
-                                Privacy Policy
+                            <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: '#E31E25', marginLeft: 10 }}>
+                                Help
                             </Text>
                         </View>
 
                         <Text>
-                            <Icon name="angle-right" size={30} color="white" />
+                            <Icon name="angle-right" size={30} color="#E31E25" />
                         </Text>
 
                     </TouchableOpacity>

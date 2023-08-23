@@ -40,7 +40,7 @@ const SearchScreen = ({ navigation }) => {
       setItems(items)
       setVideos(videos)
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     } finally {
       setLoading(false);
     }

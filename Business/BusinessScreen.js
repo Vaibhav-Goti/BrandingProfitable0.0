@@ -24,15 +24,15 @@ const BusinessScreen = ({ navigation, route }) => {
 	const reloadScreen = () => {
 		// Your refresh logic goes here
 		retrieveProfileData()
-	  };
-	
-	  useEffect(() => {
+	};
+
+	useEffect(() => {
 		// Add a listener to the focus event to reload the screen
 		const unsubscribe = navigation.addListener('focus', reloadScreen);
-	
+
 		// Clean up the listener when the component unmounts
 		return () => unsubscribe();
-	  }, [navigation]);
+	}, [navigation]);
 
 	const retrieveProfileData = async () => {
 		setLoading(true)
@@ -41,29 +41,33 @@ const BusinessScreen = ({ navigation, route }) => {
 			if (dataString) {
 				const data = JSON.parse(dataString);
 				setProfileData(data);
-				setUserBusiness(data.Designation||data.businessType)
+				setUserBusiness(data.Designation || data.businessType)
 			}
 		} catch (error) {
 			console.error('Error retrieving profile data:', error);
 		}
-		setLoading(false)
+		setTimeout(() => {
+			setLoading(false)
+		}, 1000);
 	};
 	const fetchData = async () => {
 		setLoading(true)
 		try {
-			const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness||MyBusiness}`);
-			console.log(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness||MyBusiness}`)
+			const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness || MyBusiness}`);
+			console.log(`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness || MyBusiness}`)
 			const result = response.data.data;
 			setData(result);
 		} catch (error) {
-			console.log('Error fetching data:', error);
+			console.log('Error fetching data....:', error);
 		}
 		setLoading(false);
 	};
 
 	useEffect(() => {
-		retrieveProfileData();
-		fetchData()
+		if (businessFromAll || userBusiness) {
+			retrieveProfileData();
+			fetchData()
+		}
 	}, [businessFromAll, businessOrPersonal]);
 
 	if (loading) {
@@ -78,67 +82,67 @@ const BusinessScreen = ({ navigation, route }) => {
 		navigation.navigate('EditBusiness', {
 			items: item.items,
 			bannername: item.businessCategoryName,
-			index: index?index:''
+			index: index ? index : ''
 		});
 	};
 
-		return (
-			<LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
-				
-				<Header />
-				
-				<View style={{ paddingHorizontal: 15, paddingTop: 20, flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
-					<View style={{ borderRadius: 30, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: 'red', height: 30, }}>
-						<Text style={{ color: 'white', fontFamily:'Manrope-Regular' }}>
-							{businessFromAll || userBusiness||MyBusiness}
-						</Text>
-					</View>
-					<TouchableOpacity onPress={() => { navigation.navigate('AllBusiness') }} style={{ borderRadius: 40, backgroundColor: 'red', width: 40, height: 30, alignItems: 'center', justifyContent: 'center' }}>
-						<Text style={{ color: 'white' }}>
-							<Octicons name="pencil" size={20} color={'white'} />
-						</Text>
-					</TouchableOpacity>
+	return (
+		<LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom: 50 }}>
+
+			<Header />
+
+			<View style={{ paddingHorizontal: 15, paddingTop: 20, flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+				<View style={{ borderRadius: 30, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: 'red', height: 30, }}>
+					<Text style={{ color: 'white', fontFamily: 'Manrope-Regular' }}>
+						{businessFromAll || userBusiness || MyBusiness}
+					</Text>
 				</View>
-				<View style={styles.container}>
-					<ScrollView contentContainerStyle={styles.scrollViewContainer}>
-						{data.map((item) => (
-							<View key={item.businessCategoryName} style={styles.BannerItem}>
-								<View>
-									<View style={styles.bannerHeader}>
-										<Text style={styles.bannerHeaderText}>
-											{item.businessCategoryName}
+				<TouchableOpacity onPress={() => { navigation.navigate('AllBusiness') }} style={{ borderRadius: 40, backgroundColor: 'red', width: 40, height: 30, alignItems: 'center', justifyContent: 'center' }}>
+					<Text style={{ color: 'white' }}>
+						<Octicons name="pencil" size={20} color={'white'} />
+					</Text>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.container}>
+				<ScrollView contentContainerStyle={styles.scrollViewContainer}>
+					{data.map((item) => (
+						<View key={item.businessCategoryName} style={styles.BannerItem}>
+							<View>
+								<View style={styles.bannerHeader}>
+									<Text style={styles.bannerHeaderText}>
+										{item.businessCategoryName}
+									</Text>
+									<TouchableOpacity onPress={() => handleImagePress(item)}>
+										<Text style={[styles.bannerHeaderText, { width: 30, height: 30, textAlign: 'right', }]}>
+											{/* <Icon name="angle-right" size={32} color={"white"} /> */}
 										</Text>
-										<TouchableOpacity onPress={() => handleImagePress(item)}>
-											<Text style={[styles.bannerHeaderText, { width: 30, height: 30, textAlign: 'right', }]}>
-												{/* <Icon name="angle-right" size={32} color={"white"} /> */}
-											</Text>
-										</TouchableOpacity>
-									</View>
-									<ScrollView
-										horizontal
-										showsHorizontalScrollIndicator={false}
-										contentContainerStyle={styles.imageScrollView}
-									>
-										{item.items.map((imageItem, index) => (
-											<TouchableOpacity
-												key={index.toString()}
-												onPress={() => handleImagePress(item, index)}
-											>
-												<FastImage
-													source={{ uri: imageItem.myBusinessImageOrVideo }}
-													style={[styles.image, { marginLeft: index === 0 ? 15 : 0 }]}
-													onLoadEnd={() => Image.prefetch(imageItem.myBusinessImageOrVideo)}
-												/>
-											</TouchableOpacity>
-										))}
-									</ScrollView>
+									</TouchableOpacity>
 								</View>
+								<ScrollView
+									horizontal
+									showsHorizontalScrollIndicator={false}
+									contentContainerStyle={styles.imageScrollView}
+								>
+									{item.items.map((imageItem, index) => (
+										<TouchableOpacity
+											key={index.toString()}
+											onPress={() => handleImagePress(item, index)}
+										>
+											<FastImage
+												source={{ uri: imageItem.myBusinessImageOrVideo }}
+												style={[styles.image, { marginLeft: index === 0 ? 15 : 0 }]}
+												onLoadEnd={() => Image.prefetch(imageItem.myBusinessImageOrVideo)}
+											/>
+										</TouchableOpacity>
+									))}
+								</ScrollView>
 							</View>
-						))}
-					</ScrollView >
-				</View >
-			</LinearGradient>
-		)
+						</View>
+					))}
+				</ScrollView >
+			</View >
+		</LinearGradient>
+	)
 }
 
 export default BusinessScreen

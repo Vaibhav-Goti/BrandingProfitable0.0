@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, TextInput, Text, TouchableOpacity, Alert, Button, Dimensions, TouchableHighlight } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TextInput, Text, TouchableOpacity, Alert, ToastAndroid, Dimensions, TouchableHighlight, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
@@ -9,6 +9,7 @@ import LinearGradient from 'react-native-linear-gradient';
 // import StackHome from '../Home/StackNavigatorHome';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ImageCropPicker from 'react-native-image-crop-picker';
 
 const { width } = Dimensions.get(('window'))
 
@@ -25,6 +26,8 @@ const FullScreenProfile = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [dob, setDob] = useState('');
+
+  const [fileUri, setFileUri] = useState('');
 
   const handleDateChange = (_, date) => {
     hideDatePicker();
@@ -59,7 +62,7 @@ const FullScreenProfile = ({ navigation }) => {
 
       setItems(mappedItems);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     }
     setLoading(false);
   };
@@ -98,11 +101,23 @@ const FullScreenProfile = ({ navigation }) => {
     retrieveProfileData();
   }, []);
 
+  const showToastWithGravity = (data) => {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+      0,
+      50,
+    );
+  };
 
-  if (!profileData) {
+  const [isloader, setisloader] = useState(false)
+
+
+  if (!profileData || isloader) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={styles.loadingText}>Loading...</Text>
+        <ActivityIndicator color={'white'} />
       </View>
     );
   }
@@ -134,6 +149,7 @@ const FullScreenProfile = ({ navigation }) => {
   // })
 
   const onUpdate = async () => {
+    setisloader(true)
     try {
       // Include the updated designation in profileData
       const updatedProfileData = {
@@ -150,7 +166,7 @@ const FullScreenProfile = ({ navigation }) => {
       const stringData = JSON.stringify(updatedProfileData);
       await AsyncStorage.setItem('profileData', stringData); // Use 'await' to wait for AsyncStorage to complete the operation
       console.log("save krelo data! - ", stringData)
-      Alert.alert('Your Profile Updated!');
+      showToastWithGravity('Your Profile Saved!')
       navigation.navigate('ProfileScreen');
 
       // ...rest of the function
@@ -165,6 +181,47 @@ const FullScreenProfile = ({ navigation }) => {
         { cancelable: false }
       );
     }
+    setisloader(false)
+  };
+
+  const handleImagePicker = () => {
+    ImageCropPicker.openPicker({
+      width: 1000,
+      height: 1000,
+      cropping: true,
+      includeBase64: true, // Optional, set it to true if you want to get the image as base64-encoded string
+    })
+      .then((response) => {
+        const dataArray = new FormData();
+        dataArray.append('b_video', {
+          uri: response.path,
+          type: response.mime,
+          name: response.path.split('/').pop(),
+        });
+        let url = 'https://www.sparrowgroups.com/CDN/image_upload.php/';
+        axios
+          .post(url, dataArray, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then((res) => {
+            const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
+            if (businessOrPersonal == 'business') {
+              setProfileData({ ...profileData, businessLogo: imagePath });
+            } else {
+              setProfileData({ ...profileData, profileImage: imagePath });
+            }
+          })
+          .catch((err) => {
+            setProfileData(response.path)
+            console.log('Error uploading image:', err);
+          });
+      })
+      .catch((error) => {
+
+        console.log('ImagePicker Error:', error);
+      });
   };
 
   return (
@@ -209,14 +266,15 @@ const FullScreenProfile = ({ navigation }) => {
 							style={styles.profileImage}
 						/>
 					)} */}
-
-        <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage || 'https://pasrc.princeton.edu/sites/g/files/toruqf431/files/styles/freeform_750w/public/2021-03/blank-profile-picture-973460_1280.jpg?itok=QzRqRVu8' }} style={styles.profileImage} />
-        {/* <TouchableOpacity
-					style={styles.pickImageButton}
-					onPress={{}}
-					>
-						<Icon name="camera" size={20} color="white" />
-					</TouchableOpacity> */}
+        <View>
+          <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage || 'https://pasrc.princeton.edu/sites/g/files/toruqf431/files/styles/freeform_750w/public/2021-03/blank-profile-picture-973460_1280.jpg?itok=QzRqRVu8' }} style={styles.profileImage} />
+          <TouchableOpacity
+            style={styles.pickImageButton}
+            onPress={handleImagePicker}
+          >
+            <Icon name="camera" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
         <TextInput
           style={styles.title}
           value={profileData?.fullName}

@@ -35,7 +35,7 @@ const Home = ({ navigation }) => {
 
   useEffect(() => {
     // Add a listener to the focus event to reload the screen
-    const unsubscribe = navigation.addListener('focus', getNotificationCounts);
+    const unsubscribe = navigation.addListener('focus', reloadScreen);
 
     // Clean up the listener when the component unmounts
     return () => unsubscribe();

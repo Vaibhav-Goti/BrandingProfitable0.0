@@ -1,6 +1,6 @@
 import { Slider } from '@rneui/base';
 import React, { useRef, useState, useEffect, useCallback, isValidElement } from 'react';
-import { View, Text, Button, Image, TouchableOpacity, Modal, TextInput, TouchableWithoutFeedback, FlatList, Animated, Dimensions, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, Modal, TextInput, TouchableWithoutFeedback, FlatList, Animated, Dimensions, ImageBackground, StyleSheet, ActivityIndicator } from 'react-native';
 import Draggable from 'react-native-draggable';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,7 +20,7 @@ const { width } = Dimensions.get('window')
 const staticImageUrl =
     'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png'; // Replace with your static image URL
 
-const colors = ['black', 'red', 'blue', 'green', 'purple'];
+const colors = ['black', 'red', 'blue', 'green', 'purple', 'cyan', 'magenta', 'orange', 'white'];
 
 const ImageItem = React.memo(({ uri, isSelected, onDelete, onSelect, width, height, rotation, top, left, scaleX, scaleY, flipX, flipY }) => {
     const transformStyles = [];
@@ -39,8 +39,8 @@ const ImageItem = React.memo(({ uri, isSelected, onDelete, onSelect, width, heig
                 <Image
                     source={{ uri }}
                     style={{
-                        width: width * scaleX || 100,
-                        height: height * scaleY || 100,
+                        width: width * scaleX || width || 100,
+                        height: height * scaleY || height || 100,
                         borderColor: isSelected ? 'black' : 'transparent',
                         borderWidth: isSelected ? 2 : 0,
                         top: 0,
@@ -88,6 +88,7 @@ const App = ({ navigation, route }) => {
     const { imageId } = route.params;
 
     useEffect(() => {
+        setImageLoader(true)
         // Define the URL for the GET request
         const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/cd_section/cds_data/${imageId}`;
 
@@ -100,13 +101,12 @@ const App = ({ navigation, route }) => {
                     data: imageData
                 };
                 setJsonData(data);
-
-                console.log(imageData)
-
             })
             .catch(error => {
                 console.error('Error fetching response.data.data:', error)
             });
+
+            setImageLoader(false)
 
     }, []);
 
@@ -182,7 +182,6 @@ const App = ({ navigation, route }) => {
 
         scenes.forEach((scene) => {
             const layers = scene.layers;
-            console.log(layers)
             layers.forEach((layer) => {
                 if (layer.type === "StaticText") {
                     const newItem = {
@@ -306,7 +305,9 @@ const App = ({ navigation, route }) => {
         if (selectedImageIndex !== null) {
             const updatedImages = [...images];
             const selectedImage = updatedImages[selectedImageIndex];
-            selectedImage.width = (selectedImage.width || 150) - 10;
+            selectedImage.width = (selectedImage.width || 150) - 10;       
+             console.log(selectedImage)
+
             selectedImage.height = (selectedImage.height || 150) - 10;
             setImages(updatedImages);
         }
@@ -500,8 +501,8 @@ const App = ({ navigation, route }) => {
                         ],
                         borderColor: isSelected ? 'black' : 'transparent',
                         borderWidth: isSelected ? 2 : 0,
-                        top,
-                        left,
+                        top: top || 150,
+                        left: left || 110,
                         justifyContent: 'center'
                     }}
                 >
@@ -630,6 +631,19 @@ const App = ({ navigation, route }) => {
     };
 
     const FrameAddorNot = () => {
+        const updatedTextItems = textItems.map((item, i) => ({
+            ...item,
+            isSelected: false,
+          }));
+      
+          // Deselect image items when a text item is selected
+          const updatedImages = images.map((image) => ({
+            ...image,
+            isSelected: false,
+          }));
+          
+          setImages(updatedImages);
+          setTextItems(updatedTextItems);
         showAlert5()
     }
     const YesAddFrame = async () => {
@@ -651,6 +665,7 @@ const App = ({ navigation, route }) => {
     const [isModalVisible5, setModalVisible5] = useState(false);
 
     const [imageLoader, setImageLoader] = useState(false)
+    const [loader, setLoader] = useState(false)
 
     const showAlert5 = () => {
         setModalVisible5(true);
@@ -682,6 +697,12 @@ const App = ({ navigation, route }) => {
             console.log('ImagePicker Error:', error);
         });
     };    
+
+    if (loader) {
+        <View style={{backgroundColor:'black',flex:1,justifyContent:"center",alignItems:'center'}}>
+            <ActivityIndicator color={'white'} />
+        </View>
+    }
     
 
     return (
@@ -1166,7 +1187,7 @@ const TextInputModal = React.memo(({ visible, initialValue, initialColor, onSave
                     }}
                 >
                     <TouchableWithoutFeedback onPress={() => { }}>
-                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, height: 200, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, height: 200, justifyContent: 'center', alignItems: 'center', width:300 }}>
                             <TextInput
                                 value={textValue || "enter text"}
                                 onChangeText={setTextValue}
@@ -1192,7 +1213,7 @@ const TextInputModal = React.memo(({ visible, initialValue, initialColor, onSave
                             />
                             <TouchableOpacity activeOpacity={1} style={{ backgroundColor: 'black', width: '100%', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 7 }} onPress={handleSave}>
 
-                                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 17 }}>Save</Text>
+                                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 17, textAlign:'center' }}>Save</Text>
 
                             </TouchableOpacity>
                         </View>

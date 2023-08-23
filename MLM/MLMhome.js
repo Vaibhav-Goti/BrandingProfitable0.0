@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Image, ActivityIndicator, Modal, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Image, ActivityIndicator, Modal, Alert, ScrollView, ToastAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
@@ -15,6 +15,18 @@ const MLMhome = ({ navigation }) => {
     const [businessOrPersonal, setBusinessOrPersonal] = useState('');
     const [profileData, setProfileData] = useState(null);
     const [userToken, setUserToken] = useState()
+
+    // toast
+
+    const showToastWithGravity = (data) => {
+        ToastAndroid.showWithGravityAndOffset(
+            data,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            0,
+            50,
+        );
+    };
 
     // modal input 
 
@@ -132,14 +144,18 @@ const MLMhome = ({ navigation }) => {
                 console.log('Response status code:', res.data.statusCode); // Log the status code
 
                 if (res.data.statusCode === 200) {
-                    // Successful response
                     setSecondModalVisible(false)
-                    Alert.alert('Request sent Successfully!');
+                    showToastWithGravity("Request Sent Successfully!")
+                } else if (res.data.statusCode === 403) {
+                    showToastWithGravity("Left side is Already Full!")
+                } else if (res.data.statusCode === 405) {
+                    showToastWithGravity("Right side is Already Full!")
                 } else if (res.data.statusCode === 401) {
-                    // Unauthorized response
-                    console.log('Unauthorized Request!');
+                    showToastWithGravity("Tree Id or Referal Id not Found!")
                 } else if (res.data.statusCode === 402) {
-                    // Other status codes...
+                    showToastWithGravity("Left & Right Both Full, Choose other Tree Id")
+                } else if (res.data.statusCode === 406) {
+                    showToastWithGravity("Invalid Referal Id")
                 }
                 // Add more condition checks for other status codes if needed
             })
@@ -148,11 +164,15 @@ const MLMhome = ({ navigation }) => {
                     // Axios received an error response from the server
                     console.log('Error status code:', err.response.status); // Log the error status code
 
-                    if (err.response.status === 401) {
-                        Alert.alert('referal id not found!')
+                    // showToastWithGravity(err.response.data.message||err.response.error)
+
+                    if (err.response.status == 406) {
+                        showToastWithGravity(err.response.data.error)
                     } else {
-                        console.log('Other Error:', err.response.data.message);
+                        showToastWithGravity(err.response.data.message)
                     }
+
+                    console.log(err.response.data)
                 } else {
                     // Axios didn't receive a response from the server
                     console.log('Network Error:', err.message);

@@ -107,9 +107,9 @@ const MLMScreen2 = ({ navigation, route }) => {
 
   const {aadhar} = route.params
 
-  const [isLeft, setIsLeft] = React.useState(false)
+  const [isLeft, setIsLeft] = React.useState(true)
   const [isRight, setIsRight] = React.useState(false)
-  const [isDirect, setIsDirect] = React.useState(true)
+  const [isDirect, setIsDirect] = React.useState(false)
 
   
 const [treeData, setTreeData] = React.useState([])
@@ -201,7 +201,7 @@ const [DirectSponser, setDirectSponser] = React.useState([])
       const result = response.data;
       setDirectSponser(result);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     }
   };
   const fetchData2 = async () => {
@@ -211,7 +211,7 @@ const [DirectSponser, setDirectSponser] = React.useState([])
       const result = response.data;
       setTreeData(result);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     }
   };
 
@@ -219,6 +219,8 @@ const [DirectSponser, setDirectSponser] = React.useState([])
     fetchData()
     fetchData2()
   }, [])
+
+  console.log(DirectSponser)
 
   return (
     <LinearGradient colors={['#20AE5C', '#000']} locations={[0.3, 1]} style={{ flex: 1, }}>

@@ -6,29 +6,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Notifications = ({ navigation }) => {
-  const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
 
-  console.log(notifications)
-
-  const getNotificationCounts = useCallback(async () => {
-    try {
-      const notificationsData = await AsyncStorage.getItem('notificationData');
-      const parsedNotifications = JSON.parse(notificationsData || {});
-      setNotifications(parsedNotifications?.notifications);
-    //   setNotificationCount(parsedNotifications?.counts);
-    } catch (error) {
-      console.log('Error getting notification counts:', error);
-    }
-  }, []);
-
   useEffect(() => {
-    getNotificationCounts();
-  }, [getNotificationCounts]);
-
-  const clearNoti = async () => {
-    // Implement your clear notification logic here
-  };
+    // Fetch notifications data from AsyncStorage when the component mounts
+    AsyncStorage.getItem('notificationData').then(data => {
+      if (data) {
+        const notificationData = JSON.parse(data);
+        // Set the notifications data in the component state
+        setNotifications(notificationData.notifications.reverse());
+      }
+    });
+  }, []);
 
   const renderItem = ({ item }) => {
     const sentTime = item.sentTime;
@@ -81,9 +70,6 @@ const Notifications = ({ navigation }) => {
             Notifications{' '}
           </Text>
         </View>
-        {/* <TouchableOpacity style={{ padding: 5 }} onPress={clearNoti}>
-          <Icon name="trash" size={22} color={'white'} />
-        </TouchableOpacity> */}
       </View>
 
       {notifications.length === 0 ? (
@@ -94,7 +80,7 @@ const Notifications = ({ navigation }) => {
         </View>
       ) : (
         <FlatList
-          data={notifications?.reverse()}
+          data={notifications}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
         />

@@ -135,6 +135,12 @@ const ProfileScreen = ({ navigation }) => {
               {profileData?.email || 'John Doe'}
             </Text>
 
+            <TouchableOpacity style={{marginTop:10}} onPress={()=>{navigation.navigate('ViewProfile')}}>
+              <Text style={{height:40,color:'#00D3FF',fontFamily:"Manrope-Regular",fontSize:15}}>
+                View
+              </Text>
+            </TouchableOpacity>
+
           </View>
 
         </View>
@@ -348,7 +354,7 @@ const ProfileScreen = ({ navigation }) => {
                       <TouchableOpacity
                         onPress={async () => {
                           hideAlert()
-                          navigation.navigate('StackLogin');
+                          navigation.navigate('LoginScreen');
                           await AsyncStorage.removeItem('isLoggedIn');
                           await AsyncStorage.removeItem('profileData');
                           await AsyncStorage.removeItem('businessOrPersonal');

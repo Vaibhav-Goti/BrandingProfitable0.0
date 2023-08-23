@@ -206,7 +206,7 @@ const EditHome = ({ route, navigation }) => {
 
       setLanguages(result);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     }
   };
 

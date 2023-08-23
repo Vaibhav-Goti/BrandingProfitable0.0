@@ -10,6 +10,7 @@ import CustomFrame2 from './CustomFrame2';
 import EditProfile from './EditProfile';
 import Frames from './Frames';
 import CustomFrameForm from './CustomFrame1';
+import ViewProfile from './ViewProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ const StackProfile = () => {
         <Stack.Screen name="editprofile" component={EditProfile} options={{ headerShown: false, animation: 'slide_from_right' }} />
         <Stack.Screen name="Frames" component={Frames} options={{ headerShown: false, animation: 'slide_from_right' }} />            
         <Stack.Screen name="CustomFrameFormProfile" component={CustomFrameForm} options={{headerShown:false}} />
+        <Stack.Screen name="ViewProfile" component={ViewProfile} options={{headerShown:false, animation: 'slide_from_right'}} />
       </Stack.Navigator>
   );
 };

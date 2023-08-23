@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, Alert, ActivityIndicator, Dimensions, TouchableHighlight, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, TextInput, Image, Text, Alert, ActivityIndicator, Dimensions, TouchableHighlight, TouchableOpacity, ScrollView, ToastAndroid } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -8,16 +8,30 @@ import jwtDecode from 'jwt-decode';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
 import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
 
 const { width, height } = Dimensions.get('window')
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [isLoader, setIsLoader] = useState(false);
 
+  const navigation = useNavigation()
+
   const [businessOrPersonal, setBusinessOrPersonal] = useState('')
+
+
+  const showToastWithGravity = (data) => {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      0,
+      0
+    )
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,23 +44,24 @@ const LoginScreen = ({ navigation }) => {
 
   const [fcmToken, setFcmToken] = useState('')
 
+  const getfcmToken = async () => {
+    try {
+      const data = await AsyncStorage.getItem('fcmtoken');
+      setFcmToken(data);
+    } catch (error) {
+      console.log('Error retrieving fcmtoken:', error);
+    }
+  };
 
-  function getFCMToken() {
-    return AsyncStorage.getItem("fcmtoken").then((token) => {
-      console.log('FCM Token:', token); // Log the FCM token here
-      setFcmToken(token)
-      return token;
-    });
-  }
   useEffect(() => {
-    getFCMToken();
+    getfcmToken();
   })
 
   const handleSuccessLogin = async (response) => {
-    Alert.alert("Login Successfully...");
-    const dataAfterDecode = jwtDecode(response.data.token)
+    // Alert.alert("Login Successfully...");
+    const dataAfterDecode = jwtDecode(response)
 
-    console.log(dataAfterDecode)
+    // console.log(dataAfterDecode)
 
     navigation.navigate('StackMain');
 
@@ -61,18 +76,14 @@ const LoginScreen = ({ navigation }) => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(response.data.statusCode)
     } catch (error) {
       console.log(error)
     }
 
     const saveProfiledatatoLocal = JSON.stringify(dataAfterDecode);
-    console.log(dataAfterDecode.isPersonal)
     if (dataAfterDecode.isPersonal) {
-      console.log('personal set karyu!')
       await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
     } else {
-      console.log('business set karyu!')
       await AsyncStorage.setItem('BusinessOrPersonl', 'business')
     }
     try {
@@ -88,15 +99,14 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     setIsLoader(true);
 
-    if (phone === "" || password === "") {
-      Alert.alert("Please enter all details");
+    if (phone.length !== 10) {
+      Alert.alert("Please enter Valid Number!");
       setIsLoader(false);
     } else {
-      const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/user/user_login';
+      const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/user/sendotp';
 
       const requestData = {
         mobileNumber: phone,
-        password: password,
       };
 
       try {
@@ -107,9 +117,10 @@ const LoginScreen = ({ navigation }) => {
         });
 
         if (response.data.statusCode === 200) {
-          handleSuccessLogin(response);
+          navigation.navigate('OTP', { phone: phone })
+          showToastWithGravity("OTP sent!")
         } else {
-          Alert.alert("User Not Exist!");
+          showToastWithGravity("Can not found Your account, please SignUp")
         }
       } catch (error) {
         console.error(error);
@@ -117,7 +128,6 @@ const LoginScreen = ({ navigation }) => {
         setIsLoader(false);
       }
       setPhone('')
-      setPassword('')
     }
   };
 
@@ -133,25 +143,42 @@ const LoginScreen = ({ navigation }) => {
 
   //  {"idToken": null, "scopes": ["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"], "serverAuthCode": null, "user": {"email": "gohelmeet1212@gmail.com", "familyName": "Meet", "givenName": "Gohel", "id": "101768662035041948455", "name": "Gohel Meet", "photo": "https://lh3.googleusercontent.com/a/AAcHTtdNmTiYoIB87fMluxBvtmAno8g6QbUIJ4xfFweWWaTOCyo"}}
 
+  const handleGoogleLoginSuccessResponse = () => {
+
+  }
+
   const handleSuccessGoogleLogin = async (details) => {
-    // setIsLoader(true)
-    // console.log(details.user.email)
+
     const profileData = {
       "email": details.user.email,
       "profileImage": details.user.photo,
       "fullName": details.user.name,
     }
-    const setData = JSON.stringify(profileData)
+
+    const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/user/email/${profileData.email}`;
+
     try {
-      Alert.alert("Login Successfully...");
-      navigation.navigate('StackMain');
-      await AsyncStorage.setItem('profileData', setData)
-      await AsyncStorage.setItem("isLoggedIn", "true")
-      await AsyncStorage.setItem('BusinessOrPersonl', 'personal')
-      console.log("google login details save thai gyi bapu! - ", setData)
+
+      const response = await axios.get(apiUrl);
+
+      if (response.data.statusCode == 200) {
+        handleSuccessLogin(response.data.user)
+        console.log(response.data.user)
+
+      } else {
+        try {
+          await AsyncStorage.setItem('profileDataFromGoogle', JSON.stringify(profileData));
+        } catch (error) {
+          console.error('Error saving profile data:', error);
+        }
+        navigation.navigate('SignUpStack');
+        showToastWithGravity("Create Your Account!")
+      }
     } catch (error) {
-      console.log("google login ma error - ", error)
+      console.error(error);
     }
+
+
     // setIsLoader(false)
   }
 
@@ -165,7 +192,6 @@ const LoginScreen = ({ navigation }) => {
         GoogleSignin.signOut();
 
         GoogleSignin.signIn().then((userInfo) => {
-          console.log(JSON.stringify(userInfo))
           handleSuccessGoogleLogin(userInfo)
         }).catch((e) => {
           console.log("ERROR IS: " + JSON.stringify(e));
@@ -226,7 +252,7 @@ const LoginScreen = ({ navigation }) => {
                 />
               </View>
 
-              <View style={{ width: '70%', alignItems: 'flex-start' }}>
+              {/* <View style={{ width: '70%', alignItems: 'flex-start' }}>
                 <Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 15 }}>
                   Enter Password
                 </Text>
@@ -240,14 +266,14 @@ const LoginScreen = ({ navigation }) => {
                   onChangeText={setPassword}
                   secureTextEntry
                 />
-              </View>
+              </View> */}
               <TouchableHighlight onPress={handleLogin} style={{ backgroundColor: '#FF0000', borderRadius: 8, margin: 15, width: "70%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5 }} >
                 <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
                   Login
                 </Text>
               </TouchableHighlight>
               <GoogleSigninButton
-                style={{ width: '71%', height: 48, marginVertical: 10 }}
+                style={{ width: '71%', height: 55, marginVertical: 10 }}
                 size={GoogleSigninButton.Size.Wide}
                 color={GoogleSigninButton.Color.Dark}
                 onPress={signIn}

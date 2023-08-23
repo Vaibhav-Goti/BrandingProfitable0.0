@@ -48,7 +48,7 @@ const SavedFrames = ({ navigation }) => {
             console.log(result);
             setData(result.data); // Assuming 'data' property contains the array of images
         } catch (error) {
-            console.log('Error fetching data:', error);
+            console.log('Error fetching data...:', error);
         }
         setRefreshing(false); // Make sure to set refreshing to false even if there's an error
     };

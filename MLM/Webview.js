@@ -18,26 +18,29 @@ const WebViewScreen = (props) => {
   const handleLoad = () => {
     postTreeData();
   };
-
+  
   const filterTreeData = (data) => {
-    if (isLeft) {
-      data.children = data.children.filter(child => child.side !== 'right');
-    }
+    if (data && data.children) {
+      if (isLeft) {
+        data.children = data.children.filter(child => child.side !== 'right');
+      }
 
-    if (isRight) {
-      data.children = data.children.filter(child => child.side !== 'left');
+      if (isRight) {
+        data.children = data.children.filter(child => child.side !== 'left');
+      }
     }
 
     return data;
   };
 
   const postTreeData = () => {
-    const dataToSend = filterTreeData({ ...treeData });
-    
-    if (webViewRef.current) {
-      webViewRef.current.injectJavaScript(`
+    if (treeData) { 
+      const dataToSend = filterTreeData({ ...treeData }); 
+      if (webViewRef.current) {
+        webViewRef.current.injectJavaScript(`
         window.postMessage(JSON.stringify(${JSON.stringify(dataToSend)}), '*');
-      `);
+        `);
+      }
     }
   };
 

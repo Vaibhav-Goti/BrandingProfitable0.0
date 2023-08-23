@@ -11,6 +11,7 @@ import Video from 'react-native-video';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image'
 import DropDownPicker from 'react-native-dropdown-picker';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
@@ -32,7 +33,7 @@ const EditItem = ({ route, navigation }) => {
       const result = response.data;
       setdata(result)
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     } finally {
       setLoading(false);
     }
@@ -203,7 +204,7 @@ const EditItem = ({ route, navigation }) => {
     { languageName: 'ગુજરાતી' },
     { languageName: 'हिंदी' }
   ])
-  
+
   useEffect(() => {
     retrieveProfileData()
   }, [retrieveProfileData])
@@ -235,7 +236,7 @@ const EditItem = ({ route, navigation }) => {
 
       setLanguages(result);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     }
   };
 
@@ -261,10 +262,10 @@ const EditItem = ({ route, navigation }) => {
   }
 
   return (
-    <>
+    <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={() => { navigation.goBack() }}>
-          <Icon name="angle-left" size={30} color={"black"} />
+          <Icon name="angle-left" size={30} color={"white"} />
         </TouchableOpacity>
         <Text style={styles.headerText} onPress={() => { navigation.goBack() }}>
           {categoryName}
@@ -338,65 +339,25 @@ const EditItem = ({ route, navigation }) => {
           </View>
         )}
 
-        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'space-between', flex: 1, width: '92%', gap: 10, marginBottom: 65, height: 60 }}>
+
+        <View style={{ flexDirection: 'row', alignSelf: 'center', justifyContent: 'flex-start', flex: 1, width: '92%', gap: 10, marginTop: 10, marginBottom: 40 }}>
+          {/* 1 */}
+          <TouchableOpacity onPress={() => {
+            setdisplayImage(false)
+          }}
+            style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20, }}>
+            <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+              Images
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            setdisplayImage(true)
+          }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
+            <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
+              Videos
+            </Text>
+          </TouchableOpacity>
           {/* 2 */}
-
-          <View style={{ width: 120, zIndex: 1, alignSelf: 'flex-end', height: '100%' }}>
-            <DropDownPicker
-              open={open}
-              value={selectedLanguage}
-              items={languages.map((language) => ({
-                label: language.languageName,
-                value: language.languageName,
-              }))}
-              setOpen={setOpen}
-              setValue={(value) => setSelectedLanguage(value)}
-              style={{
-                backgroundColor: 'white',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 20,
-                height: 30,
-              }}
-              dropDownStyle={{
-                backgroundColor: 'white',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 20,
-                maxHeight: 150,
-              }}
-              containerStyle={{ height: 30 }} // Set a fixed height for the container
-              listItemContainerStyle={{ height: 30 }} // Set a fixed height for each item in the dropdown
-              scrollViewProps={{ // Enable scrolling for the dropdown
-                nestedScrollEnabled: true,
-              }}
-              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
-              placeholder="Language"
-              placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
-            />
-          </View>
-
-
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            {/* 1 */}
-            <TouchableOpacity onPress={() => {
-              setdisplayImage(false)
-            }}
-              style={{ height: 30, width: 80, backgroundColor: displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
-              <Text style={{ color: displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
-                Images
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              setdisplayImage(true)
-            }} style={{ height: 30, width: 80, backgroundColor: !displayImage ? 'white' : 'red', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }}>
-              <Text style={{ color: !displayImage ? 'gray' : 'white', fontFamily: 'Manrope-Regular' }}>
-                Videos
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-
         </View>
 
         <View>
@@ -447,7 +408,7 @@ const EditItem = ({ route, navigation }) => {
           )}
         </View>
       </View>
-    </>
+    </LinearGradient>
   )
 }
 
@@ -455,7 +416,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'white'
   },
   overlayImage: {
     position: 'absolute',
@@ -501,11 +461,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 20,
-    backgroundColor: 'white'
   },
   headerText: {
     fontSize: 19,
-    color: 'black',
+    color: 'white',
     fontFamily: 'Manrope-Bold',
     marginLeft: 20
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, Alert } from 'react-native';
 // import imageData from '../apiData/200x200';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -12,6 +12,7 @@ import axios from 'axios';
 import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient';
 import DropDownPicker from 'react-native-dropdown-picker';
+// import CameraRoll from '@react-native-community/cameraroll';
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5;
@@ -68,6 +69,53 @@ const EditHome = ({ route, navigation }) => {
   const handleImagePressV = (item) => {
     setSelectedVideo(item.uri);
   };
+
+
+
+  // const captureAndShareImage = async () => {
+  //   try {
+  //     const uri = await viewShotRef.current.capture();
+      
+  //     Alert.alert(
+  //       'Download or Share Image',
+  //       'Do you want to download the image or share it?',
+  //       [
+  //         {
+  //           text: 'Download',
+  //           onPress: async () => {
+  //             const fileName = 'sharedImage.jpg';
+  //             const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+              
+  //             await RNFS.copyFile(uri, destPath);
+              
+  //             // Save the image to the device's gallery
+  //             CameraRoll.saveToCameraRoll(`file://${destPath}`, 'photo'); // Save as a photo
+              
+  //             // Show a success message or navigate to a download screen.
+  //           },
+  //         },
+  //         {
+  //           text: 'Share',
+  //           onPress: async () => {
+  //             const shareOptions = {
+  //               type: 'image/jpeg',
+  //               url: `file://${uri}`,
+  //             };
+              
+  //             await Share.open(shareOptions);
+  //           },
+  //         },
+  //         {
+  //           text: 'Cancel',
+  //           style: 'cancel',
+  //         },
+  //       ],
+  //       { cancelable: true }
+  //     );
+  //   } catch (error) {
+  //     console.error('Error sharing image:', error);
+  //   }
+  // };
 
   const captureAndShareImage = async () => {
     try {
@@ -200,7 +248,7 @@ const EditHome = ({ route, navigation }) => {
 
       setLanguages(result);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data...:', error);
     }
   };
 

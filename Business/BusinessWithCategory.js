@@ -21,7 +21,7 @@ const BusinessWithCategory = ({route,navigation}) => {
             const result = response.data.data;
             setData(result);
         } catch (error) {
-            console.log('Error fetching data:', error);
+            console.log('Error fetching data...:', error);
         }
         setLoading(false)
     };
