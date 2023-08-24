@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Image, Text, Alert, FlatList, Dimensions, TouchableHighlight, TouchableOpacity, Modal, ActivityIndicator, PermissionsAndroid } from 'react-native';
+import { View, StyleSheet, TextInput, Image, Text, Alert, FlatList, Dimensions, TouchableHighlight, TouchableOpacity, Modal, ActivityIndicator, PermissionsAndroid, ToastAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -21,32 +21,32 @@ const LoginScreen = ({ navigation }) => {
 
 	const retrieveData = async () => {
 		try {
-		  const dataString = await AsyncStorage.getItem('profileDataFromGoogle');
-		  if (dataString) {
-			const data = JSON.parse(dataString);
-			const { profileImage, email, fullName } = data;
-			
-			if (email) setEmail(email);
-			if (profileImage) setFileUri(profileImage);
-			if (fullName) setFullName(fullName);
-	  
-			console.log({ profileImage, email, fullName });
-		  }
-		} catch (error) {
-		  console.log('Error retrieving data from AsyncStorage:', error);
-		}
-	  };
+			const dataString = await AsyncStorage.getItem('profileDataFromGoogle');
+			if (dataString) {
+				const data = JSON.parse(dataString);
+				const { profileImage, email, fullName } = data;
 
-	  const [addData, setAddData] = useState(true)
-	  
-	  useEffect(()=>{
+				if (email) setEmail(email);
+				if (profileImage) setFileUri(profileImage);
+				if (fullName) setFullName(fullName);
+
+				console.log({ profileImage, email, fullName });
+			}
+		} catch (error) {
+			console.log('Error retrieving data from AsyncStorage:', error);
+		}
+	};
+
+	const [addData, setAddData] = useState(true)
+
+	useEffect(() => {
 		if (addData) {
 			retrieveData()
 			setAddData(false)
 		}
-	  })
+	})
 
-// console.log(profileDataFromGoogle)
+	// console.log(profileDataFromGoogle)
 
 	const [fullName, setFullName] = useState('');
 	const [phone, setPhone] = useState('');
@@ -146,6 +146,18 @@ const LoginScreen = ({ navigation }) => {
 			adhaar: adhaar,
 		};
 
+	const showToastWithGravity = (data) => {
+		ToastAndroid.showWithGravityAndOffset(
+			data,
+			ToastAndroid.SHORT,
+			ToastAndroid.BOTTOM,
+			0,
+			50,
+		);
+	};
+
+	console.log(adhaar.length)
+
 	const handleSave = async () => {
 
 		if (password == Cpassword) {
@@ -153,6 +165,15 @@ const LoginScreen = ({ navigation }) => {
 			if (!localimage && !fileUri) {
 				showAlert4()
 				return null;
+			}
+			if (adhaar.length != 12) {
+				showToastWithGravity("Invalid Aadhar Number!")
+				return null;
+			}
+			if (phone.length != 10) {
+				showToastWithGravity("Invalid Phone Number!")
+				return null;
+
 			}
 
 			setloader(true)
@@ -174,7 +195,7 @@ const LoginScreen = ({ navigation }) => {
 						adress: address,
 						// password: password,
 						adhaar: adhaar,
-						isPersonal: true, 
+						isPersonal: true,
 					}
 					: {
 						businessLogo: fileUri || localimage,
@@ -186,10 +207,8 @@ const LoginScreen = ({ navigation }) => {
 						adress: address,
 						// password: password,
 						adhaar: adhaar,
-						isPersonal: false, 
+						isPersonal: false,
 					};
-
-					console.log(requestData)
 
 				try {
 					const response = await axios.post(apiUrl, requestData, {
@@ -198,25 +217,23 @@ const LoginScreen = ({ navigation }) => {
 						},
 					});
 
-					console.log(response.data.statusCode)
-
 					if (response.data.statusCode === 200) {
 
 						showAlert3()
 
 					} else if (response.data.statusCode === 402) {
-						showAlert2()
+						showToastWithGravity("Mobile Number is Already Used!")
 					} else if (response.data.statusCode === 401) {
-						showAlert2()
+						showToastWithGravity("Email id is Already Used!")
 					} else if (response.data.statusCode === 403) {
-						showAlert2()
+						showToastWithGravity("AAdhar Number is Already Used!")
 					} else if (response.data.statusCode === 500) {
+						showToastWithGravity("Something Went Wrong!")
 					} else {
 						Alert.alert('Error! please try again...');
 					}
 				} catch (error) {
-					Alert.alert("Sign Up Failed!")
-					console.log(error)
+					showToastWithGravity("Something went wrong!")
 				}
 				setloader(false)
 			}
@@ -238,7 +255,7 @@ const LoginScreen = ({ navigation }) => {
 
 	const renderFileUri = () => {
 		if (localimage || fileUri) {
-			return <FastImage source={{ uri: localimage || fileUri }} style={{ height: 100, width: 100, borderRadius: 100 }} />;
+			return <FastImage source={{ uri: localimage || fileUri }} style={{ height: 110, width: 110, borderRadius: 100 }} />;
 		} else {
 			return (
 				<View style={styles.logoContainer}>
@@ -466,210 +483,210 @@ const LoginScreen = ({ navigation }) => {
 				style={styles.mainContainer}
 				keyboardShouldPersistTaps="handled"
 				data={[{ key: 'content' }]} // Dummy data to satisfy FlatList's requirement
-                renderItem={() => (
-                    <View style={{
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
-                        <View style={[styles.labelContainer, { marginTop: 40 }]}>
-                            <Text style={styles.label}>
-                                Register As
-                            </Text>
-                        </View>
+				renderItem={() => (
+					<View style={{
+						justifyContent: 'center',
+						alignItems: 'center'
+					}}>
+						<View style={[styles.labelContainer, { marginTop: 40 }]}>
+							<Text style={styles.label}>
+								Register As
+							</Text>
+						</View>
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: "80%", marginTop: 15, marginBottom: 20 }}>
-                            {/* 1 */}
-                            <TouchableOpacity
-                                onPress={() => { setBusinessOrPersonal('personal') }}
-                                style={{
-                                    width: '45%',
-                                    height: 60,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    borderWidth: businessOrPersonal === 'business' ? 1 : 0,
-                                    borderColor: 'lightgray',
-                                    backgroundColor: businessOrPersonal === 'personal' ? 'red' : null,
-                                    borderRadius: 10,
-                                }}
-                            >
-                                <View style={{ flexDirection: "row", gap: 10, justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
-                                    <FontAwesome6 name="circle-user" size={30} color={businessOrPersonal === 'business' ? 'gray' : 'white'} />
-                                    <Text style={{ color: businessOrPersonal === 'business' ? 'gray' : 'white', fontFamily: 'Manrope-Bold', fontSize: 17 }}>Person</Text>
-                                </View>
-                            </TouchableOpacity>
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: "80%", marginTop: 15, marginBottom: 20 }}>
+							{/* 1 */}
+							<TouchableOpacity
+								onPress={() => { setBusinessOrPersonal('personal') }}
+								style={{
+									width: '45%',
+									height: 60,
+									justifyContent: 'center',
+									alignItems: 'center',
+									borderWidth: businessOrPersonal === 'business' ? 1 : 0,
+									borderColor: 'lightgray',
+									backgroundColor: businessOrPersonal === 'personal' ? 'red' : null,
+									borderRadius: 10,
+								}}
+							>
+								<View style={{ flexDirection: "row", gap: 10, justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
+									<FontAwesome6 name="circle-user" size={30} color={businessOrPersonal === 'business' ? 'gray' : 'white'} />
+									<Text style={{ color: businessOrPersonal === 'business' ? 'gray' : 'white', fontFamily: 'Manrope-Bold', fontSize: 17 }}>Person</Text>
+								</View>
+							</TouchableOpacity>
 
-                            {/* 2 */}
-                            <TouchableOpacity
-                                onPress={() => { setBusinessOrPersonal('business') }}
-                                style={{
-                                    width: '45%',
-                                    height: 60,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    borderWidth: businessOrPersonal === 'personal' ? 1 : 0,
-                                    borderColor: 'lightgray',
-                                    backgroundColor: businessOrPersonal === 'business' ? 'red' : null,
-                                    borderRadius: 10,
-                                }}
-                            >
-                                <View style={{ flexDirection: "row", gap: 10, justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
-                                    <FontAwesome5 name="store" size={26} color={businessOrPersonal === 'personal' ? 'gray' : 'white'} />
-                                    <Text style={{ color: businessOrPersonal === 'personal' ? 'gray' : 'white', fontFamily: 'Manrope-Bold', fontSize: 16 }}>Business</Text>
-                                </View>
-                            </TouchableOpacity>
+							{/* 2 */}
+							<TouchableOpacity
+								onPress={() => { setBusinessOrPersonal('business') }}
+								style={{
+									width: '45%',
+									height: 60,
+									justifyContent: 'center',
+									alignItems: 'center',
+									borderWidth: businessOrPersonal === 'personal' ? 1 : 0,
+									borderColor: 'lightgray',
+									backgroundColor: businessOrPersonal === 'business' ? 'red' : null,
+									borderRadius: 10,
+								}}
+							>
+								<View style={{ flexDirection: "row", gap: 10, justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
+									<FontAwesome5 name="store" size={26} color={businessOrPersonal === 'personal' ? 'gray' : 'white'} />
+									<Text style={{ color: businessOrPersonal === 'personal' ? 'gray' : 'white', fontFamily: 'Manrope-Bold', fontSize: 16 }}>Business</Text>
+								</View>
+							</TouchableOpacity>
 
 
-                        </View>
+						</View>
 
-                        <View style={[styles.labelContainer]}>
-                            <Text style={styles.label}>
-                                Enter Name
-                            </Text>
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholderTextColor={'gray'}
-                                placeholder="Full Name"
-                                value={fullName}
-                                onChangeText={setFullName}
-                                autoCapitalize="words"
-                            />
-                        </View>
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.label}>
-                                Enter Mobile
-                            </Text>
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholderTextColor={'gray'}
-                                placeholder="Phone"
-                                value={phone}
-                                onChangeText={setPhone}
-                                autoCapitalize="none"
-                                maxLength={10}
-                                keyboardType='numeric'
-                            />
-                        </View>
-                        <View style={[styles.labelContainer,]}>
-                            <Text style={styles.label}>
-                                Enter Email
-                            </Text>
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholderTextColor={'gray'}
-                                placeholder="Email"
-                                value={email}
-                                onChangeText={setEmail}
-                                autoCapitalize="none"
-                            />
-                        </View>
+						<View style={[styles.labelContainer]}>
+							<Text style={styles.label}>
+								Enter Name
+							</Text>
+						</View>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.input}
+								placeholderTextColor={'gray'}
+								placeholder="Full Name"
+								value={fullName}
+								onChangeText={setFullName}
+								autoCapitalize="words"
+							/>
+						</View>
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>
+								Enter Mobile
+							</Text>
+						</View>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.input}
+								placeholderTextColor={'gray'}
+								placeholder="Phone"
+								value={phone}
+								onChangeText={setPhone}
+								autoCapitalize="none"
+								maxLength={10}
+								keyboardType='numeric'
+							/>
+						</View>
+						<View style={[styles.labelContainer,]}>
+							<Text style={styles.label}>
+								Enter Email
+							</Text>
+						</View>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.input}
+								placeholderTextColor={'gray'}
+								placeholder="Email"
+								value={email}
+								onChangeText={setEmail}
+								autoCapitalize="none"
+							/>
+						</View>
 
-                        {/* address */}
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.label}>
-                                Enter Address
-                            </Text>
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholderTextColor={'gray'}
-                                placeholder="Address"
-                                value={address}
-                                onChangeText={setAddress}
-                                autoCapitalize="sentences"
-                            />
-                        </View>
+						{/* address */}
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>
+								Enter Address
+							</Text>
+						</View>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.input}
+								placeholderTextColor={'gray'}
+								placeholder="Address"
+								value={address}
+								onChangeText={setAddress}
+								autoCapitalize="sentences"
+							/>
+						</View>
 
-                        {/* address */}
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.label}>
-                                Enter Aadhar
-                            </Text>
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholderTextColor={'gray'}
-                                placeholder="Aadhar Number"
-                                value={adhaar}
-                                maxLength={12}
-                                onChangeText={setAadhar}
-                                autoCapitalize="sentences"
-                            />
-                        </View>
+						{/* address */}
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>
+								Enter Aadhar
+							</Text>
+						</View>
+						<View style={styles.inputContainer}>
+							<TextInput
+								style={styles.input}
+								placeholderTextColor={'gray'}
+								placeholder="Aadhar Number"
+								value={adhaar}
+								maxLength={12}
+								onChangeText={setAadhar}
+								autoCapitalize="sentences"
+							/>
+						</View>
 
-                        {/* dropdown */}
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.label}>
-                                Enter {businessOrPersonal == 'business' ? ('Business Type') : ('Designation')}
-                            </Text>
-                        </View>
-                        {businessOrPersonal === 'personal' && (
-                            <View style={styles.inputContainer}>
-                                <DropDownPicker
-                                    key={index} // Add a unique key
-                                    open={open}
-                                    value={designation}
-                                    items={items}
-                                    setOpen={setOpen}
-                                    setValue={setDesignation}
-                                    style={styles.input}
-                                    textStyle={styles.dropdownText}
-                                    placeholder="Your Designation"
-                                    placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
-                                />
-                            </View>
-                        )}
-                        {businessOrPersonal === 'business' && (
-                            <View style={styles.inputContainer}>
-                                <DropDownPicker
-                                    key={index} // Add a unique key
-                                    open={open}
-                                    value={designation}
-                                    items={items}
-                                    setOpen={setOpen}
-                                    setValue={setDesignation}
-                                    style={styles.input}
-                                    textStyle={styles.dropdownText}
-                                    placeholder="Select Business Type"
-                                    placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
-                                />
-                            </View>
-                        )}
+						{/* dropdown */}
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>
+								Enter {businessOrPersonal == 'business' ? ('Business Type') : ('Designation')}
+							</Text>
+						</View>
+						{businessOrPersonal === 'personal' && (
+							<View style={styles.inputContainer}>
+								<DropDownPicker
+									key={index} // Add a unique key
+									open={open}
+									value={designation}
+									items={items}
+									setOpen={setOpen}
+									setValue={setDesignation}
+									style={styles.input}
+									textStyle={styles.dropdownText}
+									placeholder="Your Designation"
+									placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+								/>
+							</View>
+						)}
+						{businessOrPersonal === 'business' && (
+							<View style={styles.inputContainer}>
+								<DropDownPicker
+									key={index} // Add a unique key
+									open={open}
+									value={designation}
+									items={items}
+									setOpen={setOpen}
+									setValue={setDesignation}
+									style={styles.input}
+									textStyle={styles.dropdownText}
+									placeholder="Select Business Type"
+									placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+								/>
+							</View>
+						)}
 
-                        {/* DOB */}
-                        <View style={styles.labelContainer}>
-                            <Text style={styles.label}>
-                                Enter {businessOrPersonal === 'business' ? ('Buisness Start Date') : ('Date of Birth')}
-                            </Text>
-                        </View>
-                        {isDatePickerVisible && (
-                            <DateTimePicker
-                                value={selectedDate}
-                                mode="date"
-                                display="default"
-                                onChange={handleDateChange}
-                            />
-                        )}
-                        <View style={styles.inputContainer}>
-                            <TouchableOpacity onPress={showDatePicker}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder={businessOrPersonal == 'business' ? ('Business Start Date') : ("Date of Birth")}
-                                    value={dob}
-                                    editable={false}
-                                    placeholderTextColor={'gray'}
-                                />
-                            </TouchableOpacity>
-                        </View>
+						{/* DOB */}
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>
+								Enter {businessOrPersonal === 'business' ? ('Buisness Start Date') : ('Date of Birth')}
+							</Text>
+						</View>
+						{isDatePickerVisible && (
+							<DateTimePicker
+								value={selectedDate}
+								mode="date"
+								display="default"
+								onChange={handleDateChange}
+							/>
+						)}
+						<View style={styles.inputContainer}>
+							<TouchableOpacity onPress={showDatePicker}>
+								<TextInput
+									style={styles.input}
+									placeholder={businessOrPersonal == 'business' ? ('Business Start Date') : ("Date of Birth")}
+									value={dob}
+									editable={false}
+									placeholderTextColor={'gray'}
+								/>
+							</TouchableOpacity>
+						</View>
 
-{/*                         
+						{/*                         
                         <View style={styles.labelContainer}>
                             <Text style={styles.label}>
                                 Enter Password
@@ -700,16 +717,16 @@ const LoginScreen = ({ navigation }) => {
                                 secureTextEntry
                             />
                         </View> */}
-                        <TouchableHighlight onPress={handleSave} style={{ backgroundColor: '#FF0000', borderRadius: 8, margin: 15, width: "80%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5 }} >
-					<Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
-						Sign Up
-					</Text>
-					</TouchableHighlight>
-					<TouchableOpacity onPress={() => { navigation.navigate('LoginScreen') }} style={{ padding: 5, marginTop: 0, marginBottom: 40 }}>
-						<Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 14, textDecorationLine: 'underline' }}>
-							I have an Account
-						</Text>
-					</TouchableOpacity>
+						<TouchableHighlight onPress={handleSave} style={{ backgroundColor: '#FF0000', borderRadius: 8, margin: 15, width: "80%", height: 50, alignItems: 'center', justifyContent: 'center', elevation: 5 }} >
+							<Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Bold', fontSize: 15, }}>
+								Sign Up
+							</Text>
+						</TouchableHighlight>
+						<TouchableOpacity onPress={() => { navigation.navigate('LoginScreen') }} style={{ padding: 5, marginTop: 0, marginBottom: 40 }}>
+							<Text style={{ color: '#6B7285', fontFamily: 'Manrope-Regular', fontSize: 14, textDecorationLine: 'underline' }}>
+								I have an Account
+							</Text>
+						</TouchableOpacity>
 					</View>
 				)}
 			/>
@@ -899,7 +916,7 @@ const LoginScreen = ({ navigation }) => {
 							fontFamily: 'Manrope-Bold',
 							marginTop: 5,
 							color: 'lightgray',
-							textAlign:'center'
+							textAlign: 'center'
 						}}>Account is Created, Please Login Now!</Text>
 						{/* another */}
 
@@ -1075,8 +1092,8 @@ const styles = StyleSheet.create({
 		fontSize: 16
 	},
 	logoContainer: {
-		height: 80,
-		width: 80,
+		height: 110,
+		width: 110,
 		backgroundColor: '#9FA2A6',
 		borderRadius: 100,
 		justifyContent: 'center',

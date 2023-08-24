@@ -105,7 +105,7 @@ const { height } = Dimensions.get('window')
 
 const MLMScreen2 = ({ navigation, route }) => {
 
-  const {aadhar} = route.params
+  const {aadhar, id} = route.params
 
   const [isLeft, setIsLeft] = React.useState(true)
   const [isRight, setIsRight] = React.useState(false)

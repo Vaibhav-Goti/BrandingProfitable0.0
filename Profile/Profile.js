@@ -122,7 +122,7 @@ const ProfileScreen = () => {
       console.log('Error fetching data...:', error);
       setTimeout(() => {
         setLoader(false)
-      }, 1000);
+      }, 2000);
 
     }
   }

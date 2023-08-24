@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,10 +9,60 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window')
 
 const Wallet = ({ navigation }) => {
+    
+    const [userTeamDetails, setUserTeamDetails] = useState([])
+
+    console.log(userTeamDetails)
+    
+
+    // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+
+    // all users details 
+
+        const [profileData, setProfileData] = React.useState(null);
+    React.useEffect(() => {
+        retrieveProfileData()
+    }, [retrieveProfileData])
+
+    const retrieveProfileData = async () => {
+        try {
+            const dataString = await AsyncStorage.getItem('profileData');
+            if (dataString) {
+                const data = JSON.parse(dataString);
+                setProfileData(data);
+            }
+        } catch (error) {
+            console.error('Error retrieving profile data:', error);
+        }
+    };
+
+    const fetchDetails = async () => {
+        try {
+            if (profileData) {
+                console.log('Checking subscription status...');
+
+                const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/abc/${profileData?.adhaar}`);
+                const result = response.data;
+
+                setUserTeamDetails(result)
+            } else {
+                console.log('details malti nathi!')
+            }   
+        } catch (error) {
+            console.log('Error fetching data...:', error);
+        }
+    }
+
+    React.useEffect(() => {
+        fetchDetails();
+    })
+    
     return (
         <LinearGradient colors={['#050505', '#1A2A3D']} style={{ flex: 1, marginBottom:50 }}>
 
@@ -39,7 +89,7 @@ const Wallet = ({ navigation }) => {
             <View style={{ height: 180, backgroundColor: '#2E3133', width, borderRadius: 20, justifyContent: 'space-between', overflow: 'hidden', marginTop: 20 }}>
                 <View style={{ justifyContent: 'center', alignItems: 'center', height: '70%', gap: 10 }}>
                     <Text style={{ fontFamily: 'Poppins-Bold', color: 'white', fontSize: 19 }}>
-                        ₹ 1,20,500/-
+                        ₹ {userTeamDetails?.totalRewards || 0}/-
                     </Text>
                     <Text style={{ fontFamily: 'Manrope-Regular', color: 'gray', fontSize: 15 }}>
                         Total Earnings
@@ -57,7 +107,7 @@ const Wallet = ({ navigation }) => {
                                     Red Wallet
                                 </Text>
                                 <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
-                                    ₹ 1200/-
+                                    ₹ {userTeamDetails?.redWallet}/-
                                 </Text>
                             </View>
                         </View>
@@ -74,7 +124,7 @@ const Wallet = ({ navigation }) => {
                                     Green Wallet
                                 </Text>
                                 <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
-                                    ₹ 1200/-
+                                    ₹ {userTeamDetails?.greenWallet}/-
                                 </Text>
                             </View>
                         </View>

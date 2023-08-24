@@ -14,7 +14,7 @@ const SignUp2Screen = ({ navigation, route }) => {
 
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [designation, setDesignation] = useState('');
+  const [designation, setDesignation] = useState('')
   const [fileUri, setFileUri] = useState('');
   const [dob, setDob] = useState('');
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
@@ -24,6 +24,7 @@ const SignUp2Screen = ({ navigation, route }) => {
   const { fullName, phone, password } = route.params;
   const [open, setOpen] = useState(false);
   const [gender, setGender] = useState(null);
+
   const [items, setItems] = useState([
     { label: 'Male', value: 'male' },
     { label: 'Female', value: 'female' },

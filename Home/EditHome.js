@@ -122,9 +122,6 @@ const EditHome = ({ route, navigation }) => {
      fetchDetails();
    })
    const [isLoader, setIsLoader] = useState(true)
- 
-
-
 
   const captureAndShareImage = async () => {
         if (userTeamDetails === 'Purchase') {

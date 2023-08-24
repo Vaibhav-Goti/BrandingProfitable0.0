@@ -76,8 +76,10 @@ const AfterSubscribe = () => {
             if (profileData) {
                 console.log('Checking subscription status...');
 
-                const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+                const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/abc/${profileData?.adhaar}`);
                 const result = response.data;
+
+                console.log(result)
 
                 setUserTeamDetails(result)
             } else {
@@ -115,7 +117,7 @@ const AfterSubscribe = () => {
 
                         <View>
                             <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 20 }}>
-                                {userTeamDetails?.data?.totalRewards}
+                                {userTeamDetails?.totalRewards || 0}
                             </Text>
                         </View>
                         <View>
@@ -142,7 +144,7 @@ const AfterSubscribe = () => {
                                         Pending Earnings
                                     </Text>
                                     <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
-                                        ₹ {userTeamDetails?.data?.redWallet}
+                                        ₹ {userTeamDetails?.redWallet}/-
                                     </Text>
                                 </View>
                             </View>
@@ -156,7 +158,7 @@ const AfterSubscribe = () => {
                                         Current Earnings
                                     </Text>
                                     <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 14, color: 'white' }}>
-                                        ₹ {userTeamDetails?.data?.greenWallet}
+                                        ₹ {userTeamDetails?.greenWallet}/-
                                     </Text>
                                 </View>
                             </View>
@@ -172,11 +174,11 @@ const AfterSubscribe = () => {
                     <View>
 
                         <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 20 }}>
-                            {userTeamDetails?.data?.totalTeam}
+                            {userTeamDetails?.totalChildrenCount}
                         </Text>
 
                     </View>
-                    <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2', {'aadhar':profileData?.adhaar}) }}>
+                    <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2', {'aadhar':profileData?.adhaar, 'id': profileData?._id}) }}>
                         <Text style={{ color: '#00D3FF', fontFamily: 'Manrope-Bold', fontSize: 15, textDecorationLine: 'underline', }}>
                             Total Team
                         </Text>
@@ -204,7 +206,7 @@ const AfterSubscribe = () => {
                                     </Text>
                                     <View>
                                         <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 20 }}>
-                                            {userTeamDetails?.data?.rightSideTotalJoining}
+                                            {userTeamDetails?.rightSideTotalJoining}
                                         </Text>
                                     </View>
                                 </View>
@@ -216,7 +218,7 @@ const AfterSubscribe = () => {
                                     </Text>
                                     <View>
                                         <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 20 }}>
-                                            {userTeamDetails?.data?.rightSideTodayJoining}
+                                            {userTeamDetails?.rightSideTodayJoining || 0}
                                         </Text>
                                     </View>
                                 </View>
@@ -245,7 +247,7 @@ const AfterSubscribe = () => {
                                     </Text>
                                     <View>
                                         <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 20 }}>
-                                            {userTeamDetails?.data?.leftSideTotalJoining}
+                                            {userTeamDetails?.leftSideTotalJoining}
                                         </Text>
                                     </View>
                                 </View>
@@ -257,7 +259,7 @@ const AfterSubscribe = () => {
                                     </Text>
                                     <View>
                                         <Text style={{ color: 'white', fontFamily: 'Manrope-Bold', fontSize: 20 }}>
-                                            {userTeamDetails?.data?.leftSideTodayJoining}
+                                            {userTeamDetails?.leftSideTodayJoining || 0}
                                         </Text>
                                     </View>
                                 </View>

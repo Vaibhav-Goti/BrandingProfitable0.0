@@ -136,7 +136,7 @@ const WithdrawWallet = ({ navigation }) => {
                 <TouchableOpacity style={{ width: 30 }} onPress={() => { navigation.goBack() }}>
                     <Icon name="angle-left" size={30} color={"white"} />
                 </TouchableOpacity>
-                <Text style={styles.headerText} onPress={() => { navigation.goBack() }}>
+                <Text style={styles.headerText}>
                     WithDraw
                 </Text>
             </View>
