@@ -492,11 +492,6 @@ const App = ({ navigation, route }) => {
       <TouchableOpacity onPress={onSelect} activeOpacity={0.7}>
         <View
           style={{
-            transform: [
-              { rotate: `${rotation || 0}deg` },
-              { scaleX: scaleX || 1 }, // Apply X-axis scaling
-              { scaleY: scaleY || 1 }, // Apply Y-axis scaling
-            ],
             borderColor: isSelected ? 'black' : 'transparent',
             borderWidth: isSelected ? 2 : 0,
             top,
@@ -506,8 +501,6 @@ const App = ({ navigation, route }) => {
         >
           <Text
             style={{
-              width: width * (scaleX || 1), // Scale the width based on scaleX
-              height: height * (scaleY || 1), // Scale the height based on scaleY
               fontSize,
               color,
               textAlign,

@@ -95,35 +95,38 @@ const ProfileScreen = () => {
 
   // all users details 
 
+  const [i, seti] = React.useState(0)
   const [loader, setLoader] = React.useState(true)
 
   const fetchDetails = async () => {
+    if (i < 5) {
+      seti(i+1)
+      try {
+        if (profileData) {
+          console.log('Checking subscription status...profile');
 
-    try {
-      if (profileData) {
-        console.log('Checking subscription status...');
+          const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+          const result = response.data;
 
-        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
-        const result = response.data;
-
-        if (response.data.statusCode == 200) {
-          setUserTeamDetails('Purchase')
+          if (response.data.statusCode == 200) {
+            setUserTeamDetails('Purchase')
+          } else {
+            setUserTeamDetails(result)
+          }
         } else {
-          setUserTeamDetails(result)
+          console.log('details malti nathi!')
         }
-      } else {
-        console.log('details malti nathi!')
+        setTimeout(() => {
+          setLoader(false)
+        }, 5000);
+
+      } catch (error) {
+        console.log('Error fetching data...:', error);
+        setTimeout(() => {
+          setLoader(false)
+        }, 2000);
+
       }
-      setTimeout(() => {
-        setLoader(false)
-      }, 1000);
-
-    } catch (error) {
-      console.log('Error fetching data...:', error);
-      setTimeout(() => {
-        setLoader(false)
-      }, 2000);
-
     }
   }
 
@@ -252,7 +255,7 @@ const ProfileScreen = () => {
           <ScrollView style={{ height: '100%', width: '100%' }}>
             <View style={{ alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingBottom: 35 }}>
               {/*  */}
-              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center', display: userTeamDetails != 'Purchase' ? 'none' : 'flex' }} onPress={()=>{navigation.navigate('WithdrawWallet')}}>
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center', display: userTeamDetails != 'Purchase' ? 'none' : 'flex' }} onPress={() => { navigation.navigate('WithdrawWallet') }}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
                   <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>

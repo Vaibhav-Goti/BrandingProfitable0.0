@@ -74,7 +74,7 @@ const AfterSubscribe = () => {
     const fetchDetails = async () => {
         try {
             if (profileData) {
-                console.log('Checking subscription status...');
+                console.log('Checking subscription status...aftersubscribe');
 
                 const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/abc/${profileData?.adhaar}`);
                 const result = response.data;

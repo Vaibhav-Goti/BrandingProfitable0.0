@@ -36,7 +36,6 @@ const SearchScreen = ({ navigation }) => {
       setCategories(categories)
       const items = result.filter((item) => item.isCategory == false && item.isVideo == false)
       const videos = result.filter((item) => item.isCategory == false && item.isVideo == true)
-      console.log(videos)
       setItems(items)
       setVideos(videos)
     } catch (error) {
@@ -77,15 +76,9 @@ const SearchScreen = ({ navigation }) => {
           style={[styles.image, { display: !isPlaying ? 'flex' : 'none' }]}
           resizeMode={FastImage.resizeMode.cover}
         />
-        <Video
-          source={{ uri: item.image }} // Use item.video instead of item.image
-          style={[styles.image, { display: isPlaying ? 'flex' : 'none' }]}
-          paused={!isPlaying}
-          resizeMode="cover"
-        />
-        <TouchableOpacity onPress={togglePlay} style={styles.playPauseButton}>
-          <Icon name={isPlaying ? 'pause' : 'play'} size={30} color="white" />
-        </TouchableOpacity>
+        <View style={styles.playPauseButton}>
+          <Icon name={'play-circle'} size={30} color="white" />
+        </View>
       </TouchableOpacity>
     );
   };

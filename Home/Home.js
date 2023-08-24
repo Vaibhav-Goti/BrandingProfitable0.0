@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, BackHandler, Modal, TouchableOpacity, Image, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, Text, BackHandler, Modal, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,6 +14,9 @@ import TodayBanner from './Category/Today';
 import DynamicSection from './DynamicSection';
 import FastImage from 'react-native-fast-image';
 import Feather from 'react-native-vector-icons/Feather'
+import axios from 'axios';
+
+const { height, width } = Dimensions.get('window')
 
 const Home = ({ navigation }) => {
 
@@ -23,8 +26,9 @@ const Home = ({ navigation }) => {
     setBusinessOrPersonal(businessOrPersonal);
   };
 
-  useEffect(() => {
+  const [displayPopUp, setDisplayPopUp] = useState(true)
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -126,24 +130,24 @@ const Home = ({ navigation }) => {
   };
 
   const [notificationCount, setNotificationCount] = useState(0)
-    const [notifications, setNotifications] = useState([])
+  const [notifications, setNotifications] = useState([])
 
-    const getNotificationCounts = async () => {
-        try {
-            const notificationsData = await AsyncStorage.getItem('notificationData');
+  const getNotificationCounts = async () => {
+    try {
+      const notificationsData = await AsyncStorage.getItem('notificationData');
 
-            const parsedNotifications = JSON.parse(notificationsData || '[]'); // Parse the JSON data
+      const parsedNotifications = JSON.parse(notificationsData || '[]'); // Parse the JSON data
 
-            setNotifications(parsedNotifications?.notifications);
-            setNotificationCount(parsedNotifications?.counts.unreadCount);
-        } catch (error) {
-            console.log('Error getting notification counts:', error);
-        }
+      setNotifications(parsedNotifications?.notifications);
+      setNotificationCount(parsedNotifications?.counts.unreadCount);
+    } catch (error) {
+      console.log('Error getting notification counts:', error);
     }
+  }
 
-    useEffect(() => {
-        getNotificationCounts();
-    }, []);
+  useEffect(() => {
+    getNotificationCounts();
+  }, []);
 
   // console.log(notificationCount, "noti counts!")
 
@@ -169,10 +173,38 @@ const Home = ({ navigation }) => {
   // }, 5000);
 
   console.log(businessOrPersonal)
+  const [popuUpImage, setPopUpImage] = useState('')
+
+  const fetchPopUp = async () => {
+    try {
+      const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/popup_banner/popup_banner');
+      setPopUpImage(response.data.popupBannerImage)
+    } catch (e) {
+      console.log("popuBanner Error: ", e)
+    }
+  }
+
+  useEffect(() => {
+    fetchPopUp()
+  })
 
   return (
     <View
       style={styles.container}>
+      <View style={[styles.modalContainer, { display: displayPopUp ? 'flex' : 'none' }]}>
+        <View style={styles.modalBackground} />
+        <View style={styles.modalContent}>
+          <TouchableOpacity style={{ position: 'absolute', top: -10, right: -10, zIndex: 10, backgroundColor: 'white', borderRadius: 100, width: 25, height: 25, alignItems: 'center', justifyContent: 'center' }} onPress={() => { setDisplayPopUp(false) }}>
+            <Icon name="close" size={18} />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: 'https://www.sparrowgroups.com/CDN/upload/259popup%20banner.jpg' }}
+            style={styles.modalImage}
+            onError={(error) => console.error('Error loading image:', error)}
+          />
+        </View>
+      </View>
+
       <Modal
         animationType="fade" // You can use "fade" or "none" for animation type
         visible={isModalVisible}
@@ -272,9 +304,9 @@ const Home = ({ navigation }) => {
               backgroundColor: 'red',
               borderColor: 'white',
               borderWidth: 0.2,
-              elevation:2,
-              borderColor:'white',
-              borderWidth:0.2
+              elevation: 2,
+              borderColor: 'white',
+              borderWidth: 0.2
             }}>
               <Text style={{
                 color: 'white',
@@ -371,8 +403,30 @@ const styles = StyleSheet.create({
   },
   searchText: {
     marginRight: 10,
-    color:'lightgray'
-  }
+    color: 'lightgray'
+  },
+  modalContainer: {
+    height,
+    width,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 3,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+  },
+  modalBackground: {
+    position: 'absolute',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalImage: {
+    height: height - 360,
+    width: width - 100,
+    borderRadius: 10
+  },
 });
 
 export default Home;

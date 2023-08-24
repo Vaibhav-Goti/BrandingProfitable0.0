@@ -98,7 +98,7 @@ const CategoriesScreen = ({ route, navigation }) => {
                 
             </View>
             <FlatList
-                data={item.items}
+                data={item.items.slice(0,10)}
                 horizontal={true}
                 keyExtractor={(item, index) => index.toString()}
                 showsHorizontalScrollIndicator={false}
@@ -112,6 +112,9 @@ const CategoriesScreen = ({ route, navigation }) => {
                             });
                         }}
                     >
+                        <View style={{position:'absolute',top:45,left:index == 0 ? 55 : 40,zIndex:1, display:imageItem.isVideo?'flex':'none'}}>
+                            <Icon name="play-circle" size={30} color={"white"} />
+                        </View>
                         <FastImage
                             source={{ uri: imageItem.todayAndTomorrowImageOrVideo }}
                             style={[styles.image, { marginLeft: index == 0 ? 15 : 0 }]}

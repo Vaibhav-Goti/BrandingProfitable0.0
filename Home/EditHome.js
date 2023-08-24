@@ -85,64 +85,64 @@ const EditHome = ({ route, navigation }) => {
   };
 
 
-   // fetch the user team details 
-   const [userTeamDetails, setUserTeamDetails] = useState([])
+  // fetch the user team details 
+  const [userTeamDetails, setUserTeamDetails] = useState([])
 
-   console.log(userTeamDetails)
- 
-   // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
- 
-   // all users details 
- 
-   const fetchDetails = async () => {
-     try {
-       if (profileData) {
- 
-         const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
-         const result = response.data;
- 
-         if (response.data.statusCode == 200) {
-           setUserTeamDetails('Purchase')
-         } else {
-           console.log("user not data aavto nathi athava purchase request ma che ")
-         }
-       } else {
-         console.log('details malti nathi!')
-       }
-     } catch (error) {
-       console.log('Error fetching data...:', error);
-     }finally{
+  console.log(userTeamDetails)
+
+  // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
+
+  // all users details 
+
+  const fetchDetails = async () => {
+    try {
+      if (profileData) {
+
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const result = response.data;
+
+        if (response.data.statusCode == 200) {
+          setUserTeamDetails('Purchase')
+        } else {
+          console.log("user not data aavto nathi athava purchase request ma che ")
+        }
+      } else {
+        console.log('details malti nathi!')
+      }
+    } catch (error) {
+      console.log('Error fetching data...:', error);
+    } finally {
       setTimeout(() => {
         setIsLoader(false)
       }, 1000);
     }
-   }
- 
-   useEffect(() => {
-     fetchDetails();
-   })
-   const [isLoader, setIsLoader] = useState(true)
+  }
+
+  useEffect(() => {
+    fetchDetails();
+  })
+  const [isLoader, setIsLoader] = useState(true)
 
   const captureAndShareImage = async () => {
-        if (userTeamDetails === 'Purchase') {
-    try {
-      const uri = await viewShotRef.current.capture();
+    if (userTeamDetails === 'Purchase') {
+      try {
+        const uri = await viewShotRef.current.capture();
 
-      const fileName = 'sharedImage.jpg';
-      const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+        const fileName = 'sharedImage.jpg';
+        const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
 
-      await RNFS.copyFile(uri, destPath);
+        await RNFS.copyFile(uri, destPath);
 
-      const shareOptions = {
-        type: 'image/jpeg',
-        url: `file://${destPath}`,
-      };
+        const shareOptions = {
+          type: 'image/jpeg',
+          url: `file://${destPath}`,
+        };
 
-      await Share.open(shareOptions);
-    } catch (error) {
-      console.error('Error sharing image:', error);
-    }
-     } else {
+        await Share.open(shareOptions);
+      } catch (error) {
+        console.error('Error sharing image:', error);
+      }
+    } else {
       showToastWithGravity("Purchase MLM to share/download")
     }
   };
@@ -190,14 +190,10 @@ const EditHome = ({ route, navigation }) => {
 
   const renderItemV = useCallback(({ item }) => (
     <TouchableOpacity onPress={() => handleImagePressV(item)}>
-      <Video
-        source={{ uri: item?.todayAndTomorrowImageOrVideo }}   // Can be a URL or a local file.
-        style={styles.image}
-        paused={false}               // Pauses playback entirely.
-        resizeMode="cover"            // Fill the whole screen at aspect ratio.
-        muted={true}
-        repeat={true}
-      />
+      <View style={{ position: 'absolute', top: 45, left: 45, zIndex: 1, }}>
+        <Icon name="play-circle" size={30} color={"white"} />
+      </View>
+      <FastImage source={item?.todayAndTomorrowImageOrVideo ? { uri: item?.todayAndTomorrowImageOrVideo } : { uri: item.imageUrl }} style={styles.image} onLoadEnd={() => Image.prefetch(item?.todayAndTomorrowImageOrVideo ? item?.todayAndTomorrowImageOrVideo : item.imageUrl)} />
     </TouchableOpacity>
   ), []);
 
@@ -227,7 +223,7 @@ const EditHome = ({ route, navigation }) => {
     { languageName: 'ગુજરાતી' },
     { languageName: 'हिंदी' }
   ])
-  
+
   useEffect(() => {
     retrieveProfileData()
   }, [retrieveProfileData])
@@ -413,46 +409,14 @@ const EditHome = ({ route, navigation }) => {
 
 
         </View>
-
-        {!displayImage ? (
-          images.length > 0 ? (
-            <FlatList
-              data={images}
-              numColumns={3} // Adjust the number of columns as needed
-              keyExtractor={(item) => item._id.toString()}
-              renderItem={renderItem}
-              contentContainerStyle={styles.flatListContainer}
-              shouldComponentUpdate={() => false}
-              removeClippedSubviews
-              initialNumToRender={30}
-              maxToRenderPerBatch={30}
-              windowSize={10}
-            />
-          ) : (
-            <FlatList
-              data={items}
-              numColumns={3} // Adjust the number of columns as needed
-              renderItem={renderItem}
-              contentContainerStyle={styles.flatListContainer}
-              shouldComponentUpdate={() => false}
-              removeClippedSubviews
-              initialNumToRender={30}
-              maxToRenderPerBatch={30}
-              windowSize={10}
-            />
-          )
-        ) : (
-          FlatlistisLoad ? (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
-              <ActivityIndicator />
-            </View>
-          ) :
-            videos.length > 0 ? (
+        <View>
+          {!displayImage ? (
+            images.length > 0 ? (
               <FlatList
-                data={videos}
+                data={images}
                 numColumns={3} // Adjust the number of columns as needed
-                // keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItemV}
+                keyExtractor={(item) => item._id.toString()}
+                renderItem={renderItem}
                 contentContainerStyle={styles.flatListContainer}
                 shouldComponentUpdate={() => false}
                 removeClippedSubviews
@@ -461,11 +425,39 @@ const EditHome = ({ route, navigation }) => {
                 windowSize={10}
               />
             ) : (
-              <View style={{ justifyContent: 'center', flex: 1 }}>
-                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>No videos Found!</Text>
-              </View>
+              <FlatList
+                data={items}
+                numColumns={3} // Adjust the number of columns as needed
+                renderItem={renderItem}
+                contentContainerStyle={styles.flatListContainer}
+                shouldComponentUpdate={() => false}
+                removeClippedSubviews
+                initialNumToRender={30}
+                maxToRenderPerBatch={30}
+                windowSize={10}
+              />
             )
-        )}
+          ) : (
+              videos.length > 0 ? (
+                <FlatList
+                  data={videos}
+                  numColumns={3} // Adjust the number of columns as needed
+                  // keyExtractor={(item) => item.id.toString()}
+                  renderItem={renderItemV}
+                  contentContainerStyle={styles.flatListContainer}
+                  shouldComponentUpdate={() => false}
+                  removeClippedSubviews
+                  initialNumToRender={30}
+                  maxToRenderPerBatch={30}
+                  windowSize={10}
+                />
+              ) : (
+                <View style={{ justifyContent: 'center', flex: 1 }}>
+                  <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>No videos Found!</Text>
+                </View>
+              )
+          )}
+        </View>
       </View>
     </LinearGradient>
   );
@@ -499,7 +491,7 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray'
   },
   flatListContainer: {
-    paddingBottom: 30,
+    paddingBottom: 70,
     paddingTop: 20
   },
   ShareContainer: {

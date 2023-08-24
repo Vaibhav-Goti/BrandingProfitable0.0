@@ -13,7 +13,7 @@ const TodayBanner = () => {
 
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
-        const options = { month: 'long', day: 'numeric' };
+        const options = { month: 'short', day: 'numeric' };
         const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
         return formattedDate;
     };
@@ -36,7 +36,7 @@ const TodayBanner = () => {
                                 source={{ uri: item.image }}
                                 style={styles.bannerImage}
                             />
-                            <View style={{ position: 'absolute', backgroundColor: '#1E1E1E', paddingHorizontal: 10, bottom: 7, borderRadius: 30, alignItems: 'center', paddingVertical: 3, width:100 }}>
+                            <View style={{ position: 'absolute', backgroundColor: '#1E1E1E', paddingHorizontal: 10, bottom: 7, borderRadius: 30, alignItems: 'center', paddingVertical: 3, width:80 }}>
                                 <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Regular' }}>
                                     {formatDate(item.imageDate)}
                                 </Text>

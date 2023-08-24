@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, ToastAndroid } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Alert, ToastAndroid } from 'react-native';
 // import imageData from '../apiData/200x200';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -131,6 +131,8 @@ const EditItem = ({ route, navigation }) => {
       }
     } catch (error) {
       console.log('Error fetching data...:', error);
+    } finally {
+      setIsLoader(false)
     }
   }
 
@@ -174,7 +176,7 @@ const EditItem = ({ route, navigation }) => {
 
   // capture video
   const captureAndShareVideo = async () => {
-    Alert.alert("share video clicked")
+    Alert.alert("Video Sharing in Development...")
     // try {
     //   const videoURL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
 
@@ -217,14 +219,12 @@ const EditItem = ({ route, navigation }) => {
 
   const renderItemV = useCallback(({ item }) => (
     <TouchableOpacity onPress={() => handleImagePressV(item)}>
-      <Video
-        source={{ uri: item.image }}   // Can be a URL or a local file.
-        style={styles.image}
-        paused={false}               // Pauses playback entirely.
-        resizeMode="cover"            // Fill the whole screen at aspect ratio.
-        muted={true}
-        repeat={true}
+      <FastImage source={{ uri: item.image }} style={styles.image}
+        onLoadEnd={() => Image.prefetch(item.image)}
       />
+      <View style={{ position: 'absolute', top: 45, left: 45, zIndex: 1, }}>
+        <Icon name="play-circle" size={30} color={"white"} />
+      </View>
     </TouchableOpacity>
   ), []);
 
@@ -253,15 +253,7 @@ const EditItem = ({ route, navigation }) => {
 
   // language
 
-  const [userToken, setUserToken] = useState()
   const [profileData, setProfileData] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [languages, setLanguages] = useState([
-    { languageName: 'English' },
-    { languageName: 'ગુજરાતી' },
-    { languageName: 'हिंदी' }
-  ])
 
   useEffect(() => {
     retrieveProfileData()
@@ -281,34 +273,6 @@ const EditItem = ({ route, navigation }) => {
     }
   };
 
-  const fetchDataL = async () => {
-    try {
-      const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/language/languages',
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
-      const result = response.data.data;
-
-      setLanguages(result);
-    } catch (error) {
-      console.log('Error fetching data...:', error);
-    }
-  };
-
-  const [callLanguageFunc, setCallLanguageFunc] = useState(true)
-
-  useEffect(() => {
-    setInterval(() => {
-      if (callLanguageFunc) {
-        fetchDataL()
-        const all = {}
-        setCallLanguageFunc(false)
-      }
-    }, 1000);
-  })
   if (isLoader) {
     return (
       <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

@@ -18,7 +18,7 @@ const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5;
 
 const EditHome = ({ route, navigation }) => {
-  
+
   const showToastWithGravity = (data) => {
     ToastAndroid.showWithGravityAndOffset(
       data,
@@ -110,7 +110,7 @@ const EditHome = ({ route, navigation }) => {
       }
     } catch (error) {
       console.log('Error fetching data...:', error);
-    }finally{
+    } finally {
       setTimeout(() => {
         setIsLoader(false)
       }, 1000);
@@ -120,7 +120,7 @@ const EditHome = ({ route, navigation }) => {
   useEffect(() => {
     fetchDetails();
   })
-  
+
 
 
   const captureAndShareImage = async () => {
@@ -190,14 +190,10 @@ const EditHome = ({ route, navigation }) => {
 
   const renderItemV = useCallback(({ item }) => (
     <TouchableOpacity onPress={() => handleImagePressV(item)}>
-      <Video
-        source={{ uri: item.uri }}   // Can be a URL or a local file.
-        style={styles.image}
-        paused={false}               // Pauses playback entirely.
-        resizeMode="cover"            // Fill the whole screen at aspect ratio.
-        muted={true}
-        repeat={true}
-      />
+      <FastImage source={{ uri: item.imageUrl }} style={styles.image} onLoadEnd={() => Image.prefetch(item.imageUrl)} />
+      <View style={{ position: 'absolute', top: 45, left: 45, zIndex: 1, }}>
+        <Icon name="play-circle" size={30} color={"white"} />
+      </View>
     </TouchableOpacity>
   ), []);
 

@@ -33,10 +33,12 @@ const CategoriesScreen = ({ route, navigation }) => {
     }, []);
 
     const [data, setData] = useState([])
-    
+
 
     // render images
     // onPress={() => { navigation.navigate('EditHomeScreen', { 'bannername': item.categoryName }) }} 
+
+    // imageItem.isVideo
 
     const renderItem = useCallback(({ item }) => (
         <View style={styles.BannerItem}>
@@ -49,7 +51,7 @@ const CategoriesScreen = ({ route, navigation }) => {
                 </Text> */}
             </View>
             <FlatList
-                data={item.items}
+                data={item.items.slice(0,10)}
                 horizontal={true}
                 keyExtractor={(item, index) => index.toString()}
                 showsHorizontalScrollIndicator={false}
@@ -63,21 +65,14 @@ const CategoriesScreen = ({ route, navigation }) => {
                             });
                         }}
                     >
-                        {imageItem.isVideo ? (
-                            <Video
-                                source={{ uri: imageItem.todayAndTomorrowImageOrVideo }}
-                                style={styles.image}
-                                resizeMode="cover"
-                                muted={true}
-                                repeat={true}
-                            />
-                        ) : (
-                            <FastImage
-                                source={{ uri: imageItem.todayAndTomorrowImageOrVideo }}
-                                style={[styles.image, { marginLeft: index == 0 ? 15 : 0 }]}
-                                onLoadEnd={() => Image.prefetch(imageItem.todayAndTomorrowImageOrVideo)}
-                            />
-                        )}
+                        <View style={{position:'absolute',top:45,left:index == 0 ? 55 : 40,zIndex:1, display:imageItem.isVideo?'flex':'none'}}>
+                            <Icon name="play-circle" size={30} color={"white"} />
+                        </View>
+                        <FastImage
+                            source={{ uri: imageItem.todayAndTomorrowImageOrVideo }}
+                            style={[styles.image, { marginLeft: index == 0 ? 15 : 0 }]}
+                            onLoadEnd={() => Image.prefetch(imageItem.todayAndTomorrowImageOrVideo)}
+                        />
                     </TouchableOpacity>
                 )}
             />
@@ -96,7 +91,7 @@ const CategoriesScreen = ({ route, navigation }) => {
         <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
 
             <View style={styles.headerContainer}>
-                <TouchableOpacity style={{width:40, alignItems:'center'}} onPress={() => { navigation.navigate('HomeScreen') }}>
+                <TouchableOpacity style={{ width: 40, alignItems: 'center' }} onPress={() => { navigation.navigate('HomeScreen') }}>
                     <Icon name="angle-left" size={30} color={"white"} />
                 </TouchableOpacity>
                 <Text style={styles.headerText} onPress={() => { navigation.navigate('HomeScreen') }}>
@@ -137,7 +132,7 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 20,
         color: 'white',
-        fontFamily:'Manrope-Bold',
+        fontFamily: 'Manrope-Bold',
         marginLeft: 10
     },
     container: {
@@ -167,7 +162,7 @@ const styles = StyleSheet.create({
     bannerHeaderText: {
         fontSize: 18,
         color: 'white',
-        fontFamily:'Manrope-Bold'
+        fontFamily: 'Manrope-Bold'
     },
     flatListContainer: {
         width: width,
