@@ -36,8 +36,8 @@ const TodayBanner = () => {
                                 source={{ uri: item.image }}
                                 style={styles.bannerImage}
                             />
-                            <View style={{ position: 'absolute', backgroundColor: '#1E1E1E', paddingHorizontal: 10, bottom: 7, borderRadius: 30, alignItems: 'center', paddingVertical: 3, width:80 }}>
-                                <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Regular' }}>
+                            <View style={{ position: 'absolute', backgroundColor: '#1E1E1E', paddingHorizontal: 10, top: 3, borderRadius: 30, alignItems: 'center', paddingVertical: 1, width:70 }}>
+                                <Text style={{ color: 'white', fontFamily: 'DMSans_18pt-Regular', fontSize:12 }}>
                                     {formatDate(item.imageDate)}
                                 </Text>
                             </View>
@@ -61,7 +61,7 @@ const TodayBanner = () => {
             })
             .catch(error => {
                 // Handle errors
-                console.error('Error fetching data...:', error);
+                console.error('Error fetching data... today:', error);
                 setLoading(false);
             });
     }, []);

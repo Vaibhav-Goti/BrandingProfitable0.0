@@ -76,17 +76,15 @@ const AfterSubscribe = () => {
             if (profileData) {
                 console.log('Checking subscription status...aftersubscribe');
 
-                const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/abc/${profileData?.adhaar}`);
+                const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/abc/${profileData?.mobileNumber}`);
                 const result = response.data;
-
-                console.log(result)
-
+console.log(result)
                 setUserTeamDetails(result)
             } else {
                 console.log('details malti nathi!')
             }
         } catch (error) {
-            console.log('Error fetching data...:', error);
+            console.log('Error fetching data... after subscribe:', error);
         }
     }
 
@@ -101,8 +99,6 @@ const AfterSubscribe = () => {
             </View>
         )
     }
-
-    
 
     return (
         <LinearGradient colors={['#20AE5C', '#000']} locations={[0.2, 1]} style={{ flex: 1, marginBottom: 50 }}>
@@ -178,7 +174,7 @@ const AfterSubscribe = () => {
                         </Text>
 
                     </View>
-                    <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2', {'aadhar':profileData?.adhaar, 'id': profileData?._id}) }}>
+                    <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2', {'aadhar':profileData?.phone, 'id': profileData?._id}) }}>
                         <Text style={{ color: '#00D3FF', fontFamily: 'Manrope-Bold', fontSize: 15, textDecorationLine: 'underline', }}>
                             Total Team
                         </Text>

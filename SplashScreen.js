@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
+import ReactCurvedText from "react-curved-text";
 
 const SplashScreen = () => {
     return (
@@ -26,11 +27,11 @@ const SplashScreen = () => {
             </View>
             <View style={styles.belowTextContainer}>
                 <Text style={styles.belowText}>
-                    Made by
-                    <Text style={[styles.belowText, { color: '#FF0000' }]}>
-                        {" Indians for Indians "} 🇮🇳
-                    </Text>
+                    From
                 </Text>
+                <View>
+                    <Image style={{ height: 40, width: 100 }} source={require('./assets/kuberLOGO.png')} />
+                </View>
             </View>
         </LinearGradient>
     );
@@ -67,11 +68,15 @@ const styles = StyleSheet.create({
     belowText: {
         color: 'white',
         fontFamily: 'Poppins-Regular',
-        fontSize: 16
+        fontSize: 16,
+        marginTop: 20
     },
     belowTextContainer: {
         justifySelf: 'flex-end',
-        marginBottom:20
+        marginBottom: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10
     }
 
 })

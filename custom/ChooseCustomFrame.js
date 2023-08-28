@@ -99,7 +99,7 @@ const ChooseCustomFrame = ({ navigation, route }) => {
     try {
       if (profileData) {
 
-        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
         const result = response.data;
 
         if (response.data.statusCode == 200) {
@@ -112,7 +112,7 @@ const ChooseCustomFrame = ({ navigation, route }) => {
         console.log('details malti nathi!')
       }
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data... choose custom frame:', error);
     } finally {
       setTimeout(() => {
         setIsLoader(false)

@@ -50,7 +50,7 @@ const TodayBanner = () => {
             })
             .catch(error => {
                 // Handle errors
-                console.error('Error fetching data...:', error);
+                console.error('Error fetching data... trending banner:', error);
                 setLoading(false);
             });
     }, []);

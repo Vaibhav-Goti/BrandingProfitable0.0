@@ -43,7 +43,7 @@ const MyComponent = () => {
             })
             .catch(error => {
                 // Handle errors
-                console.error('Error fetching data...:', error);
+                console.error('Error fetching data... ad banner:', error);
                 setLoading(false);
             });
     }, []);

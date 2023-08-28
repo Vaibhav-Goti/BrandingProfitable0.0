@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, Alert, ToastAndroid } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, Modal, ToastAndroid } from 'react-native';
 // import imageData from '../apiData/200x200';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -11,7 +11,9 @@ import Video from 'react-native-video';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient';
+import Feather from 'react-native-vector-icons/Feather'
 import DropDownPicker from 'react-native-dropdown-picker';
+import SelectDropdown from 'react-native-select-dropdown';
 // import CameraRoll from '@react-native-community/cameraroll';
 
 const { width } = Dimensions.get('window');
@@ -29,6 +31,7 @@ const EditHome = ({ route, navigation }) => {
     );
   };
 
+
   const { bannername } = route.params; i
 
   const { items, index } = route.params
@@ -42,7 +45,7 @@ const EditHome = ({ route, navigation }) => {
     if (i < 2) {
       if (items.length > 0) {
         setItem(items[index ? index : 0].imageUrl)
-        seti(i + 1)
+        seti(i)
       }
     } else {
       console.log("i is bigger")
@@ -63,9 +66,11 @@ const EditHome = ({ route, navigation }) => {
   const loadCustomFrames = async () => {
     try {
       const framesData = await AsyncStorage.getItem('customFrames');
-      if (framesData) {
+      if (framesData.length !== 2 && framesData ) {
         const frames = JSON.parse(framesData);
         setCustomFrames(frames);
+      } else {
+        showAlert()
       }
     } catch (error) {
       console.error('Error loading custom frames:', error);
@@ -80,14 +85,9 @@ const EditHome = ({ route, navigation }) => {
     setSelectedVideo(item.uri);
   };
 
-
-
-
   const [isLoader, setIsLoader] = useState(true)
   // fetch the user team details 
   const [userTeamDetails, setUserTeamDetails] = useState([])
-
-  console.log(userTeamDetails)
 
   // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
 
@@ -97,7 +97,7 @@ const EditHome = ({ route, navigation }) => {
     try {
       if (profileData) {
 
-        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
         const result = response.data;
 
         if (response.data.statusCode == 200) {
@@ -109,7 +109,7 @@ const EditHome = ({ route, navigation }) => {
         console.log('details malti nathi!')
       }
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data... edit home dynamic:', error);
     } finally {
       setTimeout(() => {
         setIsLoader(false)
@@ -121,7 +121,17 @@ const EditHome = ({ route, navigation }) => {
     fetchDetails();
   })
 
+  const [isModalVisible, setModalVisible] = useState(false);
 
+  const showAlert = () => {
+    setModalVisible(true);
+  };
+
+  const hideAlert = () => {
+    setModalVisible(false);
+  };
+
+  console.log(userTeamDetails)
 
   const captureAndShareImage = async () => {
     if (userTeamDetails === 'Purchase') {
@@ -237,31 +247,40 @@ const EditHome = ({ route, navigation }) => {
   const [languages, setLanguages] = useState([
     { languageName: 'English' },
     { languageName: 'ગુજરાતી' },
-    { languageName: 'हिंदी' }
+    { languageName: 'हिन्दी' }
   ])
 
+  let [apiRun, setApiRun] = useState(true)
   const fetchData = async () => {
-    try {
-      const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/language/languages',
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
-      const result = response.data.data;
+      try {
+        const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/language/languages',
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+        const result = response.data.data;
+        setApiRun(false)
 
-      setLanguages(result);
-    } catch (error) {
-      console.log('Error fetching :', error);
-    }
+        setLanguages(result);
+      } catch (error) {
+        console.log('Error fetching data... edit home:', error);
+      }
+
   };
+
+  useEffect(()=>{
+    if(apiRun){
+
+      fetchData();
+    }
+  }, [fetchData])
 
   const [callLanguageFunc, setCallLanguageFunc] = useState(true)
 
   useEffect(() => {
     if (callLanguageFunc) {
-      fetchData()
       setCallLanguageFunc(false)
     }
   })
@@ -299,6 +318,79 @@ const EditHome = ({ route, navigation }) => {
 
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
+
+      <Modal
+        animationType="fade" // You can use "fade" or "none" for animation type
+        visible={isModalVisible}
+        transparent={true}
+      >
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
+        }}>
+          <View style={{
+            backgroundColor: 'white',
+            padding: 20,
+            borderRadius: 8,
+            height: "40%",
+            height: 230,
+            width: 300,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* icon */}
+            <TouchableOpacity onPress={hideAlert} style={{
+              backgroundColor: 'red',
+              padding: 8,
+              borderRadius: 8,
+            }}>
+              <Text style={{
+                color: 'white',
+                fontWeight: 'bold',
+              }}><Feather name="log-out" size={25} color="white" /></Text>
+            </TouchableOpacity>
+            {/* title */}
+            <Text style={{
+              fontSize: 16,
+              fontFamily: 'Manrope-Bold',
+              marginTop: 10,
+              color: 'red'
+            }}>Let's Create Awesome Frames!</Text>
+            {/* caption */}
+            <Text style={{
+              fontSize: 16,
+              fontFamily: 'Manrope-Bold',
+              marginTop: 5,
+              color: 'lightgray',
+              textAlign: 'center'
+            }}>Now don't have any frames let's create!</Text>
+            {/* another */}
+            <View style={{ width: '80%', marginTop: 30, flexDirection: 'row', justifyContent: 'center' }}>
+              <TouchableOpacity
+                onPress={() => {
+                  hideAlert()
+                  navigation.navigate('StackProfileScreen');
+                }}
+                style={{
+                  backgroundColor: 'red',
+                  width: 70,
+                  paddingVertical: 5,
+                  alignItems: 'center',
+                  justifyContent: "center",
+                  borderRadius: 8,
+                }}>
+                <Text style={{
+                  color: 'white',
+                  fontFamily: "Manrope-Bold"
+                }}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.headerContainer}>
         <TouchableOpacity style={{ width: 30 }} onPress={() => { navigation.goBack() }}>
@@ -405,43 +497,28 @@ const EditHome = ({ route, navigation }) => {
           {/* 2 */}
 
           <View style={{ width: 120, zIndex: 1, alignSelf: 'flex-end', height: '100%' }}>
-            <DropDownPicker
-              open={open}
-              value={selectedLanguage}
-              items={languages.map((language) => ({
-                label: language.languageName,
-                value: language.languageName,
-              }))}
-              setOpen={setOpen}
-              setValue={(value) => setSelectedLanguage(value)}
-              style={{
-                backgroundColor: 'white',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 20,
-                height: 30,
+            <SelectDropdown
+              data={languages.map((language) => language.languageName)} // Use the language names
+              onSelect={(selectedItem, index) => {
+                setSelectedLanguage(selectedItem);
               }}
-              dropDownStyle={{
-                backgroundColor: 'white',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 20,
-                maxHeight: 150,
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
               }}
-              containerStyle={{ height: 30 }} // Set a fixed height for the container
-              listItemContainerStyle={{ height: 30 }} // Set a fixed height for each item in the dropdown
-              scrollViewProps={{ // Enable scrolling for the dropdown
-                nestedScrollEnabled: true,
+              rowTextForSelection={(item, index) => {
+                return item;
               }}
-              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
-              placeholder="Language"
-              placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+              buttonStyle={{ backgroundColor: 'red', height: 30, borderRadius: 100, width: 130, }}
+              rowTextStyle={{ fontFamily: "Manrope-Regular", fontSize: 13, color: "black" }}
+              buttonTextStyle={{ fontFamily: "Manrope-Regular", fontSize: 13, color: "white" }}
+              defaultButtonText='Select Language'
+              dropdownStyle={{borderRadius:10,marginTop:-32}}
             />
           </View>
 
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
-            {/* 1 */}
+            {/* 1 */} 
             <TouchableOpacity onPress={() => {
               setdisplayImage(false)
             }}
@@ -462,7 +539,6 @@ const EditHome = ({ route, navigation }) => {
 
         </View>
 
-        <View>
           {!displayImage ? (
             items.length > 0 ? (
               <FlatList
@@ -515,7 +591,6 @@ const EditHome = ({ route, navigation }) => {
                 </View>
               )
           )}
-        </View>
 
       </View>
     </LinearGradient>
@@ -550,6 +625,7 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray'
   },
   flatListContainer: {
+    paddingBottom:40,
   },
   ShareContainer: {
     position: 'absolute',

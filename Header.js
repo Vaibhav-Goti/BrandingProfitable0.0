@@ -83,7 +83,7 @@ const Header = () => {
             <Text style={styles.yourBuisness}>
               {businessOrPersonal == 'business' ? 'Business' : 'Profile'}
             </Text>
-            <Text style={styles.buisnessTitle}>
+            <Text style={[styles.buisnessTitle,{elevation:3}]}>
               {profileData !== null && profileData?.fullName || 'John Doe'}{' '}
               <Icon name="angle-down" size={25} />
             </Text>
@@ -131,23 +131,22 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       flexDirection: 'row',
       paddingHorizontal: 20,
-      backgroundColor: 'white',
       borderBottomLeftRadius: 10,
       borderBottomRightRadius: 10,
-      elevation: 5,
     },
     headerText: {
       fontSize: 20,
-      color: 'black',
+      color: 'white',
       fontWeight: 'bold',
     },
     buisnessTitle: {
       fontSize: 19,
-      color: 'black',
+      color: 'white',
       fontFamily: 'Manrope-Bold',
     },
     yourBuisness: {
       fontSize: 12,
       fontFamily: 'Manrope-Regular',
+      color:'white'
     },
 });

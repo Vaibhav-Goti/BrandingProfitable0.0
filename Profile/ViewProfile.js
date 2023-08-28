@@ -40,7 +40,7 @@ const FullScreenProfile = ({ navigation }) => {
 
             setItems(mappedItems);
         } catch (error) {
-            console.log('Error fetching data...:', error);
+            console.log('Error fetching data... view profile:', error);
         }
         setLoading(false);
     };

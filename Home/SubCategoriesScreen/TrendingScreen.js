@@ -7,10 +7,10 @@ import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
-const itemWidth = width / 3.5; // Adjust the number of columns as needed
+const itemWidth = width / 3.5;
 
 const CategoriesScreen = ({ route, navigation }) => {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);   
 
     useEffect(() => {
         // Define the URL for the GET request
@@ -26,7 +26,7 @@ const CategoriesScreen = ({ route, navigation }) => {
             })
             .catch(error => {
                 // Handle errors
-                console.error('Error fetching data...:', error)
+                console.error('Error fetching data... trending screen:', error)
                 setLoading(false);
             });
 
@@ -34,13 +34,14 @@ const CategoriesScreen = ({ route, navigation }) => {
 
     const [data, setData] = useState([])
 
-
     // render images
     // onPress={() => { navigation.navigate('EditHomeScreen', { 'bannername': item.categoryName }) }} 
 
     // imageItem.isVideo
 
-    const renderItem = useCallback(({ item }) => (
+    const renderItem = useCallback(({ item }) => {
+
+        return(
         <View style={styles.BannerItem}>
             <View style={styles.bannerHeader}>
                 <Text style={styles.bannerHeaderText}>
@@ -77,15 +78,7 @@ const CategoriesScreen = ({ route, navigation }) => {
                 )}
             />
         </View>
-    ), [navigation]);
-
-    // if (loading) {
-    //     return (
-    //         <View style={styles.container}>
-    //             <ActivityIndicator />
-    //         </View>
-    //     )
-    // }
+    )}, [navigation]);
 
     return (
         <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
@@ -118,8 +111,6 @@ const CategoriesScreen = ({ route, navigation }) => {
         </LinearGradient>
     )
 }
-
-// [{"__v": 0, "_id": "64be599da5ba4bf6a044d760", "categoryName": "Mohram", "image": "https://www.sparrowgroups.com/CDN/upload/580mohram.jpg", "imageDate": "2023-07-24", "imageName": "Mohram", "todayAndTomorrowCategoryId": "06", "todayAndTomorrowCategorySwitch": true}, {"__v": 0, "_id": "64be5986a5ba4bf6a044d75a", "categoryName": "FreindShip", "image": "https://www.sparrowgroups.com/CDN/upload/660Happy-Friendship-Day-Images.jpg", "imageDate": "2023-07-24", "imageName": "FriendShip Day", "todayAndTomorrowCategoryId": "05", "todayAndTomorrowCategorySwitch": true}, {"__v": 0, "_id": "64be5963a5ba4bf6a044d754", "categoryName": "Shravan", "image": "https://www.sparrowgroups.com/CDN/upload/7811657822174_happy-shravan-maas-card-images-with-name-edit.jpg", "imageDate": "2023-07-24", "imageName": "Shravan Maas", "todayAndTomorrowCategoryId": "04", "todayAndTomorrowCategorySwitch": true}, {"__v": 0, "_id": "64be594ba5ba4bf6a044d74e", "categoryName": "attitude Quotes", "image": "https://www.sparrowgroups.com/CDN/upload/421attitude.jpg", "imageDate": "2023-07-24", "imageName": "attitude Quotes", "todayAndTomorrowCategoryId": "03", "todayAndTomorrowCategorySwitch": true}, {"__v": 0, "_id": "64be58bea5ba4bf6a044d740", "categoryName": "sport", "image": "https://www.sparrowgroups.com/CDN/upload/448cricket-g3aaf329d8_640.jpg", "imageDate": "2023-07-24", "imageName": "sport", "todayAndTomorrowCategoryId": "02", "todayAndTomorrowCategorySwitch": true}, {"__v": 0, "_id": "64b8b60311e8c4d7cbf9ac36", "categoryName": "abc", "image": "https://www.sparrowgroups.com/CDN/upload/903Frame 228_0.webp", "imageDate": "2023-07-21", "imageName": "efef", "todayAndTomorrowCategoryId": "01", "todayAndTomorrowCategorySwitch": true}]
 
 const styles = StyleSheet.create({
     headerContainer: {

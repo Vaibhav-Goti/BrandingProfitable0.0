@@ -118,9 +118,9 @@ const Custom = ({ navigation }) => {
         </TouchableOpacity>
       </View> */}
 
-      <Header />
 
       <ScrollView style={{ flex: 1, }}>
+        <Header />
         <View style={{ marginTop: 20 }}>
           <Banner />
 
@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 20,
-    backgroundColor: 'white',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     elevation: 5

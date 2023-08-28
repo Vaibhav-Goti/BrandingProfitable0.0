@@ -44,7 +44,7 @@ const EditItem = ({ route, navigation }) => {
       const result = response.data;
       setdata(result)
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data... edit item search :', error);
     } finally {
       setLoading(false);
     }
@@ -118,7 +118,7 @@ const EditItem = ({ route, navigation }) => {
     try {
       if (profileData) {
 
-        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
         const result = response.data;
 
         if (response.data.statusCode == 200) {
@@ -130,7 +130,7 @@ const EditItem = ({ route, navigation }) => {
         console.log('details malti nathi!')
       }
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data...edit item search :', error);
     } finally {
       setIsLoader(false)
     }

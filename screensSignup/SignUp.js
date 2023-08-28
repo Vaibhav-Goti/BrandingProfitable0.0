@@ -98,7 +98,7 @@ const LoginScreen = ({ navigation }) => {
 
 			setItems(mappedItems);
 		} catch (error) {
-			console.log('Error fetching data...:', error);
+			console.log('Error fetching data... sign up:', error);
 		}
 		setLoading(false);
 	};
@@ -155,8 +155,6 @@ const LoginScreen = ({ navigation }) => {
 			50,
 		);
 	};
-
-	console.log(adhaar.length)
 
 	const handleSave = async () => {
 
@@ -225,8 +223,6 @@ const LoginScreen = ({ navigation }) => {
 						showToastWithGravity("Mobile Number is Already Used!")
 					} else if (response.data.statusCode === 401) {
 						showToastWithGravity("Email id is Already Used!")
-					} else if (response.data.statusCode === 403) {
-						showToastWithGravity("AAdhar Number is Already Used!")
 					} else if (response.data.statusCode === 500) {
 						showToastWithGravity("Something Went Wrong!")
 					} else {
@@ -250,7 +246,34 @@ const LoginScreen = ({ navigation }) => {
 		// } catch (error) {
 		// console.error('Error saving businessOrPersonal:', error);
 		// }
-		navigation.navigate('LoginScreen')
+		// navigation.navigate('LoginScreen')
+		setloader(true)
+
+		const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/user/sendotp';
+
+		const requestData = {
+			mobileNumber: phone,
+		};
+
+		try {
+			const response = await axios.post(apiUrl, requestData, {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+
+			if (response.data.statusCode === 200) {
+				navigation.navigate('OTP', { phone: phone })
+				showToastWithGravity("OTP sent!")
+			} else {
+				showToastWithGravity("Sorry, OTP sent failed!")
+			}
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setloader(false);
+		}
+
 	}
 
 	const renderFileUri = () => {
@@ -629,17 +652,14 @@ const LoginScreen = ({ navigation }) => {
 						</View>
 						{businessOrPersonal === 'personal' && (
 							<View style={styles.inputContainer}>
-								<DropDownPicker
-									key={index} // Add a unique key
-									open={open}
-									value={designation}
-									items={items}
-									setOpen={setOpen}
-									setValue={setDesignation}
+								<TextInput
 									style={styles.input}
-									textStyle={styles.dropdownText}
+									placeholderTextColor={'gray'}
 									placeholder="Your Designation"
-									placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+									value={designation}
+									maxLength={12}
+									onChangeText={setDesignation}
+									autoCapitalize="sentences"
 								/>
 							</View>
 						)}

@@ -89,7 +89,8 @@ const LoginScreen = () => {
     try {
       await AsyncStorage.setItem("isLoggedIn", "true");
       await AsyncStorage.setItem("profileData", saveProfiledatatoLocal);
-      await AsyncStorage.setItem("userToken", response.data.token);
+      await AsyncStorage.setItem("userToken", response);
+      console.log("local ma set krelo data - ", response)
     } catch (error) {
       console.log('Error saving profile data:', error);
     }

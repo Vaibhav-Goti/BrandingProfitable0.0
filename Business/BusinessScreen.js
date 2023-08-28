@@ -42,7 +42,7 @@ const BusinessScreen = ({ navigation, route }) => {
 			const result = response.data.data;
 			setData(result);
 		} catch (error) {
-			console.log('Error fetching data....:', error);
+			console.log('Error fetching data.... business screen:', error);
 		}
 		setLoading(false);
 	};
@@ -124,6 +124,11 @@ const BusinessScreen = ({ navigation, route }) => {
 							</View>
 						</View>
 					))}
+
+					{/* anohter all business data */}
+
+
+
 				</ScrollView >
 			</View >
 		</LinearGradient>

@@ -2588,7 +2588,7 @@ balanced-match@^1.0.0:
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
-base-64@^0.1.0:
+base-64@^0.1.0, base-64@0.1.0:
   version "0.1.0"
   resolved "https://registry.npmjs.org/base-64/-/base-64-0.1.0.tgz"
   integrity sha512-Y5gU45svrR5tI2Vt/X9GPd3L0HNIKzGu202EjxrXMpuc2V2CiKgemAbUUsqYmZJvPtCXoUKjNZwBJzsNScUbXA==
@@ -2770,6 +2770,11 @@ cjs-module-lexer@^1.0.0:
   version "1.2.3"
   resolved "https://registry.npmjs.org/cjs-module-lexer/-/cjs-module-lexer-1.2.3.tgz"
   integrity sha512-0TNiGstbQmCFwt4akjjBg5pLRTSyj/PkWQ1ZoO2zntmg9yLqSRxwEa4iCfQLGjqhiqBfOJa7W/E8wfGrTDmlZQ==
+
+classnames@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.npmjs.org/classnames/-/classnames-2.3.2.tgz"
+  integrity sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==
 
 cli-cursor@^3.1.0:
   version "3.1.0"
@@ -3039,7 +3044,7 @@ dayjs@^1.8.15:
   resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.9.tgz"
   integrity sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA==
 
-debug@^2.2.0, debug@2.6.9:
+debug@^2.1.3, debug@^2.2.0, debug@2.6.9:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
   integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
@@ -3079,7 +3084,7 @@ decamelize@^1.2.0:
   resolved "https://registry.npmjs.org/decamelize/-/decamelize-1.2.0.tgz"
   integrity sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==
 
-decode-uri-component@^0.2.2:
+decode-uri-component@^0.2.0, decode-uri-component@^0.2.2:
   version "0.2.2"
   resolved "https://registry.npmjs.org/decode-uri-component/-/decode-uri-component-0.2.2.tgz"
   integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
@@ -3192,6 +3197,11 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+dommatrix@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/dommatrix/-/dommatrix-1.0.3.tgz"
+  integrity sha512-l32Xp/TLgWb8ReqbVJAFIvXmY7go4nTxxlWiAFyhoQw9RKEOHBZNnyGvJWqDVSPmq3Y9HlM4npqF/T6VMOXhww==
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -3630,6 +3640,11 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
+ffmpeg-kit-react-native@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.npmjs.org/ffmpeg-kit-react-native/-/ffmpeg-kit-react-native-5.1.0.tgz"
+  integrity sha512-WGuF7wm18vvhr1oCMLRfHIDCwKrmBezWgVtzim6Z3cbDiHeYvDjpm7KJwrvBMwOgekQtP4R4zI9W0ZByoXjMnQ==
+
 file-entry-cache@^6.0.1:
   version "6.0.1"
   resolved "https://registry.npmjs.org/file-entry-cache/-/file-entry-cache-6.0.1.tgz"
@@ -3867,6 +3882,18 @@ glob@^7.1.3, glob@^7.1.4:
     inflight "^1.0.4"
     inherits "2"
     minimatch "^3.1.1"
+    once "^1.3.0"
+    path-is-absolute "^1.0.0"
+
+glob@7.0.6:
+  version "7.0.6"
+  resolved "https://registry.npmjs.org/glob/-/glob-7.0.6.tgz"
+  integrity sha512-f8c0rE8JiCxpa52kWPAOa3ZaYEnzofDzCQLCn3Vdk0Z5OVLq3BsRFJI4S4ykpeVW6QMGBUkMeUpoEgWnMTnw5Q==
+  dependencies:
+    fs.realpath "^1.0.0"
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "^3.0.2"
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
@@ -4888,6 +4915,13 @@ jsonfile@^4.0.0:
   integrity sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==
   optionalDependencies:
     graceful-fs "^4.1.6"
+
+jsonp@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.npmjs.org/jsonp/-/jsonp-0.2.1.tgz"
+  integrity sha512-pfog5gdDxPdV4eP7Kg87M8/bHgshlZ5pybl+yKxAnCZ5O7lCIn7Ixydj03wOlnDQesky2BPyA91SQ+5Y/mNwzw==
+  dependencies:
+    debug "^2.1.3"
 
 "jsx-ast-utils@^2.4.1 || ^3.0.0":
   version "3.3.4"
@@ -6399,7 +6433,7 @@ prompts@^2.0.1, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@*, prop-types@^15.5.10, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@*, prop-types@^15.5.10, prop-types@^15.5.9, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -6422,6 +6456,16 @@ pure-rand@^6.0.0:
   version "6.0.2"
   resolved "https://registry.npmjs.org/pure-rand/-/pure-rand-6.0.2.tgz"
   integrity sha512-6Yg0ekpKICSjPswYOuC5sku/TSWaRYlA0qsXqJgM/d/4pLPHPuTxK7Nbf7jFKzAeedUhR8C7K9Uv63FBsSo8xQ==
+
+query-string@^6.2.0:
+  version "6.14.1"
+  resolved "https://registry.npmjs.org/query-string/-/query-string-6.14.1.tgz"
+  integrity sha512-XDxAeVmpfu1/6IjyT/gXHOl+S0vQ9owggJ30hhWKdHAsNPOcasn5o9BW0eejZqL2e4vMjhAxoW3jVHcD6mbcYw==
+  dependencies:
+    decode-uri-component "^0.2.0"
+    filter-obj "^1.1.0"
+    split-on-first "^1.0.0"
+    strict-uri-encode "^2.0.0"
 
 query-string@^7.1.3:
   version "7.1.3"
@@ -6450,6 +6494,13 @@ range-parser@~1.2.1:
   resolved "https://registry.npmjs.org/range-parser/-/range-parser-1.2.1.tgz"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
 
+react-curved-text@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/react-curved-text/-/react-curved-text-2.0.2.tgz"
+  integrity sha512-wEHJ8NgfgS6dIWfuFcx8v+en0Ohnd9OuIxzrmpRhltts7H7FWbDuiGEkPYLjJN2AvCI7hv+txCT4PwRuERrFkg==
+  dependencies:
+    svg-path-commander "1.0.5"
+
 react-devtools-core@^4.27.2:
   version "4.28.0"
   resolved "https://registry.npmjs.org/react-devtools-core/-/react-devtools-core-4.28.0.tgz"
@@ -6457,6 +6508,14 @@ react-devtools-core@^4.27.2:
   dependencies:
     shell-quote "^1.6.1"
     ws "^7"
+
+react-dom@>=18.0.0:
+  version "18.2.0"
+  resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"
+  integrity sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==
+  dependencies:
+    loose-envify "^1.1.0"
+    scheduler "^0.23.0"
 
 react-freeze@^1.0.0:
   version "1.0.3"
@@ -6495,15 +6554,36 @@ react-native-draggable@^3.3.0:
   dependencies:
     prop-types "^15.7.2"
 
+react-native-dropdown-autocomplete@^1.0.18:
+  version "1.0.18"
+  resolved "https://registry.npmjs.org/react-native-dropdown-autocomplete/-/react-native-dropdown-autocomplete-1.0.18.tgz"
+  integrity sha512-C3urLi/iLaLT6gyrpjx0WFTXMLrHK5pxnd48H3TzmNKZ4A32irzTiAOIcIvXcHzN0z4675y00WLKMGr1Js+gyA==
+  dependencies:
+    prop-types "^15.6.2"
+    query-string "^6.2.0"
+    react-native-keyboard-aware-scroll-view "^0.8.0"
+    react-native-material-buttons "^0.5.0"
+    react-native-material-ripple "^0.8.0"
+
 react-native-dropdown-picker@^5.4.6:
   version "5.4.6"
   resolved "https://registry.npmjs.org/react-native-dropdown-picker/-/react-native-dropdown-picker-5.4.6.tgz"
   integrity sha512-T1XBHbE++M6aRU3wFYw3MvcOuabhWZ29RK/Ivdls2r1ZkZ62iEBZknLUPeVLMX3x6iUxj4Zgr3X2DGlEGXeHsA==
 
+react-native-dropdown@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.npmjs.org/react-native-dropdown/-/react-native-dropdown-0.0.6.tgz"
+  integrity sha512-6FmZCcz5nizCEKkQCAICUYrz7/XHrRrRmrWbTk+Bm9eeh5E+C0XNLT48Kxzgi+yjRQQz6uwIkXDF2MLCdTjJsA==
+
 react-native-fast-image@^8.6.3:
   version "8.6.3"
   resolved "https://registry.npmjs.org/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz"
   integrity sha512-Sdw4ESidXCXOmQ9EcYguNY2swyoWmx53kym2zRsvi+VeFCHEdkO+WG1DK+6W81juot40bbfLNhkc63QnWtesNg==
+
+react-native-ffmpeg@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.npmjs.org/react-native-ffmpeg/-/react-native-ffmpeg-0.5.2.tgz"
+  integrity sha512-YxKWI9kPo4nDtAzNO+MIMIu56rfaixJrviQBKvdvmFD09oWH0GhKurJ+uJOvTbN3T7eEYCE0kUzK1puPDsniAA==
 
 react-native-fs@^2.20.0:
   version "2.20.0"
@@ -6518,10 +6598,52 @@ react-native-image-crop-picker@^0.40.0:
   resolved "https://registry.npmjs.org/react-native-image-crop-picker/-/react-native-image-crop-picker-0.40.0.tgz"
   integrity sha512-FpqiCS4CiPQp8qIorlELWKbpi1d9lyhJki9spZr4LShv9hk65GWo6tYJupfTV19o5XcRwJn8d4MHIUoyWMJRTQ==
 
+react-native-image-overlay@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/react-native-image-overlay/-/react-native-image-overlay-0.1.2.tgz"
+  integrity sha512-0bM8Zc8/GZWvvbGccADPmw1onhE9ZVrq/brOSoNIoJU0Kp+8G7lJ2w5+7Us3wIVKHi6Syji/KNypS91svCH8gA==
+  dependencies:
+    prop-types "^15.6.1"
+
+react-native-iphone-x-helper@^1.0.3:
+  version "1.3.1"
+  resolved "https://registry.npmjs.org/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.3.1.tgz"
+  integrity sha512-HOf0jzRnq2/aFUcdCJ9w9JGzN3gdEg0zFE4FyYlp4jtidqU03D5X7ZegGKfT1EWteR0gPBGp9ye5T5FvSWi9Yg==
+
+react-native-keyboard-aware-scroll-view@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.npmjs.org/react-native-keyboard-aware-scroll-view/-/react-native-keyboard-aware-scroll-view-0.8.0.tgz"
+  integrity sha512-gPfhgHQI/z7Cc5aeNOEmK0b250QkAeU6V+4oH8EC7mmFneEKn6MAIDjpoiwqt6bV+lFJPABXfx9MtrRmtCeJ/Q==
+  dependencies:
+    prop-types "^15.6.2"
+    react-native-iphone-x-helper "^1.0.3"
+
 react-native-linear-gradient@^2.8.0:
   version "2.8.0"
   resolved "https://registry.npmjs.org/react-native-linear-gradient/-/react-native-linear-gradient-2.8.0.tgz"
   integrity sha512-ZuvNXEB98CMEOAphV/8N9eWrIQTbzUIZD5Tb8IqFoDE8ESERISPT2hTZMvoHTSfjvaB1zge6YpWVg3rpwiTZow==
+
+react-native-material-buttons@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.npmjs.org/react-native-material-buttons/-/react-native-material-buttons-0.5.0.tgz"
+  integrity sha512-WRQyCG1hd4ZvTr+YdMoyKwoyt/onaFAh8DmyC8BxZ0JT1gy/hs9qTYAilbYb8C1l+okTusalyJeqoPh5GzA1pQ==
+  dependencies:
+    prop-types "^15.5.9"
+    react-native-material-ripple "^0.7.0"
+
+react-native-material-ripple@^0.7.0:
+  version "0.7.5"
+  resolved "https://registry.npmjs.org/react-native-material-ripple/-/react-native-material-ripple-0.7.5.tgz"
+  integrity sha512-pHUrmxuPQMBcOssFfr+kERfAwkLhHqiP2ZTJeUsC77W9h+k2IU17T/cOb184S1jkbZP3CFJcOLd9V7RW112YGQ==
+  dependencies:
+    prop-types "^15.5.10"
+
+react-native-material-ripple@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.npmjs.org/react-native-material-ripple/-/react-native-material-ripple-0.8.0.tgz"
+  integrity sha512-ZgamZTJlrAPMg5Im8+ruK3zsSDHdPKgYA52qK7g0x/LJvzE/99M01kjmUVERqQAHxlVzOfIfVpxn9SjzNn6TEA==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-otp-input@^1.0.12:
   version "1.0.12"
@@ -6552,6 +6674,11 @@ react-native-screens@^3.23.0, "react-native-screens@>= 3.0.0":
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-select-dropdown@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.npmjs.org/react-native-select-dropdown/-/react-native-select-dropdown-3.4.0.tgz"
+  integrity sha512-9xK1z4tYpwMxp3hsM0y1+xfqq/JoMh+l7sBsJ81b2eikFwT6ZbndFBqupQXrsQ1akce9hgC/10Nkzj0LjVjeXQ==
 
 react-native-share@^9.2.3:
   version "9.2.3"
@@ -6610,7 +6737,7 @@ react-native-webview@^13.3.1:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
 
-react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", react-native@>=0.40.0, react-native@>=0.57.0, react-native@>=0.60.0, react-native@0.72.0:
+react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", react-native@>=0.40.0, react-native@>=0.42.0, react-native@>=0.48.4, react-native@>=0.57.0, react-native@>=0.60.0, react-native@0.72.0:
   version "0.72.0"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.72.0.tgz"
   integrity sha512-BP2qq5f05pl3zV+eYgW7nmjCV+3zLXs/Vm69xMTCLD34U2bvRhuWbuUhqpauw7fyk5c8+LrY9NKcnARCkqKXcw==
@@ -6665,6 +6792,14 @@ react-shallow-renderer@^16.15.0:
     object-assign "^4.1.1"
     react-is "^16.12.0 || ^17.0.0 || ^18.0.0"
 
+react-share@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.npmjs.org/react-share/-/react-share-4.4.1.tgz"
+  integrity sha512-AJ9m9RiJssqvYg7MoJUc9J0D7b/liWrsfQ99ndKc5vJ4oVHHd4Fy87jBlKEQPibT40oYA3AQ/a9/oQY6/yaigw==
+  dependencies:
+    classnames "^2.3.2"
+    jsonp "^0.2.1"
+
 react-test-renderer@18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-18.2.0.tgz"
@@ -6674,7 +6809,7 @@ react-test-renderer@18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.0"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^17 || ^18", react@^18.2.0, react@>=16.0, react@>=16.8, react@>=17.0.0, react@18.2.0:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.3.0 || ^17 || ^18", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^17 || ^18", react@^18.2.0, react@>=16.0, react@>=16.8, react@>=17.0.0, react@>=18.0.0, react@18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
@@ -6865,6 +7000,14 @@ rimraf@~2.6.2:
   integrity sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==
   dependencies:
     glob "^7.1.3"
+
+rn-fetch-blob@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.npmjs.org/rn-fetch-blob/-/rn-fetch-blob-0.12.0.tgz"
+  integrity sha512-+QnR7AsJ14zqpVVUbzbtAjq0iI8c9tCg49tIoKO2ezjzRunN7YL6zFSFSWZm6d+mE/l9r+OeDM3jmb2tBb2WbA==
+  dependencies:
+    base-64 "0.1.0"
+    glob "7.0.6"
 
 run-parallel@^1.1.9:
   version "1.2.0"
@@ -7323,6 +7466,13 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+svg-path-commander@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npmjs.org/svg-path-commander/-/svg-path-commander-1.0.5.tgz"
+  integrity sha512-hhQfARVXoPrwwe4DNPWM4hjQLK7rTxwQ+TUc5mxoe5g0k5eStc4SPnKqmivlm/dzZ98bI+yDyKye92n2t+oOiQ==
+  dependencies:
+    dommatrix "^1.0.3"
 
 tailwindcss@^3.3.3:
   version "3.3.3"

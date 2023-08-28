@@ -17,7 +17,6 @@ const SavedFrames = ({ navigation }) => {
     }
 
     const renderItem = ({ item }) => {
-        console.log('Rendering item:', item.image);
         return (
             <TouchableOpacity
                 style={styles.imageContainer}
@@ -48,7 +47,7 @@ const SavedFrames = ({ navigation }) => {
             console.log(result);
             setData(result.data); // Assuming 'data' property contains the array of images
         } catch (error) {
-            console.log('Error fetching data...:', error);
+            console.log('Error fetching data... custom frame:', error);
         }
         setRefreshing(false); // Make sure to set refreshing to false even if there's an error
     };
@@ -89,7 +88,8 @@ const styles = StyleSheet.create({
     },
     flatListContainer: {
         marginTop: 10,
-        paddingTop: 20
+        paddingTop: 20,
+        paddingBottom:50
     },
     imageContainer: {
         alignItems: 'center',

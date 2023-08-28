@@ -172,7 +172,6 @@ const Home = ({ navigation }) => {
   //   console.log("noti count function call thyu!")
   // }, 5000);
 
-  console.log(businessOrPersonal)
   const [popuUpImage, setPopUpImage] = useState('')
 
   const fetchPopUp = async () => {
@@ -209,7 +208,6 @@ const Home = ({ navigation }) => {
         animationType="fade" // You can use "fade" or "none" for animation type
         visible={isModalVisible}
         transparent={true}
-        onRequestClose={hideAlert}
       >
         <View style={{
           flex: 1,
@@ -278,56 +276,58 @@ const Home = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-      {/* header */}
-      <View style={styles.headerContainer}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-          <View style={{ backgroundColor: 'red', borderRadius: 100, borderWidth: 1, borderColor: 'black', height: 45, width: 45, overflow: 'hidden' }}>
-            <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
-          </View>
-          <TouchableOpacity>
-            <Text style={styles.yourBuisness}>
-              {businessOrPersonal == 'business' ? 'Business' : 'Profile'}
-            </Text>
-            {/* Render the profile details conditionally */}
-            {renderProfileDetails()}
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={() => { navigation.navigate('Notifications') }} style={{ position: 'relative' }}>
-          <Icon name="bell" size={27} color={'#FF0000'} />
-          {notificationCount > 0 && (
-            <View style={{
-              position: 'absolute',
-              top: -4,
-              right: -4,
-              padding: 3,
-              borderRadius: 100,
-              backgroundColor: 'red',
-              borderColor: 'white',
-              borderWidth: 0.2,
-              elevation: 2,
-              borderColor: 'white',
-              borderWidth: 0.2
-            }}>
-              <Text style={{
-                color: 'white',
-                fontSize: 7,
-                fontFamily: 'Manrope-Bold',
-                textAlign: 'center',
-                minWidth: 10,
-              }}>
-                {notificationCount}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
+
 
       <LinearGradient
         colors={['#050505', '#1A2A3D']} style={{ flex: 1 }}>
-        <ScrollView style={{ flex: 1, height: '100%', width: '100%', marginBottom: 50, paddingTop: 10, }}>
+        {/* header */}
+        <View style={styles.headerContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <View style={{ backgroundColor: 'white', borderRadius: 100, borderWidth: 1, borderColor: 'white', height: 45, width: 45, overflow: 'hidden' }}>
+              <FastImage source={{ uri: profileData?.businessLogo || profileData?.profileImage }} style={{ height: 45, width: 45 }} />
+            </View>
+            <TouchableOpacity>
+              <Text style={styles.yourBuisness}>
+                {businessOrPersonal == 'business' ? 'Business' : 'Profile'}
+              </Text>
+              {/* Render the profile details conditionally */}
+              {renderProfileDetails()}
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity onPress={() => { navigation.navigate('Notifications') }} style={{ position: 'relative' }}>
+            <Icon name="bell" size={27} color={'#FF0000'} />
+            {notificationCount > 0 && (
+              <View style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                padding: 3,
+                borderRadius: 100,
+                backgroundColor: 'red',
+                borderColor: 'white',
+                borderWidth: 0.2,
+                elevation: 2,
+                borderColor: 'white',
+                borderWidth: 0.2
+              }}>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 7,
+                  fontFamily: 'Manrope-Bold',
+                  textAlign: 'center',
+                  minWidth: 10,
+                }}>
+                  {notificationCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+        <ScrollView style={{ flex: 1, height: '100%', width: '100%', marginBottom: 50, paddingTop: 10, }} >
+
           <TouchableOpacity style={styles.searchContainer} onPress={() => { navigation.navigate('SearchScreen') }}>
             <Text style={[styles.searchText]}>
-              <Icon name="search" size={25} />
+              <Icon name="search" size={20} />
             </Text>
             <Text style={[styles.searchText, { fontSize: 16, fontFamily: 'Manrope-Regular' }]}>
               Search
@@ -357,12 +357,13 @@ const styles = StyleSheet.create({
   },
   buisnessTitle: {
     fontSize: 19,
-    color: 'black',
+    color: 'white',
     fontFamily: 'Manrope-Bold'
   },
   yourBuisness: {
     fontSize: 12,
-    fontFamily: 'Manrope-Regular'
+    fontFamily: 'Manrope-Regular',
+    color: 'white'
   },
   image: {
     height: 160,
@@ -381,20 +382,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 20,
-    backgroundColor: 'white',
     borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10
+    borderBottomRightRadius: 10,
   },
   headerText: {
     fontSize: 20,
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold'
   },
   searchContainer: {
     flexDirection: 'row',
     marginHorizontal: 15,
     paddingHorizontal: 15,
-    paddingVertical: 13,
+    paddingVertical: 5,
     borderRadius: 10,
     backgroundColor: 'white',
     marginVertical: 10,

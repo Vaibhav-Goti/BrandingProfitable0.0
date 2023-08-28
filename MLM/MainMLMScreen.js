@@ -31,6 +31,9 @@ const MainMLMScreen = () => {
   };
 
   const [i, seti] = React.useState(0)
+  const [loader, setLoader] = React.useState(true)
+
+
 
   useEffect(() => {
     const subscriptionCheckInterval = setInterval(async () => {
@@ -38,12 +41,13 @@ const MainMLMScreen = () => {
         seti(i+1)
         try {
           if (profileData) {
-            console.log('Checking subscription status...mainmlm');
+            console.log('Checking subscription status...');
 
-            const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/premium/${profileData?.adhaar}`);
+            const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/premium/${profileData?.mobileNumber}`);
             const result = response.data.statusCode;
-
-            setIsSubscribed(result);
+console.log(result)
+          setLoader(false); // Set loader to false after handling subscription status
+          setIsSubscribed(result);
           } else {
             console.log("No profile data available.");
           }
@@ -60,10 +64,11 @@ const MainMLMScreen = () => {
     return () => {
       clearInterval(subscriptionCheckInterval);
     };
+    setLoader(false); // Set loader to false after handling subscription status
+
   }, [profileData]);
 
 
-  const [loader, setLoader] = React.useState(true)
 
 
   if (loader) {

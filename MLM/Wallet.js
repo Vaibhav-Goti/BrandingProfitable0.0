@@ -55,7 +55,7 @@ const Wallet = ({ navigation }) => {
                 console.log('details malti nathi!')
             }   
         } catch (error) {
-            console.log('Error fetching data...:', error);
+            console.log('Error fetching data... wallet:', error);
         }
     }
 

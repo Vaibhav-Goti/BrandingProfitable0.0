@@ -28,7 +28,7 @@ const DynamicSection = ({ route }) => {
       })
       .catch(error => {
         // Handle errors
-        console.error('Error fetching data...:', error)
+        console.error('Error fetching data...dynamic section:', error)
         setLoading(false);
       });
 

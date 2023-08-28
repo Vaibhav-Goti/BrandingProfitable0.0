@@ -651,7 +651,7 @@ const App = ({ navigation, route }) => {
 
   // handle image picker
 
-  console.log(images[0]?.id)
+  console.log(images)
 
   // [{"height": 60, "id": "-2UZrscLPt1tNduHQ1X7y", "left": 20.54000000000002, "scaleX": 1, "scaleY": 1, "src": "https://www.livedesimall.com/CDN/upload/400face-icon-user-icon-design-user-profile-share-icon-avatar-black-and-white-silhouette-png-clipart-removebg-preview_2_optimized.png?auto=compress&cs=tinysrgb&h=60", "top": 21.900000000000006, "type": "image", "width": 60}]
 

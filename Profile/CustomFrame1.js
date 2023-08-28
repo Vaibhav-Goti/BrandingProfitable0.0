@@ -15,6 +15,7 @@ import RNFS from 'react-native-fs';
 import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const { width } = Dimensions.get('window')
 
@@ -26,8 +27,8 @@ const colors = ['black', 'red', 'blue', 'green', 'purple'];
 const ImageItem = React.memo(({ id, uri, isSelected, onDelete, onSelect, width, height, rotation, top, left, scaleX, scaleY }) => {
 
   const [profileFound, isProfileFound] = useState(false)
-  useEffect(()=>{
-    if (uri == 'https://www.sparrowgroups.com/CDN/upload/932PngItem_5040528.png?auto=compress&cs=tinysrgb&h=60') {
+  useEffect(() => {
+    if (uri == 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60') {
       isProfileFound(true)
     }
   })
@@ -660,7 +661,7 @@ const App = ({ navigation, route }) => {
   const handleProfileImageChange = () => {
     console.log("profile image nu funcation call thyu!")
     // Find the index of the image with the specified id
-    const imageIndex = images.findIndex((image) => image.src === 'https://www.sparrowgroups.com/CDN/upload/932PngItem_5040528.png?auto=compress&cs=tinysrgb&h=60');
+    const imageIndex = images.findIndex((image) => image.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60');
 
     if (imageIndex !== -1) {
       // Open the image picker and replace the selected image with the new one
@@ -681,7 +682,7 @@ const App = ({ navigation, route }) => {
         .catch((error) => {
           console.log('ImagePicker Error:', error);
         });
-    }else{
+    } else {
       console.log("first")
     }
   };
@@ -712,8 +713,8 @@ const App = ({ navigation, route }) => {
   const [customFrames, setCustomFrames] = useState([]);
 
   const saveCustomFrame = async (uri) => {
-    
-    
+
+
     try {
       const framesData = await AsyncStorage.getItem('customFrames');
       let frames = framesData ? JSON.parse(framesData) : [];
@@ -733,20 +734,85 @@ const App = ({ navigation, route }) => {
         ...item,
         isSelected: false,
       }));
-  
+
       // Deselect image items when a text item is selected
       const updatedImages = images.map((image) => ({
         ...image,
         isSelected: false,
       }));
-      
+
       setImages(updatedImages);
       setTextItems(updatedTextItems);
-        const uri = await viewShotRef.current.capture();
-        await saveCustomFrame(uri);
+
+      // const uri = await viewShotRef.current.capture();
+      // await saveCustomFrame(uri);
+
+      // console.log("save krva mate ni frame - ", uri)
+
+      // // image cdn ma upload karva mate 
+
+      // const dataArray = new FormData();
+      // dataArray.append('b_video', {
+      //   uri: uri,
+      //   type: response.mime,
+      //   name: uri.split('/').pop(),
+      // });
+      // setlocalImage(response.path)
+      // let url = 'https://www.sparrowgroups.com/CDN/image_upload.php/';
+      // axios
+      //   .post(url, dataArray, {
+      //     headers: {
+      //       'Content-Type': 'multipart/form-data',
+      //     },
+      //   })
+      //   .then((res) => {
+      //     setImageLoader(false)
+      //     const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
+      //     setFileUri(imagePath);
+      //   })
+      //   .catch((err) => {
+      //     setImageLoader(false)
+      //     setFileUri(response.path)
+      //     console.log('Error uploading image:', err);
+      //   });
+
+      const uri = await viewShotRef.current.capture();
+      await saveCustomFrame(uri);
+
+
+      // Convert the file to base64
+      // const base64Image = await convertFileToBase64(uri);
+
+      // // Now you can use the base64Image as needed, e.g., send it to a CDN URL
+      // console.log("Base64 image:", base64Image);
+
+      // upload image to cdn url 
+
+      // const apiUrl = "https://sparrowsofttech.in/cdn/index.php";
+      // const requestData = {
+      //   base64_content: base64Image, // Use the updated base64 image data here
+      // };
+      // // Upload the canvas image to the CDN
+      // axios
+      //   .post(apiUrl, requestData)
+      //   .then(async (response) => {
+      //     const { status, message, image_url } = response.data;
+      //     if (status === "success") {
+      //       console.log(image_url)
+      //     } else {
+      //       console.error("Image upload failed:", message);
+      //     }
+      //   })
+
+
     } catch (error) {
       console.error('Error saving image to local storage:', error);
     }
+  };
+
+  const convertFileToBase64 = async (fileUri) => {
+    const response = await RNFetchBlob.fs.readFile(fileUri, 'base64');
+    return response;
   };
 
   const [isModalVisible3, setModalVisible3] = useState(false);
@@ -808,7 +874,7 @@ const App = ({ navigation, route }) => {
                     width={image.width || 150}
                     height={image.height || 150}
                     rotation={image.rotation || 0}
-                    top={image.top || 0}  
+                    top={image.top || 0}
                     left={image.left || 0}
                     onSelect={() => {
                       setSelectedImageIndex(index);

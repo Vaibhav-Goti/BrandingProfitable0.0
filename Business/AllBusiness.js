@@ -21,7 +21,7 @@ const AllBusiness = ({ navigation }) => {
       setData(result);
       setFilteredData(result);
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data...all business:', error);
     }
     setLoading(false);
   };

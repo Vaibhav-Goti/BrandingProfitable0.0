@@ -126,7 +126,7 @@ const EditHome = ({ route, navigation }) => {
         console.log('details malti nathi!')
       }
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data...edit businesss:', error);
     }finally{
       setTimeout(() => {
         setIsLoader(false)

@@ -27,7 +27,12 @@ import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ route }) => {
+
+
+  const { userNotHaveFrame } = route.params || false
+
+
   const navigation = useNavigation()
   // get business or profile
   const [businessOrPersonal, setBusinessOrPersonal] = useState('');
@@ -90,6 +95,7 @@ const ProfileScreen = () => {
 
   // fetch the user team details 
   const [userTeamDetails, setUserTeamDetails] = useState([])
+  const [userTeamDetails11, setUserTeamDetails11] = useState([])
 
   // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
 
@@ -100,33 +106,35 @@ const ProfileScreen = () => {
 
   const fetchDetails = async () => {
     if (i < 5) {
-      seti(i+1)
+
       try {
         if (profileData) {
-          console.log('Checking subscription status...profile');
 
-          const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
-          const result = response.data;
-
+          const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
+          const result = response.data.data;
+          console.log(response.data.statusCode)
           if (response.data.statusCode == 200) {
-            setUserTeamDetails('Purchase')
+            setUserTeamDetails(result)
+            setUserTeamDetails11('Purchase')
           } else {
             setUserTeamDetails(result)
           }
-        } else {
-          console.log('details malti nathi!')
+
+          seti(i + 1)
+
+
         }
+
         setTimeout(() => {
           setLoader(false)
-        }, 5000);
+        }, 3000);
 
       } catch (error) {
-        console.log('Error fetching data...:', error);
         setTimeout(() => {
           setLoader(false)
-        }, 2000);
-
+        }, 1000);
       }
+
     }
   }
 
@@ -154,7 +162,6 @@ const ProfileScreen = () => {
 
             {/* header */}
             <Header />
-
 
           </View>
 
@@ -208,7 +215,7 @@ const ProfileScreen = () => {
         <View style={{ height: '50%', width: '100%', backgroundColor: '#2B353F', borderTopRightRadius: 15, borderTopLeftRadius: 15, overflow: 'hidden' }}>
           {/* 1 */}
 
-          {userTeamDetails !== 'Purchase' ? (
+          {userTeamDetails11 !== 'Purchase' ? (
             // not purchased by user
             <View style={{ height: 80, width: '100%', backgroundColor: '#414851', justifyContent: 'center', alignItems: 'center' }}>
               <View>
@@ -255,7 +262,7 @@ const ProfileScreen = () => {
           <ScrollView style={{ height: '100%', width: '100%' }}>
             <View style={{ alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingBottom: 35 }}>
               {/*  */}
-              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center', display: userTeamDetails != 'Purchase' ? 'none' : 'flex' }} onPress={() => { navigation.navigate('WithdrawWallet') }}>
+              <TouchableOpacity style={{ justifyContent: 'space-between', marginTop: 20, width: '80%', flexDirection: 'row', alignItems: 'center', display: userTeamDetails11 != 'Purchase' ? 'none' : 'flex' }} onPress={() => { navigation.navigate('WithdrawWallet') }}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3 }}>
                   <View style={{ backgroundColor: '#1E242D', height: 35, width: 35, justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
@@ -307,7 +314,7 @@ const ProfileScreen = () => {
                     </Text>
                   </View>
                   <Text style={{ fontFamily: 'Manrope-Bold', fontSize: 16, color: 'white', marginLeft: 10 }}>
-                    Custom Frames
+                    Frames
                   </Text>
                 </View>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Button, ToastAndroid } from 'react-native';
+import { View, StyleSheet, Image, FlatList, Dimensions, Text, TouchableOpacity, ActivityIndicator, Modal, ToastAndroid, ProgressBarAndroid } from 'react-native';
 import imageData from '../apiData/200x200';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -9,9 +9,15 @@ import Swiper from 'react-native-swiper';
 import ViewShot from "react-native-view-shot";
 import Video from 'react-native-video';
 import FastImage from 'react-native-fast-image'
+import Feather from 'react-native-vector-icons/Feather'
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
+import RNFetchBlob from 'rn-fetch-blob';
+import { RNFFmpeg } from 'react-native-ffmpeg';
+
 import DropDownPicker from 'react-native-dropdown-picker';
+
+import SelectDropdown from 'react-native-select-dropdown'
 
 const { width } = Dimensions.get('window');
 const itemWidth = width / 3.5; // Adjust the number of columns as needed
@@ -41,12 +47,11 @@ const EditHome = ({ route, navigation }) => {
   useEffect(() => {
     if (i < 2) {
       if (images.length != 0) {
-        setItem(images[index ? index : 0]?.todayAndTomorrowImageOrVideo)
-        seti(i + 1)
+        setItem(images[index ? index - 1 : 0]?.todayAndTomorrowImageOrVideo)
+        seti(i)
       } else {
-        setItem(images[index ? index : 0]?.
-          imageUrl)
-        seti(i + 1)
+        setItem(images[index ? index - 1 : 0]?.imageUrl)
+        seti(i)
       }
     } else {
       console.log("i is bigger")
@@ -67,9 +72,11 @@ const EditHome = ({ route, navigation }) => {
   const loadCustomFrames = async () => {
     try {
       const framesData = await AsyncStorage.getItem('customFrames');
-      if (framesData) {
+      if (framesData.length !== 2 && framesData ) {
         const frames = JSON.parse(framesData);
         setCustomFrames(frames);
+      } else {
+        showAlert()
       }
     } catch (error) {
       console.error('Error loading custom frames:', error);
@@ -88,34 +95,36 @@ const EditHome = ({ route, navigation }) => {
   // fetch the user team details 
   const [userTeamDetails, setUserTeamDetails] = useState([])
 
-  console.log(userTeamDetails)
-
   // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
 
   // all users details 
 
   const fetchDetails = async () => {
-    try {
-      if (profileData) {
+    if (i < 5) {
 
-        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
-        const result = response.data;
+      try {
+        if (profileData) {
 
-        if (response.data.statusCode == 200) {
-          setUserTeamDetails('Purchase')
+          const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
+          const result = response.data;
+
+          if (response.data.statusCode == 200) {
+            setUserTeamDetails('Purchase');
+          } else {
+            console.log("user no data aavto nathi athava purchase request ma che ");
+          }
         } else {
-          console.log("user not data aavto nathi athava purchase request ma che ")
+          console.log('details malti nathi!')
         }
-      } else {
-        console.log('details malti nathi!')
+      } catch (error) {
+        console.log('Error fetching data... edit home:', error);
+      } finally {
+        setTimeout(() => {
+          setIsLoader(false)
+        }, 1000);
       }
-    } catch (error) {
-      console.log('Error fetching data...:', error);
-    } finally {
-      setTimeout(() => {
-        setIsLoader(false)
-      }, 1000);
     }
+
   }
 
   useEffect(() => {
@@ -150,34 +159,101 @@ const EditHome = ({ route, navigation }) => {
   const videoRef = useRef();
   const frameRef = useRef();
 
-  const captureAndShareVideo = async () => {
-    alert('Video Sharing in Process...')
-    // try {
-    //   const videoURL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
+  // -----------------------------------------------------------------------------------------------------
 
-    //   // Download the video to a temporary directory
-    //   const response = await RNFetchBlob.config({
-    //     fileCache: true,
-    //     path: `${RNFetchBlob.fs.dirs.CacheDir}/sharedVideo.mp4`,
-    //   }).fetch('GET', videoURL);
 
-    //   const tempPath = response.path();
+  // now cahnge the code
 
-    //   const shareOptions = {
-    //     title: 'Share Video',
-    //     url: `file://${tempPath}`,
-    //     social: Share.Social.WHATSAPP, // Change to other social media if needed
-    //     failOnCancel: false,
-    //   };
+  
+  
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  const captureAndShareVideoWithOverlay = async (imageSource) => {
+    const videoURL = selectedVideo;
+    console.log("select karelo video: ", selectedVideo);
+    
+    setIsProcessing(true);
+    try {
+      // Clear previous temporary files (if any)
+      await clearCache();
 
-    //   // Share the video
-    //   Share.open(shareOptions)
-    //     .then((res) => console.log('Shared successfully'))
-    //     .catch((err) => console.log('Error sharing:', err));
-    // } catch (error) {
-    //   console.log('Error during video sharing:', error);
-    // }
+      // Generate unique file names for the video, image, and output
+      const videoFileName = `video_${Date.now()}.mp4`;
+      const imageFileName = `image_${Date.now()}.png`;
+      const outputFileName = `output_${Date.now()}.mp4`;
+
+      // Download the video to a temporary directory with a unique name
+      const videoResponse = await RNFetchBlob.config({
+        fileCache: true,
+        path: `${RNFetchBlob.fs.dirs.CacheDir}/${videoFileName}`,
+      }).fetch('GET', videoURL);
+
+      const videoPath = videoResponse.path();
+
+      // Download the image to a temporary directory with a unique name
+      const imageResponse = await RNFetchBlob.config({
+        fileCache: true,
+        path: `${RNFetchBlob.fs.dirs.CacheDir}/${imageFileName}`,
+      }).fetch('GET', imageSource);
+
+      const imagePath = imageResponse.path();
+
+      // Resize the video to 300x300
+      const resizedVideoPath = `${RNFetchBlob.fs.dirs.CacheDir}/resizedVideo.mp4`;
+      const resizeVideoCommand = `-i ${videoPath} -vf "scale=300:300" -c:a copy ${resizedVideoPath}`;
+      await RNFFmpeg.execute(resizeVideoCommand);
+
+      // Resize the image to 300x300
+      const resizedImagePath = `${RNFetchBlob.fs.dirs.CacheDir}/resizedImage.png`;
+      const resizeImageCommand = `-i ${imagePath} -vf "scale=300:300" ${resizedImagePath}`;
+      await RNFFmpeg.execute(resizeImageCommand);
+
+      // Combine resized video and image using FFmpeg
+      const outputPath = `${RNFetchBlob.fs.dirs.CacheDir}/${outputFileName}`;
+      const ffmpegCommand = `-i ${resizedVideoPath} -i ${resizedImagePath} -filter_complex "[0:v][1:v]overlay=0:0" -c:a copy ${outputPath}`;
+      await RNFFmpeg.execute(ffmpegCommand);
+
+    setIsProcessing(false);
+
+
+      // Share the video
+      const shareOptions = {
+        title: 'Share Video with Branding Profitable!',
+        url: `file://${outputPath}`,
+        type: 'video/mp4',
+        failOnCancel: false,
+      };
+
+      await Share.open(shareOptions);
+      setIsProcessing(false);
+      console.log('Shared successfully');
+    } catch (error) {
+      console.log('Error during video sharing:', error);
+    setIsProcessing(false);
+
+    }
+
+    setIsProcessing(false);
   };
+
+  const clearCache = async () => {
+    try {
+      const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
+      const files = await RNFetchBlob.fs.ls(cacheDir);
+
+      // Delete all files in the cache directory
+      for (const file of files) {
+        await RNFetchBlob.fs.unlink(`${cacheDir}/${file}`);
+      }
+
+      console.log('Cache cleared');
+    } catch (error) {
+      console.log('Error clearing cache:', error);
+    }
+  };
+
+
+  // -----------------------------------------------------------------------------------------------------
 
   const [isLoad, setIsLoad] = useState(true)
   const [FlatlistisLoad, setFlatlistIsLoad] = useState(true)
@@ -221,7 +297,7 @@ const EditHome = ({ route, navigation }) => {
   const [languages, setLanguages] = useState([
     { languageName: 'English' },
     { languageName: 'ગુજરાતી' },
-    { languageName: 'हिंदी' }
+    { languageName: 'हिन्दी' }
   ])
 
   useEffect(() => {
@@ -242,7 +318,10 @@ const EditHome = ({ route, navigation }) => {
     }
   };
 
+  const [k, setk] = useState(0)
+  const [l, setl] = useState(0)
 
+  let [apiRun, setApiRun] = useState(true)
   const fetchData = async () => {
     try {
       const response = await axios.get('https://b-p-k-2984aa492088.herokuapp.com/language/languages',
@@ -253,23 +332,56 @@ const EditHome = ({ route, navigation }) => {
         }
       );
       const result = response.data.data;
+      setApiRun(false)
 
       setLanguages(result);
     } catch (error) {
-      console.log('Error fetching data...:', error);
+      console.log('Error fetching data... edit home:', error);
     }
+
   };
+
+  useEffect(() => {
+    if (apiRun) {
+
+      fetchData();
+    }
+  }, [fetchData])
 
   const [callLanguageFunc, setCallLanguageFunc] = useState(true)
 
   useEffect(() => {
     setInterval(() => {
-      if (callLanguageFunc) {
-        fetchData()
-        setCallLanguageFunc(false)
+      if (k > 5) {
+        setk(k + 1)
+        if (callLanguageFunc) {
+          setCallLanguageFunc(false)
+        }
       }
-    }, 1000);
+    }, 10000);
   })
+
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const showAlert = () => {
+    setModalVisible(true);
+  };
+
+  const hideAlert = () => {
+    setModalVisible(false);
+  };
+
+  // filter of languages 
+
+  const filteredItems = items.filter((item) => (item.languageName == selectedLanguage))
+
+  if (isProcessing) {
+    return (
+      <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Image style={{height:200,width:200}} source={require('../assets/output-onlinegiftools(1).gif')} />
+      </LinearGradient >
+    )
+  }
   if (isLoader) {
     return (
       <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -280,6 +392,79 @@ const EditHome = ({ route, navigation }) => {
 
   return (
     <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1 }}>
+      <Modal
+        animationType="fade" // You can use "fade" or "none" for animation type
+        visible={isModalVisible}
+        transparent={true}
+      >
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
+        }}>
+          <View style={{
+            backgroundColor: 'white',
+            padding: 20,
+            borderRadius: 8,
+            height: "40%",
+            height: 230,
+            width: 300,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* icon */}
+            <TouchableOpacity onPress={hideAlert} style={{
+              backgroundColor: 'red',
+              padding: 8,
+              borderRadius: 8,
+            }}>
+              <Text style={{
+                color: 'white',
+                fontWeight: 'bold',
+              }}><Feather name="log-out" size={25} color="white" /></Text>
+            </TouchableOpacity>
+            {/* title */}
+            <Text style={{
+              fontSize: 16,
+              fontFamily: 'Manrope-Bold',
+              marginTop: 10,
+              color: 'red'
+            }}>Let's Create Awesome Frames!</Text>
+            {/* caption */}
+            <Text style={{
+              fontSize: 16,
+              fontFamily: 'Manrope-Bold',
+              marginTop: 5,
+              color: 'lightgray',
+              textAlign: 'center'
+            }}>Now don't have any frames let's create!</Text>
+            {/* another */}
+            <View style={{ width: '80%', marginTop: 30, flexDirection: 'row', justifyContent: 'center' }}>
+              <TouchableOpacity
+                onPress={() => {
+                  hideAlert()
+                  navigation.navigate('StackProfileScreen');
+                }}
+                style={{
+                  backgroundColor: 'red',
+                  width: 70,
+                  paddingVertical: 5,
+                  alignItems: 'center',
+                  justifyContent: "center",
+                  borderRadius: 8,
+                }}>
+                <Text style={{
+                  color: 'white',
+                  fontFamily: "Manrope-Bold"
+                }}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.headerContainer}>
         <TouchableOpacity style={{ width: 30 }} onPress={() => { navigation.goBack() }}>
           <Icon name="angle-left" size={30} color={"white"} />
@@ -287,7 +472,7 @@ const EditHome = ({ route, navigation }) => {
         <Text style={styles.headerText} onPress={() => { navigation.goBack() }}>
           {bannername}
         </Text>
-        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : captureAndShareVideo}>
+        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : ()=>{captureAndShareVideoWithOverlay('https://www.sparrowgroups.com/CDN/upload/589vecteezy_abstract-modern-elegant-blue-gold-frame-border-social-media_15314464_975.png')}}>
           <View style={{
             zIndex: 1,
             padding: 8,
@@ -324,27 +509,33 @@ const EditHome = ({ route, navigation }) => {
               </View>
             )
               : (
-                <Swiper loop={false} index={currentFrame} showsPagination={false}>
-                  {customFrames.map((frame, index) => (
-                    <View key={index}>
-                      {selectedVideo == null ? (
-                        <View style={{ top: 100, left: 100 }}>
-                          <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>
-                            No Video Found!
-                          </Text>
-                        </View>
-                      ) : (
-                        <Video
-                          source={{ uri: selectedVideo }}
-                          style={styles.mainImage}
-                          resizeMode="cover"
-                          onLoad={() => setVideoPause(false)}
-                        />
-                      )}
-                      <FastImage source={{ uri: frame.image }} style={styles.overlayImage} />
+                <View style={{ flex: 1 }}>
+                  {/* Video component */}
+                  {selectedVideo == null ? (
+                    <View style={{ position: 'absolute', top: 100, left: 100, zIndex: 1 }}>
+                      <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>
+                        No Video Found!
+                      </Text>
                     </View>
-                  ))}
-                </Swiper>
+                  ) : (
+                    <Video
+                      source={{ uri: selectedVideo }}
+                      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+                      resizeMode="cover"
+                      onLoad={() => setVideoPause(false)}
+                    />
+                  )}
+
+                  {/* Swiper component for overlay images */}
+                  <Swiper loop={false} index={currentFrame} showsPagination={false}>
+                    {customFrames.map((frame, index) => (
+                      <View key={index}>
+                        <FastImage source={{ uri: frame.image }} style={styles.overlayImage} />
+                      </View>
+                    ))}
+                  </Swiper>
+                </View>
+
               )}
           </View>
         )}
@@ -353,37 +544,22 @@ const EditHome = ({ route, navigation }) => {
           {/* 2 */}
 
           <View style={{ width: 120, zIndex: 1, alignSelf: 'flex-end', height: '100%' }}>
-            <DropDownPicker
-              open={open}
-              value={selectedLanguage}
-              items={languages.map((language) => ({
-                label: language.languageName,
-                value: language.languageName,
-              }))}
-              setOpen={setOpen}
-              setValue={(value) => setSelectedLanguage(value)}
-              style={{
-                backgroundColor: 'white',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 20,
-                height: 30,
+            <SelectDropdown
+              data={languages.map((language) => language.languageName)} // Use the language names
+              onSelect={(selectedItem, index) => {
+                setSelectedLanguage(selectedItem);
               }}
-              dropDownStyle={{
-                backgroundColor: 'white',
-                borderColor: 'black',
-                borderWidth: 1,
-                borderRadius: 20,
-                maxHeight: 150,
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
               }}
-              containerStyle={{ height: 30 }} // Set a fixed height for the container
-              listItemContainerStyle={{ height: 30 }} // Set a fixed height for each item in the dropdown
-              scrollViewProps={{ // Enable scrolling for the dropdown
-                nestedScrollEnabled: true,
+              rowTextForSelection={(item, index) => {
+                return item;
               }}
-              textStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
-              placeholder="Language"
-              placeholderStyle={{ color: 'gray', fontFamily: 'Manrope-Regular' }}
+              buttonStyle={{ backgroundColor: 'red', height: 30, borderRadius: 100, width: 130, }}
+              rowTextStyle={{ fontFamily: "Manrope-Regular", fontSize: 13, color: "black" }}
+              buttonTextStyle={{ fontFamily: "Manrope-Regular", fontSize: 13, color: "white" }}
+              defaultButtonText='Select Language'
+              dropdownStyle={{ borderRadius: 10, marginTop: -32 }}
             />
           </View>
 
@@ -413,7 +589,7 @@ const EditHome = ({ route, navigation }) => {
           {!displayImage ? (
             images.length > 0 ? (
               <FlatList
-                data={images}
+                data={selectedLanguage == 'All' || selectedLanguage == [] ? items : filteredItems}
                 numColumns={3} // Adjust the number of columns as needed
                 keyExtractor={(item) => item._id.toString()}
                 renderItem={renderItem}
@@ -426,7 +602,7 @@ const EditHome = ({ route, navigation }) => {
               />
             ) : (
               <FlatList
-                data={items}
+                data={selectedLanguage == 'All' || selectedLanguage == [] ? items : filteredItems}
                 numColumns={3} // Adjust the number of columns as needed
                 renderItem={renderItem}
                 contentContainerStyle={styles.flatListContainer}
@@ -438,24 +614,24 @@ const EditHome = ({ route, navigation }) => {
               />
             )
           ) : (
-              videos.length > 0 ? (
-                <FlatList
-                  data={videos}
-                  numColumns={3} // Adjust the number of columns as needed
-                  // keyExtractor={(item) => item.id.toString()}
-                  renderItem={renderItemV}
-                  contentContainerStyle={styles.flatListContainer}
-                  shouldComponentUpdate={() => false}
-                  removeClippedSubviews
-                  initialNumToRender={30}
-                  maxToRenderPerBatch={30}
-                  windowSize={10}
-                />
-              ) : (
-                <View style={{ justifyContent: 'center', flex: 1 }}>
-                  <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>No videos Found!</Text>
-                </View>
-              )
+            videos.length > 0 ? (
+              <FlatList
+                data={videos}
+                numColumns={3} // Adjust the number of columns as needed
+                // keyExtractor={(item) => item.id.toString()}
+                renderItem={renderItemV}
+                contentContainerStyle={styles.flatListContainer}
+                shouldComponentUpdate={() => false}
+                removeClippedSubviews
+                initialNumToRender={30}
+                maxToRenderPerBatch={30}
+                windowSize={10}
+              />
+            ) : (
+              <View style={{ justifyContent: 'center', flex: 1 }}>
+                <Text style={{ color: 'white', fontFamily: 'Manrope-Bold' }}>No videos Found!</Text>
+              </View>
+            )
           )}
         </View>
       </View>
