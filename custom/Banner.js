@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import axios from 'axios';
+import { Linking } from 'react-native';
 
 const BannerComponent = ({ bannerData }) => {
     return (
@@ -10,7 +11,10 @@ const BannerComponent = ({ bannerData }) => {
                     <TouchableOpacity
                     activeOpacity={1}
                         key={item._id}
-                        onPress={() => alert(`You clicked on ${item.cds_bannerName}!`)}
+                        onPress={() => {
+                            // Open the link in the browser when the image is clicked
+                            Linking.openURL(item.cds_bannerLink);
+                          }}
                         style={[
                             styles.bannerItem,
                             { marginLeft: index === 0 ? 20 : 0 }, // Apply different margin to the first item

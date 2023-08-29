@@ -103,7 +103,7 @@ const EditHome = ({ route, navigation }) => {
         if (response.data.statusCode == 200) {
           setUserTeamDetails('Purchase')
         } else {
-          console.log("user not data aavto nathi athava purchase request ma che ")
+          console.log("user not data aavto nathi athava purchase request ma che ");
         }
       } else {
         console.log('details malti nathi!')

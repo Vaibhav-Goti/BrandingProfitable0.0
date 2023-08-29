@@ -1,6 +1,6 @@
 import { Slider } from '@rneui/base';
 import React, { useRef, useState, useEffect, useCallback, isValidElement } from 'react';
-import { View, Text, Button, Image, TouchableOpacity, Modal, TextInput, TouchableWithoutFeedback, FlatList, Animated, Dimensions, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, Modal, TextInput, TouchableWithoutFeedback, FlatList, Animated, Dimensions, ImageBackground, StyleSheet, ActivityIndicator } from 'react-native';
 import Draggable from 'react-native-draggable';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -16,6 +16,7 @@ import FastImage from 'react-native-fast-image';
 import Share from 'react-native-share';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import RNFetchBlob from 'rn-fetch-blob';
+import { ToastAndroid } from 'react-native';
 
 const { width } = Dimensions.get('window')
 
@@ -86,6 +87,35 @@ const App = ({ navigation, route }) => {
 
   const { itemId } = route.params;
 
+  // profile data getting --------------------------------------------------------------------------------
+
+  const [profileData, setProfileData] = useState(null);
+  const [userToken, setUserToken] = useState()
+
+  // setInterval(() => {
+  //   retrieveProfileData()
+  // }, 3000);
+
+  useEffect(() => {
+    retrieveProfileData()
+  }, [retrieveProfileData])
+
+  const retrieveProfileData = async () => {
+    try {
+        const dataString = await AsyncStorage.getItem('profileData');
+        const userToken = await AsyncStorage.getItem('userToken');
+        setUserToken(userToken)
+        if (dataString) {
+            const data = JSON.parse(dataString);
+            setProfileData(data);
+        }
+    } catch (error) {
+        console.error('Error retrieving profile data:', error);
+    }
+};
+
+  // --------------------------------------------------------------------------------
+
   useEffect(() => {
     // Define the URL for the GET request
     const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/frame/frameimage/${itemId}`;
@@ -94,15 +124,11 @@ const App = ({ navigation, route }) => {
     axios
       .get(apiUrl)
       .then(response => {
-
-        console.log(response.data)
         const imageData = response.data.data.frame;
         const data = {
           data: imageData
         };
         setJsonData(data);
-
-        console.log(imageData, "skdjfkdfjdlfkad")
 
       })
       .catch(error => {
@@ -110,13 +136,6 @@ const App = ({ navigation, route }) => {
       });
 
   }, []);
-
-  // useEffect(() => {
-  //     const jsonData = {
-  //         "data": { "id": "Dd7tTcKe3i27kZeR9p7fE", "type": "GRAPHIC", "name": "Untitled Design", "frame": { "width": 300, "height": 300 }, "scenes": [{ "id": "h7rCdxFjcb2ITDJcv3Uji", "layers": [{ "id": "background", "name": "Initial Frame", "angle": 0, "stroke": null, "strokeWidth": 0, "left": 0, "top": 0, "width": 100, "height": 100, "opacity": 1, "originX": "left", "originY": "top", "scaleX": 1, "scaleY": 1, "type": "Background", "flipX": false, "flipY": false, "skewX": 0, "skewY": 0, "visible": true, "shadow": { "color": "#FCFCFC", "blur": 4, "offsetX": 0, "offsetY": 0, "affectStroke": false, "nonScaling": false }, "fill": "#FFFFFF", "metadata": {} }, { "id": "Dr-UklbO7LcsZXq-8Snyr", "name": "StaticImage", "angle": 0, "stroke": null, "strokeWidth": 0, "left": 0, "top": 42.43000000000001, "width": 32, "height": 32, "opacity": 1, "originX": "left", "originY": "top", "scaleX": 0.98, "scaleY": 0.98, "type": "StaticImage", "flipX": false, "flipY": false, "skewX": 0, "skewY": 0, "visible": true, "shadow": null, "src": "https://www.livedesimall.com/CDN/upload/107whatsapp(1).png", "cropX": 0, "cropY": 0, "metadata": {} }, { "id": "3M6slqncFwB6_Fx-MOpjj", "name": "StaticText", "angle": -0.18, "stroke": null, "strokeWidth": 0, "left": 64.01999999999998, "top": 48.72, "width": 171.9, "height": 18.25, "opacity": 1, "originX": "left", "originY": "top", "scaleX": 1, "scaleY": 1, "type": "StaticText", "flipX": false, "flipY": false, "skewX": 0, "skewY": 0, "visible": true, "shadow": null, "charSpacing": 30, "fill": "#333333", "fontFamily": "OpenSans-Regular", "fontSize": 16.14791149129693, "lineHeight": 3.1, "text": "Sparrow Softtech", "textAlign": "center", "fontURL": "https://fonts.gstatic.com/s/opensans/v27/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0C4nY1M2xLER.ttf", "metadata": {} }, { "id": "916oTnxOTaBb27O9uz-rT", "name": "StaticImage", "angle": 0, "stroke": null, "strokeWidth": 0, "left": 134, "top": 268, "width": 32, "height": 32, "opacity": 1, "originX": "left", "originY": "top", "scaleX": 1, "scaleY": 1, "type": "StaticImage", "flipX": false, "flipY": false, "skewX": 0, "skewY": 0, "visible": true, "shadow": null, "src": "https://www.livedesimall.com/CDN/upload/659profile.png", "cropX": 0, "cropY": 0, "metadata": {} }], "name": "Untitled design" }], "metadata": {}, "preview": "" }
-  //     };
-  //     setJsonData(jsonData);
-  // }, []);
 
   // modified code 
 
@@ -181,7 +200,6 @@ const App = ({ navigation, route }) => {
 
     scenes.forEach((scene) => {
       const layers = scene.layers;
-      console.log(layers)
       layers.forEach((layer) => {
         if (layer.type === "StaticText") {
           const newItem = {
@@ -291,6 +309,7 @@ const App = ({ navigation, route }) => {
     }
   }, [selectedTextIndex, textItems])
 
+
   const increaseImageSize = () => {
     if (selectedImageIndex !== null) {
       const updatedImages = [...images];
@@ -309,39 +328,6 @@ const App = ({ navigation, route }) => {
       selectedImage.height = (selectedImage.height || 150) - 20;
       setImages(updatedImages);
     }
-  };
-  const rotateImage10Degrees = () => {
-    if (selectedImageIndex !== null) {
-      const updatedImages = [...images];
-      const selectedImage = updatedImages[selectedImageIndex];
-      selectedImage.rotation = (selectedImage.rotation || 0) + 10;
-      setImages(updatedImages);
-    }
-  };
-  const rotateImage10DegreesLeft = () => {
-    if (selectedImageIndex !== null) {
-      const updatedImages = [...images];
-      const selectedImage = updatedImages[selectedImageIndex];
-      selectedImage.rotation = (selectedImage.rotation || 0) - 10;
-      setImages(updatedImages);
-    }
-  };
-
-  const rotateImage90Degrees = () => {
-    if (selectedImageIndex !== null) {
-      const updatedImages = [...images];
-      const selectedImage = updatedImages[selectedImageIndex];
-      selectedImage.rotation = (selectedImage.rotation || 0) + 90;
-      setImages(updatedImages);
-    }
-  };
-
-  const addStaticImageToViewShot = () => {
-    setImages([...images, { uri: staticImageUrl, isSelected: false }]);
-  };
-
-  const addTextToViewShot = () => {
-    setTextItems([...textItems, { text: 'Sample Text', isSelected: false, fontSize: 20, color: 'black' }]);
   };
 
   const increaseTextSize = () => {
@@ -362,70 +348,6 @@ const App = ({ navigation, route }) => {
     }
   };
 
-  const rotateText10Degrees = () => {
-    if (selectedTextIndex !== null) {
-      const updatedTextItems = [...textItems];
-      const selectedTextItem = updatedTextItems[selectedTextIndex];
-      selectedTextItem.rotation = (selectedTextItem.rotation || 0) + 10;
-      setTextItems(updatedTextItems);
-    }
-  };
-
-  const rotateText10DegreesLeft = () => {
-    if (selectedTextIndex !== null) {
-      const updatedTextItems = [...textItems];
-      const selectedTextItem = updatedTextItems[selectedTextIndex];
-      selectedTextItem.rotation = (selectedTextItem.rotation || 0) - 10;
-      setTextItems(updatedTextItems);
-    }
-  };
-
-  const rotateText90Degrees = () => {
-    if (selectedTextIndex !== null) {
-      const updatedTextItems = [...textItems];
-      const selectedTextItem = updatedTextItems[selectedTextIndex];
-      selectedTextItem.rotation = (selectedTextItem.rotation || 0) + 90;
-      setTextItems(updatedTextItems);
-    }
-  };
-
-
-
-  const getSelectedTextItemRotation = () => {
-    if (selectedTextIndex !== null) {
-      return textItems[selectedTextIndex].rotation || 0;
-    }
-    return 0;
-  };
-
-  //   const rotateImage90Degrees = () => {
-  //     if (selectedImageIndex !== null) {
-  //         const updatedImages = [...images];
-  //         const selectedImage = updatedImages[selectedImageIndex];
-  //         selectedImage.rotation = (selectedImage.rotation || 0) + 90;
-  //         setImages(updatedImages);
-  //     }
-  // };
-
-  const handleSliderValueChange = useCallback((value) => {
-    if (selectedTextIndex !== null) {
-      const updatedTextItems = [...textItems];
-      updatedTextItems[selectedTextIndex].rotation = value;
-      setTextItems(updatedTextItems);
-    }
-  }, [selectedTextIndex, textItems]);
-  const handleSliderValueChangeI = useCallback((value) => {
-    if (selectedImageIndex !== null) {
-      const updatedTextItems = [...images];
-      updatedTextItems[selectedImageIndex].rotation = value;
-      //   const selectedImage = updatedImages[selectedImageIndex];
-      //   selectedImage.rotation = (selectedImage.rotation || 0) + 90;
-      setImages(updatedTextItems);
-    }
-  }, [selectedTextIndex, textItems]);
-
-  // ------------------------------------------------------------------------------------------
-
   const [editingTextIndex, setEditingTextIndex] = useState(-1);
   const [editText, setEditText] = useState("")
 
@@ -440,6 +362,7 @@ const App = ({ navigation, route }) => {
     updatedTextItems[editingTextIndex].color = updatedColor; // Save the selected color
     setTextItems(updatedTextItems);
     setEditingTextIndex(-1);
+
   }, [textItems, editingTextIndex])
 
   const handleCanvasTap = () => {
@@ -460,6 +383,39 @@ const App = ({ navigation, route }) => {
     setIsTextSelected(false)
   };
 
+  const showToastWithGravity = (data) => {
+    ToastAndroid.showWithGravityAndOffset(
+      data,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+      0,
+      50,
+    );
+  };
+
+
+  const [customFrames, setCustomFrames] = useState([]);
+
+  const saveCustomFrame = async (uri) => {
+
+
+    try {
+
+      navigation.goBack()
+      const framesData = await AsyncStorage.getItem('customFrames');
+      let frames = framesData ? JSON.parse(framesData) : [];
+      const frame = { name: `frame${frames.length + 1}`, image: uri };
+      frames.push(frame);
+      await AsyncStorage.setItem('customFrames', JSON.stringify(frames));
+      setCustomFrames(frames);
+      showToastWithGravity("Your Frame Saved!")
+
+    } catch (error) {
+      console.error('Error saving custom frame:', error);
+    }
+  };
+
+
   // const rens
 
   useEffect(() => {
@@ -470,9 +426,7 @@ const App = ({ navigation, route }) => {
     }).start();
   }, [rotationValue]);
 
-
-
-  const TextItem = ({
+  const TextItem = React.memo(({
     text,
     isSelected,
     onDelete,
@@ -547,119 +501,14 @@ const App = ({ navigation, route }) => {
         </View>
       </TouchableOpacity>
     );
-  };
-
-
-  // console.log(textItems[0]?.text)
-  // console.log(editText)
+  });
 
   const [isOpenFrame, setIsOpenFrame] = useState(false)
 
-  const handleFrame = () => {
-    setSelectedTextIndex(-1);
-    setIsTextSelected(false);
-    setSelectedImageIndex(-1);
-    setIsImageSelected(false);
-    setIsOpenFrame(!isOpenFrame)
-
-    const updatedTextItems = textItems.map((item, i) => ({
-      ...item,
-      isSelected: false,
-    }));
-
-    // Deselect image items when a text item is selected
-    const updatedImages = images.map((image) => ({
-      ...image,
-      isSelected: false,
-    }));
-
-    setImages(updatedImages);
-    setTextItems(updatedTextItems);
-  }
-
   // custom frames
 
-  // share 
-
-  const captureAndShareImage = async () => {
-    setSelectedTextIndex(-1);
-    setIsTextSelected(false);
-    setSelectedImageIndex(-1);
-    setIsImageSelected(false);
-
-    const updatedTextItems = textItems.map((item, i) => ({
-      ...item,
-      isSelected: false,
-    }));
-
-    // Deselect image items when a text item is selected
-    const updatedImages = images.map((image) => ({
-      ...image,
-      isSelected: false,
-    }));
-
-    setImages(updatedImages);
-    setTextItems(updatedTextItems);
-    try {
-      hideAlert5()
-
-      const uri = await viewShotRef.current.capture();
-
-      const fileName = 'sharedImage.jpg';
-      const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
-
-      await RNFS.copyFile(uri, destPath);
-
-      const shareOptions = {
-        type: 'image/jpeg',
-        url: `file://${destPath}`,
-      };
-
-      await Share.open(shareOptions);
-    } catch (error) {
-      console.error('Error sharing image:', error);
-    }
-  };
-
-  const FrameAddorNot = () => {
-    showAlert5()
-  }
-  const YesAddFrame = async () => {
-
-    try {
-      const uri = await viewShotRef.current.capture();
-
-      hideAlert5()
-
-      navigation.navigate('ChooseCustomFrame', {
-        capturedImage: uri,
-      });
-
-    } catch (error) {
-      console.error('Error capturing image:', error);
-    }
-  }
-
-  const [isModalVisible5, setModalVisible5] = useState(false);
-
-  const showAlert5 = () => {
-    setModalVisible5(true);
-  };
-
-  const hideAlert5 = () => {
-    setModalVisible5(false);
-  };
-
-  // handle image picker
-
-  console.log(images[0]?.id)
-
-  // [{"height": 60, "id": "-2UZrscLPt1tNduHQ1X7y", "left": 20.54000000000002, "scaleX": 1, "scaleY": 1, "src": "https://www.livedesimall.com/CDN/upload/400face-icon-user-icon-design-user-profile-share-icon-avatar-black-and-white-silhouette-png-clipart-removebg-preview_2_optimized.png?auto=compress&cs=tinysrgb&h=60", "top": 21.900000000000006, "type": "image", "width": 60}]
-
-  console.log(images)
-
   const handleProfileImageChange = () => {
-    console.log("profile image nu funcation call thyu!")
+
     // Find the index of the image with the specified id
     const imageIndex = images.findIndex((image) => image.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60');
 
@@ -682,49 +531,8 @@ const App = ({ navigation, route }) => {
         .catch((error) => {
           console.log('ImagePicker Error:', error);
         });
-    } else {
-      console.log("first")
-    }
-  };
-
-  const handleImagePicker = (bg) => {
-    ImageCropPicker.openPicker({
-      width: 1000,
-      height: 1000,
-      cropping: true,
-      includeBase64: true,
-    })
-      .then((response) => {
-        if (bg === 'Image') {
-          setImages([
-            ...images,
-            { id: generateUniqueId(), src: response.path, isSelected: false }, // You need to generate a unique ID for the new image
-          ]);
-        } else {
-          setFileUri(response.path);
-        }
-      })
-      .catch((error) => {
-        setImageLoader(false);
-        console.log('ImagePicker Error:', error);
-      });
-  };
-
-  const [customFrames, setCustomFrames] = useState([]);
-
-  const saveCustomFrame = async (uri) => {
-
-
-    try {
-      const framesData = await AsyncStorage.getItem('customFrames');
-      let frames = framesData ? JSON.parse(framesData) : [];
-      const frame = { name: `frame${frames.length + 1}`, image: uri };
-      frames.push(frame);
-      await AsyncStorage.setItem('customFrames', JSON.stringify(frames));
-      setCustomFrames(frames);
-      showAlert3()
-    } catch (error) {
-      console.error('Error saving custom frame:', error);
+    }else{
+      console.log("image not found")
     }
   };
 
@@ -780,13 +588,15 @@ const App = ({ navigation, route }) => {
       await saveCustomFrame(uri);
 
 
-      // Convert the file to base64
+      // // Convert the file to base64
       // const base64Image = await convertFileToBase64(uri);
 
-      // // Now you can use the base64Image as needed, e.g., send it to a CDN URL
-      // console.log("Base64 image:", base64Image);
+      // console.log("base64: ", base64Image)
 
-      // upload image to cdn url 
+      // // // Now you can use the base64Image as needed, e.g., send it to a CDN URL
+      // // console.log("Base64 image:", base64Image);
+
+      // // upload image to cdn url 
 
       // const apiUrl = "https://sparrowsofttech.in/cdn/index.php";
       // const requestData = {
@@ -796,9 +606,11 @@ const App = ({ navigation, route }) => {
       // axios
       //   .post(apiUrl, requestData)
       //   .then(async (response) => {
+      //     console.log("requesting for change to cdn")
       //     const { status, message, image_url } = response.data;
       //     if (status === "success") {
-      //       console.log(image_url)
+      //       sendFrametoDb(image_url)
+
       //     } else {
       //       console.error("Image upload failed:", message);
       //     }
@@ -815,16 +627,75 @@ const App = ({ navigation, route }) => {
     return response;
   };
 
-  const [isModalVisible3, setModalVisible3] = useState(false);
+  const sendFrametoDb = async (image_url) => {
+    const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/saveframe/frame/save';
+    const requestData = {
+      "userId": profileData?._id,
+      "fullName_user": profileData?.fullName,
+      "mobileNumber_user": profileData?.mobileNumber,
+      "savedFrame_user": image_url
+    }
 
-  const showAlert3 = () => {
-    setModalVisible3(true);
-  };
+    // sending user frames to data base 
+    try {
+      const response = await axios.post(
+          apiUrl,requestData,
+          {
+              headers: {
+                  Authorization: `Bearer ${userToken}`,
+              },
+          }
+      );
+  } catch (error) {
+      console.error('Error sending saved frames data:', error);
+  }
+  }
 
-  const hideAlert3 = () => {
-    navigation.navigate('SavedFramesProfile')
-    setModalVisible3(false);
-  };
+  // update the user data 
+  const phone = profileData?.mobileNumber;
+  const username = profileData?.fullName;
+  const userimage = profileData?.profileImage || profileData?.businessLogo;
+
+  const [run, setRun] = useState(true);
+
+  useEffect(() => {
+    // Update text items
+    if (run && textItems.length !== 0 && userimage && phone && username) {
+      const updatedTextItems = textItems.map((item) => {
+        if (item.text === '1234567890') {
+          return { ...item, text: phone }; // Update the text property
+        }
+        if (item.text === 'Your Name Here') {
+          return { ...item, text: username }; // Update the text property
+        }
+        return item; // Keep the item as is if the condition is not met
+      });
+
+      setTextItems(updatedTextItems); // Update the state with the modified array
+      setRun(false);
+    }
+
+    // Update image items
+    if (run && images.length !== 0 && userimage && phone && username) {
+      const updatedImageItems = images.map((item) => {
+        if (item.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60') {
+          return { ...item, src: userimage }; // Update the src property
+        }
+        return item; // Keep the item as is if the condition is not met
+      });
+      setImages(updatedImageItems); // Update the state with the modified arra
+      setRun(false);
+    }
+  }, [run, textItems, images, phone, username, userimage]);
+
+
+  // if (run) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'black' }}>
+  //       <ActivityIndicator color={'white'} />
+  //     </View>
+  //   )
+  // }
 
   return (
     <LinearGradient
@@ -921,7 +792,6 @@ const App = ({ navigation, route }) => {
                 onClose={() => setEditingTextIndex(-1)} // Close the modal when editing is done
               />
             </TouchableOpacity>
-
           </ViewShot>
         </TouchableOpacity>
         <View style={{ width: '100%' }}>
@@ -950,7 +820,6 @@ const App = ({ navigation, route }) => {
             (isImageSelected && !isTextSelected) ? (
 
               <View>
-
 
                 {/* Buttons */}
                 <View
@@ -1072,73 +941,6 @@ const App = ({ navigation, route }) => {
         </View>
 
       </View >
-
-      <Modal
-        animationType="fade" // You can use "fade" or "none" for animation type
-        visible={isModalVisible3}
-        transparent={true}
-        onRequestClose={hideAlert3}
-      >
-        <View style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-
-        }}>
-          <View style={{
-            backgroundColor: 'white',
-            padding: 20,
-            borderRadius: 8,
-            height: "40%",
-            width: 300,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {/* icon */}
-            <TouchableOpacity onPress={hideAlert3} style={{
-              backgroundColor: 'darkgreen',
-              padding: 8,
-              borderRadius: 8,
-            }}>
-              <Text style={{
-                color: 'white',
-                fontWeight: 'bold',
-              }}><MaterialIcons name="check" size={25} color="white" /></Text>
-            </TouchableOpacity>
-            {/* title */}
-            <Text style={{
-              fontSize: 16,
-              fontFamily: 'Manrope-Bold',
-              marginTop: 10,
-              color: 'darkgreen'
-            }}>Your Frame Saved!</Text>
-            {/* caption */}
-            <Text style={{
-              fontSize: 16,
-              fontFamily: 'Manrope-Bold',
-              marginTop: 5,
-              color: 'lightgray'
-            }}>... Thank You ...</Text>
-            {/* another */}
-
-            <TouchableOpacity onPress={hideAlert3} style={{
-              width: 70,
-              paddingVertical: 5,
-              alignItems: 'center',
-              justifyContent: "center",
-              borderRadius: 8,
-              marginTop: 30,
-              backgroundColor: 'darkgreen'
-            }}>
-              <Text style={{
-                color: 'white',
-                fontFamily: 'Manrope-Bold'
-              }}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </LinearGradient>
   );
 };

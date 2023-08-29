@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Alert, ActivityIndicator, Image, TouchableHighlight, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Alert, ActivityIndicator, Image, TouchableHighlight, ScrollView, StyleSheet, Dimensions, Linking } from 'react-native';
 import axios from 'axios';
 import Swiper from 'react-native-swiper';
 import { useNavigation } from '@react-navigation/native';
@@ -16,11 +16,14 @@ const BannerComponent = ({ bannerData }) => {
                 {bannerData.map((item, index) => (
                     <TouchableHighlight
                         key={item._id}
-                        onPress={() => { Alert.alert('Main Banner') }}
                         style={[
                             styles.bannerItem,
                             { marginLeft: 15 }, // Apply different margin to the first item
                         ]}
+                        onPress={() => {
+                            // Open the link in the browser when the image is clicked
+                            Linking.openURL(item.bannerLink);
+                          }}
                     >
                         <FastImage
                             source={{ uri: item.bannerImage }}

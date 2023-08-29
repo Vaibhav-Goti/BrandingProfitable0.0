@@ -105,7 +105,6 @@ const ProfileScreen = ({ route }) => {
   const [loader, setLoader] = React.useState(true)
 
   const fetchDetails = async () => {
-    if (i < 5) {
 
       try {
         if (profileData) {
@@ -133,13 +132,15 @@ const ProfileScreen = ({ route }) => {
         setTimeout(() => {
           setLoader(false)
         }, 1000);
-      }
-
     }
   }
 
   useEffect(() => {
+    if (i < 2) {
+
     fetchDetails();
+
+    }
   })
 
   if (loader) {

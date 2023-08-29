@@ -2,6 +2,7 @@ import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SavedFrames from './SavedFrames';
 import MainCustomFrame from './MainCustomFrames';
+import RequestFrame from './RequestFrame';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -15,8 +16,9 @@ const Frames = () => {
         tabBarIndicatorStyle: { backgroundColor: 'white' }, // Active tab indicator color
       }}
     >
-      <Tab.Screen name="CustomFramesProfile" component={MainCustomFrame} options={{title:'Custom Frames'}} />
-      <Tab.Screen name="SavedFramesProfile" component={SavedFrames} options={{title:'Saved Frames'}} />
+      <Tab.Screen name="CustomFramesProfile" component={MainCustomFrame} options={{title:'Custom'}} />
+      <Tab.Screen name="RequestFrame" component={RequestFrame} options={{title:'Request'}} />
+      <Tab.Screen name="SavedFramesProfile" component={SavedFrames} options={{title:'Saved'}} />
     </Tab.Navigator>
   );
 };

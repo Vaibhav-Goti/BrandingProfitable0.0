@@ -26,7 +26,6 @@ const SavedFrames = ({ navigation }) => {
       const framesData = await AsyncStorage.getItem('customFrames');
       if (framesData) {
         const frames = JSON.parse(framesData);
-        console.log(frames)
         setCustomFrames(frames);
       }
     } catch (error) {

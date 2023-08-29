@@ -20,16 +20,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingBottom: 12,
     borderTopWidth: 0.5,
     elevation: 0,
     borderColor: 'black',
-    height: 70,
-    paddingTop: 9,
-    flexDirection: 'row',
+    height: 60,
+    paddingTop: 5,
+
     justifyContent: 'space-between',
     backgroundColor: '#FFFFFF', // Change this to the desired background color
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    paddingBottom: 5
   },
   tabItem: {
     flex: 1,
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeTab: {
-    flexDirection: 'row',
+
     alignItems: 'center',
     paddingHorizontal: 10,
     borderRadius: 30,
@@ -82,14 +83,14 @@ const MyStack = () => {
         tabBarIcon: ({ focused }) => {
           if (focused) {
             return (
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 30, height: 35, backgroundColor: '#F5ACAE', marginTop: 10, }}>
-                <FastImage source={require('../assets/Icons/home2.png')} style={{ height: 18, width: 18, }} />
-                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', fontSize: 10, marginTop: 4 }}>
+              <View style={{ alignItems: 'center', justifyContent: 'center', marginTop:19, }}>
+                <FastImage source={require('../assets/Icons/home2.png')} style={{ height: 25, width: 25, }} />
+                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', fontSize: 12, marginTop: 1 }}>
                   {""}  Home
                 </Text>
               </View>)
           } else {
-            return <FastImage source={require('../assets/Icons/home.png')} style={{ height: 25, width: 25, marginTop: 10 }} />
+            return <FastImage source={require('../assets/Icons/home.png')} style={{ height: 25, width: 25, }} />
           }
         },
       }} />
@@ -99,38 +100,38 @@ const MyStack = () => {
         tabBarIcon: ({ focused }) => {
           if (focused) {
             return (
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 30, height: 35, backgroundColor: '#F5ACAE', marginTop: 10 }}>
-                <FastImage source={require('../assets/Icons/brush1.png')} style={{ height: 22, width: 22, marginLeft: 10 }} />
-                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', marginRight: 8, fontSize: 10, marginTop: 3 }}>
+              <View style={{ alignItems: 'center', justifyContent: 'center', marginTop:19, }}>
+                <FastImage source={require('../assets/Icons/brush1.png')} style={{ height: 25, width: 25 }} />
+                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', marginRight: 0, fontSize: 12, marginTop: 1 }}>
                   {" "}Custom
                 </Text>
               </View>)
           } else {
-            return <FastImage source={require('../assets/Icons/brush.png')} style={{ height: 25, width: 25, marginTop: 10 }} />
+            return <FastImage source={require('../assets/Icons/brush.png')} style={{ height: 25, width: 25, }} />
           }
         },
       }} component={CustomStack} />
-{/* 
+      {/* 
       {businessOrPersonal == 'personal' ? (
         null
       ) : ( */}
-        <Tab.Screen name="BusinessStack" options={{
-          headerShown: false,
-          tabBarLabel: '',
-          tabBarIcon: ({ focused }) => {
-            if (focused) {
-              return (
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 30, height: 35, backgroundColor: '#F5ACAE', marginTop: 10 }}>
-                  <FastImage source={require('../assets/Icons/bag1.png')} style={{ height: 20, width: 20, marginLeft: 12 }} />
-                  <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', marginRight: 6, fontSize: 10, marginTop: 3 }}>
-                    {" "}Business
-                  </Text>
-                </View>)
-            } else {
-              return <FastImage source={require('../assets/Icons/bag.png')} style={{ height: 25, width: 25, marginTop: 10 }} />
-            }
-          },
-        }} component={StackBusiness} />
+      <Tab.Screen name="BusinessStack" options={{
+        headerShown: false,
+        tabBarLabel: '',
+        tabBarIcon: ({ focused }) => {
+          if (focused) {
+            return (
+              <View style={{ alignItems: 'center', justifyContent: 'center', marginTop:19, }}>
+                <FastImage source={require('../assets/Icons/bag1.png')} style={{ height: 25, width: 25, }} />
+                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', marginRight: 6, fontSize: 12, marginTop: 1 }}>
+                  {" "}Business
+                </Text>
+              </View>)
+          } else {
+            return <FastImage source={require('../assets/Icons/bag.png')} style={{ height: 25, width: 25, }} />
+          }
+        },
+      }} component={StackBusiness} />
       {/* // )} */}
 
       <Tab.Screen name="StackProfileScreen" options={{
@@ -139,14 +140,14 @@ const MyStack = () => {
         tabBarIcon: ({ focused }) => {
           if (focused) {
             return (
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 30, height: 35, backgroundColor: '#F5ACAE', marginTop: 10, }}>
-                <FastImage source={require('../assets/Icons/user1.png')} style={{ height: 16, width: 16, }} />
-                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', fontSize: 10, marginTop: 3 }}>
+              <View style={{ alignItems: 'center', justifyContent: 'center', marginTop:19, }}>
+                <FastImage source={require('../assets/Icons/user1.png')} style={{ height: 23, width: 23, }} />
+                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', fontSize: 12, marginTop: 1 }}>
                   {""} Profile
                 </Text>
               </View>)
           } else {
-            return <FastImage source={require('../assets/Icons/user.png')} style={{ height: 23, width: 23, marginTop: 10 }} />
+            return <FastImage source={require('../assets/Icons/user.png')} style={{ height: 23, width: 23, }} />
           }
         },
       }} component={StackProfile} />
@@ -157,15 +158,15 @@ const MyStack = () => {
         tabBarIcon: ({ focused }) => {
           if (focused) {
             return (
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 30, height: 35, backgroundColor: '#F5ACAE', marginTop: 10 }}>
-                <FastImage source={require('../assets/Icons/new.png')} style={{ height: 20, width: 20, }} />
-                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', fontSize: 10, marginTop: 3 }}>
+              <View style={{ alignItems: 'center', justifyContent: 'center', marginTop:19, }}>
+                <FastImage source={require('../assets/Icons/new.png')} style={{ height: 25, width: 25, marginLeft:9 }} />
+                <Text style={{ color: '#FF0000', fontFamily: 'Poppins-Regular', fontSize: 12, marginTop: 1 }}>
                   {""}  MLM
 
                 </Text>
               </View>)
           } else {
-            return <FastImage source={require('../assets/Icons/mlm.png')} style={{ height: 25, width: 25, marginTop: 10 }} />
+            return <FastImage source={require('../assets/Icons/mlm.png')} style={{ height: 25, width: 25, }} />
           }
         },
       }} component={StackMLM} />

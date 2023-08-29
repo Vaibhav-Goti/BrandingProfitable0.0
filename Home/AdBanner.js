@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Alert, Dimensions, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Alert, Dimensions, Image, TouchableOpacity, ScrollView, StyleSheet, Linking     } from 'react-native';
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
 
@@ -12,7 +12,10 @@ const BannerComponent = ({ bannerData }) => {
                 {bannerData.map(item => (
                     <TouchableOpacity
                         key={item._id}
-                        onPress={() => Alert.alert(`Ad Banner!`)}
+                        onPress={() => {
+                            // Open the link in the browser when the image is clicked
+                            Linking.openURL(item.advertiseLink);
+                          }}
                         style={styles.bannerItem}>
                         <FastImage
                             source={{ uri: item.advertiseImage }}

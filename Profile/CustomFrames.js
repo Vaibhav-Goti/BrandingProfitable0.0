@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     flatListContainer: {
         marginTop: 10,
         paddingTop: 20,
-        paddingBottom:50
+        paddingBottom:80
     },
     imageContainer: {
         alignItems: 'center',
