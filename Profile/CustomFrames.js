@@ -13,7 +13,7 @@ const itemWidth = width / 2.3; // Adjust the number of columns as needed
 const SavedFrames = ({ navigation }) => {
 
     const handleSelect = (item) => {
-        navigation.navigate('CustomFrameFormProfile', { 'itemId': item._id })
+        navigation.navigate('CustomFrameFormProfile', { 'itemId': item._id, isRequest: 'no' })
     }
 
     const renderItem = ({ item }) => {

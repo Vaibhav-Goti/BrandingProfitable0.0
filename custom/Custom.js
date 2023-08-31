@@ -84,7 +84,7 @@ const Custom = ({ navigation }) => {
               {businessOrPersonal ? "Business" : 'Profile'}
             </Text>
             <Text style={styles.buisnessTitle}>
-              {profileData !== null && profileData?.fullName || "John Doe"} <Icon name="angle-down" size={25} />
+              {profileData !== null && profileData?.fullName || "John Doe"}
             </Text>
           </TouchableOpacity>
         </View>

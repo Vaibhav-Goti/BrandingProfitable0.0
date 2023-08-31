@@ -61,7 +61,7 @@ const EditHome = ({ route, navigation }) => {
   useEffect(() => {
     if (i < 2) {
       if (items.length > 0) {
-        setItem(items[index ? index : 0].myBusinessImageOrVideo)
+        setItem(items[index ? index : 0].imageUrl)
         seti(i + 1)
       }
     } else {
@@ -114,8 +114,10 @@ const EditHome = ({ route, navigation }) => {
     try {
       if (profileData) {
 
-        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.adhaar}`);
+        const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
         const result = response.data;
+
+        console.log(`https://b-p-k-2984aa492088.herokuapp.com/wallet/wallet/${profileData?.mobileNumber}`);
 
         if (response.data.statusCode == 200) {
           setUserTeamDetails('Purchase')
@@ -177,15 +179,15 @@ const EditHome = ({ route, navigation }) => {
   const [FlatlistisLoad, setFlatlistIsLoad] = useState(true)
 
   const renderItem = useCallback(({ item }) => (
-    <TouchableOpacity onPress={() => handleImagePress(item.myBusinessImageOrVideo)}>
-      <FastImage source={{ uri: item.myBusinessImageOrVideo }} style={styles.image} onLoadEnd={() => Image.prefetch(item.myBusinessImageOrVideo)} />
+    <TouchableOpacity onPress={() => handleImagePress(item.imageUrl)}>
+      <FastImage source={{ uri: item.imageUrl }} style={styles.image} onLoadEnd={() => Image.prefetch(item.imageUrl)} />
     </TouchableOpacity>
   ), []);
 
   const renderItemV = useCallback(({ item }) => (
     <TouchableOpacity onPress={() => handleImagePressV(item)}>
       <Video
-        source={{ uri: item.myBusinessImageOrVideo }}   // Can be a URL or a local file.
+        source={{ uri: item.imageUrl }}   // Can be a URL or a local file.
         style={styles.image}
         paused={false}               // Pauses playback entirely.
         resizeMode="cover"            // Fill the whole screen at aspect ratio.
@@ -206,7 +208,7 @@ const EditHome = ({ route, navigation }) => {
   const [j, setj] = useState(0)
   useEffect(() => {
     if (videos.length > 0 && j < 2) {
-      setSelectedVideo(videos[0].myBusinessImageOrVideo);
+      setSelectedVideo(videos[0].imageUrl);
       setj(j + 1);
     }
   }, [videos, j]); // Add dependency array

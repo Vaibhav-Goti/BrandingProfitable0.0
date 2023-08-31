@@ -83,6 +83,7 @@ const ProfileScreen = ({ route }) => {
   const reloadScreen = () => {
     // Your refresh logic goes here
     retrieveProfileData()
+    fetchDetails()
   };
 
   useEffect(() => {
@@ -97,6 +98,7 @@ const ProfileScreen = ({ route }) => {
   const [userTeamDetails, setUserTeamDetails] = useState([])
   const [userTeamDetails11, setUserTeamDetails11] = useState([])
 
+  console.log(userTeamDetails11)
   // {"data": {"greenWallet": 4000, "leftSideTodayJoining": 2, "leftSideTotalJoining": 2, "redWallet": -1000, "rightSideTodayJoining": 1, "rightSideTotalJoining": 1, "totalRewards": 3000, "totalTeam": 4}, "message": "Get Wallet History Successfully", "statusCode": 200}
 
   // all users details 

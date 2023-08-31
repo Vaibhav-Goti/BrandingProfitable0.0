@@ -53,9 +53,14 @@ const Header = () => {
       getNotificationCounts();
     }, []);
 
+    const reloadScreen = () => {
+      retrieveProfileData()
+      getNotificationCounts()
+    }
+
     useEffect(() => {
       // Add a listener to the focus event to reload the screen
-      const unsubscribe = navigation.addListener('focus', getNotificationCounts);
+      const unsubscribe = navigation.addListener('focus', reloadScreen);
   
       // Clean up the listener when the component unmounts
       return () => unsubscribe()
@@ -85,7 +90,6 @@ const Header = () => {
             </Text>
             <Text style={[styles.buisnessTitle,{elevation:3}]}>
               {profileData !== null && profileData?.fullName || 'John Doe'}{' '}
-              <Icon name="angle-down" size={25} />
             </Text>
           </TouchableOpacity>
         </View>

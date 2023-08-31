@@ -36,8 +36,7 @@ const BusinessScreen = ({ navigation, route }) => {
 		setLoading(true);
 		try {
 			const response = await axios.get(
-				`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business/${businessFromAll || userBusiness || MyBusiness
-				}`
+				`https://b-p-k-2984aa492088.herokuapp.com/my_business/my_business`
 			);
 			const result = response.data.data;
 			setData(result);
@@ -47,13 +46,41 @@ const BusinessScreen = ({ navigation, route }) => {
 		setLoading(false);
 	};
 
+
+	const elements = [
+		{ name: "aaa", value: 1 },
+		{ name: "bbb", value: 2 },
+		{ name: "ccc", value: 3 },
+		{ name: "jjj", value: 4 },
+		{ name: "ddd", value: 5 },
+	];
+
+	// const firstElementIndex = data.findIndex(element => element.businessTypeName === "Education");
+
+	// const elementsCopy = data.slice(firstElementIndex); // Create a copy of the data array
+
+	// console.log(elementsCopy)
+
+	// elementsCopy.splice(0, firstElementIndex); // Remove the element with the businessTypeName "jjj" from the copy
+
+	// data.unshift(elementsCopy[0]); // Insert the element with the businessTypeName "jjj" at the beginning of the original array
+
+	const businessCopy = data.filter((name) => (name.businessTypeName == userBusiness))
+	// console.log(businessCopy[0].items,"aksdfjlfkajsdlfdjklasjdfklfjl")
+
+	const filteredData = data.filter((name)=>(name.businessTypeName!=userBusiness))
+
 	const handleImagePress = (item, index) => {
 		navigation.navigate('EditBusiness', {
 			items: item.items,
-			bannername: item.businessCategoryName,
+			bannername: item.businessTypeName,
 			index: index ? index : '',
 		});
 	};
+
+	//  this is my modified arrays of business which user choose the business 
+
+
 
 	// Use useFocusEffect to fetch data when the screen is focused
 	useFocusEffect(
@@ -79,23 +106,62 @@ const BusinessScreen = ({ navigation, route }) => {
 			<View style={{ paddingHorizontal: 15, paddingTop: 20, flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
 				<View style={{ borderRadius: 30, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: 'red', height: 30, }}>
 					<Text style={{ color: 'white', fontFamily: 'Manrope-Regular' }}>
-						{businessFromAll || userBusiness || MyBusiness}
+						{userBusiness}
 					</Text>
 				</View>
-				<TouchableOpacity onPress={() => { navigation.navigate('AllBusiness') }} style={{ borderRadius: 40, backgroundColor: 'red', width: 40, height: 30, alignItems: 'center', justifyContent: 'center' }}>
+				{/* <TouchableOpacity onPress={() => { navigation.navigate('AllBusiness') }} style={{ borderRadius: 40, backgroundColor: 'red', width: 40, height: 30, alignItems: 'center', justifyContent: 'center' }}>
 					<Text style={{ color: 'white' }}>
 						<Octicons name="pencil" size={20} color={'white'} />
 					</Text>
-				</TouchableOpacity>
+				</TouchableOpacity> */}
 			</View>
 			<View style={styles.container}>
 				<ScrollView contentContainerStyle={styles.scrollViewContainer}>
-					{data.map((item) => (
-						<View key={item.businessCategoryName} style={styles.BannerItem}>
+
+					{businessCopy.length!=0?(
+						<View key={businessCopy?.businessTypeName} style={styles.BannerItem}>
+						<View>
+							<View style={styles.bannerHeader}>
+								<Text style={styles.bannerHeaderText}>
+									{businessCopy[0]?.businessTypeName}
+								</Text>
+								<TouchableOpacity onPress={() => handleImagePress(businessCopy)}>
+									<Text style={[styles.bannerHeaderText, { width: 30, height: 30, textAlign: 'right', }]}>
+										{/* <Icon name="angle-right" size={32} color={"white"} /> */}
+									</Text>
+								</TouchableOpacity>
+							</View>
+							<ScrollView
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={styles.imageScrollView}
+							>
+								{businessCopy[0]?.items?.map((imageItem, index) => (
+									<TouchableOpacity
+										key={index.toString()}
+										onPress={() => handleImagePress(businessCopy, index)}
+									>
+										<FastImage
+											source={{ uri: imageItem.imageUrl }}
+											style={[styles.image, { marginLeft: index === 0 ? 15 : 0 }]}
+											onLoadEnd={() => Image.prefetch(imageItem.imageUrl)}
+										/>
+									</TouchableOpacity>
+								))}
+							</ScrollView>
+						</View>
+					</View>
+
+					):(null)}
+
+					
+					
+					{filteredData.map((item) => (
+						<View key={item.businessTypeName} style={styles.BannerItem}>
 							<View>
 								<View style={styles.bannerHeader}>
 									<Text style={styles.bannerHeaderText}>
-										{item.businessCategoryName}
+										{item.businessTypeName}
 									</Text>
 									<TouchableOpacity onPress={() => handleImagePress(item)}>
 										<Text style={[styles.bannerHeaderText, { width: 30, height: 30, textAlign: 'right', }]}>
@@ -114,9 +180,9 @@ const BusinessScreen = ({ navigation, route }) => {
 											onPress={() => handleImagePress(item, index)}
 										>
 											<FastImage
-												source={{ uri: imageItem.myBusinessImageOrVideo }}
+												source={{ uri: imageItem.imageUrl }}
 												style={[styles.image, { marginLeft: index === 0 ? 15 : 0 }]}
-												onLoadEnd={() => Image.prefetch(imageItem.myBusinessImageOrVideo)}
+												onLoadEnd={() => Image.prefetch(imageItem.imageUrl)}
 											/>
 										</TouchableOpacity>
 									))}
@@ -126,8 +192,6 @@ const BusinessScreen = ({ navigation, route }) => {
 					))}
 
 					{/* anohter all business data */}
-
-
 
 				</ScrollView >
 			</View >

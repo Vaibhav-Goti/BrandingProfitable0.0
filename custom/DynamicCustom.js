@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   BannerItem: {
     marginBottom: 10,
-    width: '100%'
+    width: width
   },
   bannerHeader: {
     height: 45,

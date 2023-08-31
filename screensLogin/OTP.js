@@ -256,7 +256,7 @@ const OTPScreen = ({ route, navigation }) => {
 
                 <View style={{ width: '74%', }}>
                     <Text style={{ fontFamily: 'Manrope-Regular', fontSize: 16, color: 'white', textAlign: 'center' }}>
-                        Enter 4 digit number that sent to The number on your Mobile
+                        Enter 6 digit number that sent to The number on your Mobile
                     </Text>
                 </View>
 
@@ -282,6 +282,7 @@ const OTPScreen = ({ route, navigation }) => {
                                     onChangeText={(value) => handleOTPDigitInput(index, value)}
                                     keyboardType="numeric"
                                     maxLength={1}
+                                    placeholderTextColor={'gray'}
                                 />
                             </View>
                         ))}
@@ -350,7 +351,8 @@ const styles = StyleSheet.create({
         height: '110%',
         fontSize: 20,
         textAlign: 'center',
-        fontFamily: 'Manrope-Regular'
+        fontFamily: 'Manrope-Regular',
+        color:'gray'
     },
     timerText: {
         fontSize: 14,

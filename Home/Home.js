@@ -84,7 +84,7 @@ const Home = ({ navigation }) => {
       return (
         <>
           <Text style={styles.buisnessTitle}>
-            {profileData.fullName} <Icon name="angle-down" size={25} />
+            {profileData.fullName}
           </Text>
         </>
       );
@@ -96,7 +96,7 @@ const Home = ({ navigation }) => {
     return (
       <>
         <Text style={styles.buisnessTitle}>
-          John Doe <Icon name="angle-down" size={25} />
+          John Doe
         </Text>
       </>
     );

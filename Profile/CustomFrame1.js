@@ -85,7 +85,9 @@ const App = ({ navigation, route }) => {
 
   const [fileUri, setFileUri] = useState('https://img.freepik.com/premium-vector/white-texture-round-striped-surface-white-soft-cover_547648-928.jpg');
 
-  const { itemId } = route.params;
+  const { itemId, isRequest } = route.params;
+
+  console.log("request ni frame mathi aaveli id: ", itemId)
 
   // profile data getting --------------------------------------------------------------------------------
 
@@ -102,41 +104,56 @@ const App = ({ navigation, route }) => {
 
   const retrieveProfileData = async () => {
     try {
-        const dataString = await AsyncStorage.getItem('profileData');
-        const userToken = await AsyncStorage.getItem('userToken');
-        setUserToken(userToken)
-        if (dataString) {
-            const data = JSON.parse(dataString);
-            setProfileData(data);
-        }
+      const dataString = await AsyncStorage.getItem('profileData');
+      const userToken = await AsyncStorage.getItem('userToken');
+      setUserToken(userToken)
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        setProfileData(data);
+      }
     } catch (error) {
-        console.error('Error retrieving profile data:', error);
+      console.error('Error retrieving profile data:', error);
     }
-};
+  };
 
   // --------------------------------------------------------------------------------
 
+  // if request then get data from another api 
+
+  const [loadig, setisloading] = useState(true)
+
+
+
   useEffect(() => {
     // Define the URL for the GET request
-    const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/frame/frameimage/${itemId}`;
+    const apiUrl = isRequest === 'no' ? `https://b-p-k-2984aa492088.herokuapp.com/frame/frameimage/${itemId}` : `https://b-p-k-2984aa492088.herokuapp.com/saveframe/frameimage/${itemId}`;
 
-    // Make the GET request using Axios
-    axios
-      .get(apiUrl)
-      .then(response => {
+    const fetchData = async () => {
+      try {
+        if (isRequest === 'no') {
+          console.log('calling frames');
+          console.log(`https://b-p-k-2984aa492088.herokuapp.com/frame/frameimage/${itemId}`)
+        } else {
+          console.log('calling save frames');
+          console.log(`https://b-p-k-2984aa492088.herokuapp.com/saveframe/frameimage/${itemId}`)
+        }
+
+        const response = await axios.get(apiUrl);
         const imageData = response.data.data.frame;
         const data = {
           data: imageData
         };
+        console.log(imageData);
         setJsonData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Handle the error, show a message to the user, or retry the request if needed
+      }
+    };
 
-      })
-      .catch(error => {
-        console.log('Error fetching response.data.data:', error)
-      });
-
-  }, []);
-
+    fetchData();
+    setisloading(false)
+  }, [itemId, isRequest]);
   // modified code 
 
   useEffect(() => {
@@ -398,6 +415,7 @@ const App = ({ navigation, route }) => {
 
   const saveCustomFrame = async (uri) => {
 
+    console.log("saving this image url in async storage: ", uri)
 
     try {
 
@@ -425,6 +443,201 @@ const App = ({ navigation, route }) => {
       useNativeDriver: true, // Use the native driver for better performance (requires reanimated 2)
     }).start();
   }, [rotationValue]);
+
+
+
+  const [isOpenFrame, setIsOpenFrame] = useState(false)
+
+  // custom frames
+
+  const handleProfileImageChange = () => {
+
+    // Find the index of the image with the specified id
+    const imageIndex = images.findIndex((image) => (
+      image.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60' ||
+      image.src === profileData?.profileImage ||
+      image.src === profileData?.businessLogo
+    ));
+
+    if (imageIndex !== -1) {
+      // Open the image picker and replace the selected image with the new one
+      ImageCropPicker.openPicker({
+        width: 1000,
+        height: 1000,
+        cropping: true,
+        includeBase64: true,
+      })
+        .then((response) => {
+          const updatedImages = [...images];
+          updatedImages[imageIndex] = {
+            ...updatedImages[imageIndex],
+            src: response.path,
+          };
+          setImages(updatedImages);
+        })
+        .catch((error) => {
+          console.log('ImagePicker Error:', error);
+        });
+    } else {
+      console.log("image not found")
+    }
+  };
+
+  const handleSaveToLocal = async () => {
+    try {
+      const updatedTextItems = textItems.map((item, i) => ({
+        ...item,
+        isSelected: false,
+      }));
+
+      // Deselect image items when a text item is selected
+      const updatedImages = images.map((image) => ({
+        ...image,
+        isSelected: false,
+      }));
+
+      setImages(updatedImages);
+      setTextItems(updatedTextItems);
+
+      // const uri = await viewShotRef.current.capture();
+      // await saveCustomFrame(uri);
+
+      // console.log("save krva mate ni frame - ", uri)
+
+      // // image cdn ma upload karva mate 
+
+      // const dataArray = new FormData();
+      // dataArray.append('b_video', {
+      //   uri: uri,
+      //   type: response.mime,
+      //   name: uri.split('/').pop(),
+      // });
+      // setlocalImage(response.path)
+      // let url = 'https://www.sparrowgroups.com/CDN/image_upload.php/';
+      // axios
+      //   .post(url, dataArray, {
+      //     headers: {
+      //       'Content-Type': 'multipart/form-data',
+      //     },
+      //   })
+      //   .then((res) => {
+      //     setImageLoader(false)
+      //     const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
+      //     setFileUri(imagePath);
+      //   })
+      //   .catch((err) => {
+      //     setImageLoader(false)
+      //     setFileUri(response.path)
+      //     console.log('Error uploading image:', err);
+      //   });
+
+      const uri = await viewShotRef.current.capture();
+      // await saveCustomFrame(uri);
+
+
+      // Convert the file to base64
+      const base64Image = await convertFileToBase64(uri);
+
+      console.log("base64: ", base64Image)
+
+      // Now you can use the base64Image as needed, e.g., send it to a CDN URL
+      console.log("Base64 image:", base64Image);
+
+      // upload image to cdn url 
+
+      const apiUrl = "https://sparrowsofttech.in/cdn/index.php";
+      const requestData = {
+        base64_content: base64Image, // Use the updated base64 image data here
+      };
+      // Upload the canvas image to the CDN
+      axios
+        .post(apiUrl, requestData)
+        .then(async (response) => {
+          console.log("requesting for change to cdn")
+          const { status, message, image_url } = response.data;
+          
+          
+          console.log(image_url, "this is my image url")
+          if (status === "success") {
+            await saveCustomFrame(image_url);
+            // sendFrametoDb(image_url)
+
+          } else {
+            console.error("Image upload failed:", message);
+          }
+        })
+
+
+    } catch (error) {
+      console.error('Error saving image to local storage:', error);
+    }
+  };
+
+  const convertFileToBase64 = async (fileUri) => {
+    const response = await RNFetchBlob.fs.readFile(fileUri, 'base64');
+    return response;
+  };
+
+  const sendFrametoDb = async (image_url) => {
+    const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/saveframe/frame/save';
+    const requestData = {
+      "userId": profileData?._id,
+      "fullName_user": profileData?.fullName,
+      "mobileNumber_user": profileData?.mobileNumber,
+      "savedFrame_user": image_url
+    }
+
+    // sending user frames to data base 
+    try {
+      const response = await axios.post(
+        apiUrl, requestData,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error sending saved frames data:', error);
+    }
+  }
+
+  // update the user data 
+  const phone = profileData?.mobileNumber;
+  const username = profileData?.fullName;
+  const userimage = profileData?.profileImage || profileData?.businessLogo;
+
+  const [run, setRun] = useState(true);
+
+  useEffect(() => {
+    // Update text items
+    if (run && textItems.length !== 0 && userimage && phone && username) {
+      const updatedTextItems = textItems.map((item) => {
+        if (item.text === '1234567890') {
+          return { ...item, text: phone }; // Update the text property
+        }
+        if (item.text === 'Your Name Here') {
+          return { ...item, text: username }; // Update the text property
+        }
+        return item; // Keep the item as is if the condition is not met
+      });
+
+      setTextItems(updatedTextItems); // Update the state with the modified array
+      setRun(false);
+    }
+
+    // Update image items
+    if (run && images.length !== 0 && userimage && phone && username) {
+      const updatedImageItems = images.map((item) => {
+        if (item.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60') {
+          return { ...item, src: userimage }; // Update the src property
+        }
+        return item; // Keep the item as is if the condition is not met
+      });
+      setImages(updatedImageItems); // Update the state with the modified arra
+      setRun(false);
+    }
+  }, [run, textItems, images, phone, username, userimage]);
 
   const TextItem = React.memo(({
     text,
@@ -503,199 +716,15 @@ const App = ({ navigation, route }) => {
     );
   });
 
-  const [isOpenFrame, setIsOpenFrame] = useState(false)
+  console.log(loadig, textItems.length, images.length)
 
-  // custom frames
-
-  const handleProfileImageChange = () => {
-
-    // Find the index of the image with the specified id
-    const imageIndex = images.findIndex((image) => image.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60');
-
-    if (imageIndex !== -1) {
-      // Open the image picker and replace the selected image with the new one
-      ImageCropPicker.openPicker({
-        width: 1000,
-        height: 1000,
-        cropping: true,
-        includeBase64: true,
-      })
-        .then((response) => {
-          const updatedImages = [...images];
-          updatedImages[imageIndex] = {
-            ...updatedImages[imageIndex],
-            src: response.path,
-          };
-          setImages(updatedImages);
-        })
-        .catch((error) => {
-          console.log('ImagePicker Error:', error);
-        });
-    }else{
-      console.log("image not found")
-    }
-  };
-
-  const handleSaveToLocal = async () => {
-    try {
-      const updatedTextItems = textItems.map((item, i) => ({
-        ...item,
-        isSelected: false,
-      }));
-
-      // Deselect image items when a text item is selected
-      const updatedImages = images.map((image) => ({
-        ...image,
-        isSelected: false,
-      }));
-
-      setImages(updatedImages);
-      setTextItems(updatedTextItems);
-
-      // const uri = await viewShotRef.current.capture();
-      // await saveCustomFrame(uri);
-
-      // console.log("save krva mate ni frame - ", uri)
-
-      // // image cdn ma upload karva mate 
-
-      // const dataArray = new FormData();
-      // dataArray.append('b_video', {
-      //   uri: uri,
-      //   type: response.mime,
-      //   name: uri.split('/').pop(),
-      // });
-      // setlocalImage(response.path)
-      // let url = 'https://www.sparrowgroups.com/CDN/image_upload.php/';
-      // axios
-      //   .post(url, dataArray, {
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data',
-      //     },
-      //   })
-      //   .then((res) => {
-      //     setImageLoader(false)
-      //     const imagePath = res?.data?.iamge_path; // Correct the key to "iamge_path"
-      //     setFileUri(imagePath);
-      //   })
-      //   .catch((err) => {
-      //     setImageLoader(false)
-      //     setFileUri(response.path)
-      //     console.log('Error uploading image:', err);
-      //   });
-
-      const uri = await viewShotRef.current.capture();
-      await saveCustomFrame(uri);
-
-
-      // // Convert the file to base64
-      // const base64Image = await convertFileToBase64(uri);
-
-      // console.log("base64: ", base64Image)
-
-      // // // Now you can use the base64Image as needed, e.g., send it to a CDN URL
-      // // console.log("Base64 image:", base64Image);
-
-      // // upload image to cdn url 
-
-      // const apiUrl = "https://sparrowsofttech.in/cdn/index.php";
-      // const requestData = {
-      //   base64_content: base64Image, // Use the updated base64 image data here
-      // };
-      // // Upload the canvas image to the CDN
-      // axios
-      //   .post(apiUrl, requestData)
-      //   .then(async (response) => {
-      //     console.log("requesting for change to cdn")
-      //     const { status, message, image_url } = response.data;
-      //     if (status === "success") {
-      //       sendFrametoDb(image_url)
-
-      //     } else {
-      //       console.error("Image upload failed:", message);
-      //     }
-      //   })
-
-
-    } catch (error) {
-      console.error('Error saving image to local storage:', error);
-    }
-  };
-
-  const convertFileToBase64 = async (fileUri) => {
-    const response = await RNFetchBlob.fs.readFile(fileUri, 'base64');
-    return response;
-  };
-
-  const sendFrametoDb = async (image_url) => {
-    const apiUrl = 'https://b-p-k-2984aa492088.herokuapp.com/saveframe/frame/save';
-    const requestData = {
-      "userId": profileData?._id,
-      "fullName_user": profileData?.fullName,
-      "mobileNumber_user": profileData?.mobileNumber,
-      "savedFrame_user": image_url
-    }
-
-    // sending user frames to data base 
-    try {
-      const response = await axios.post(
-          apiUrl,requestData,
-          {
-              headers: {
-                  Authorization: `Bearer ${userToken}`,
-              },
-          }
-      );
-  } catch (error) {
-      console.error('Error sending saved frames data:', error);
+  if (loadig || !jsonData ) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'black' }}>
+        <ActivityIndicator color={'white'} />
+      </View>
+    )
   }
-  }
-
-  // update the user data 
-  const phone = profileData?.mobileNumber;
-  const username = profileData?.fullName;
-  const userimage = profileData?.profileImage || profileData?.businessLogo;
-
-  const [run, setRun] = useState(true);
-
-  useEffect(() => {
-    // Update text items
-    if (run && textItems.length !== 0 && userimage && phone && username) {
-      const updatedTextItems = textItems.map((item) => {
-        if (item.text === '1234567890') {
-          return { ...item, text: phone }; // Update the text property
-        }
-        if (item.text === 'Your Name Here') {
-          return { ...item, text: username }; // Update the text property
-        }
-        return item; // Keep the item as is if the condition is not met
-      });
-
-      setTextItems(updatedTextItems); // Update the state with the modified array
-      setRun(false);
-    }
-
-    // Update image items
-    if (run && images.length !== 0 && userimage && phone && username) {
-      const updatedImageItems = images.map((item) => {
-        if (item.src === 'https://www.sparrowgroups.com/CDN/upload/840image-removebg-preview.png?auto=compress&cs=tinysrgb&h=60') {
-          return { ...item, src: userimage }; // Update the src property
-        }
-        return item; // Keep the item as is if the condition is not met
-      });
-      setImages(updatedImageItems); // Update the state with the modified arra
-      setRun(false);
-    }
-  }, [run, textItems, images, phone, username, userimage]);
-
-
-  // if (run) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'black' }}>
-  //       <ActivityIndicator color={'white'} />
-  //     </View>
-  //   )
-  // }
 
   return (
     <LinearGradient

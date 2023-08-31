@@ -60,6 +60,8 @@ const EditHome = ({ route, navigation }) => {
 
   const [item, setItem] = useState();
   const [currentFrame, setCurrentFrame] = useState(0);
+
+  console.log(currentFrame, "this is my current frame!")
   const [customFrames, setCustomFrames] = useState([]);
   const viewShotRef = useRef(null);
 
@@ -72,7 +74,7 @@ const EditHome = ({ route, navigation }) => {
   const loadCustomFrames = async () => {
     try {
       const framesData = await AsyncStorage.getItem('customFrames');
-      if (framesData.length !== 2 && framesData ) {
+      if (framesData.length !== 2 && framesData) {
         const frames = JSON.parse(framesData);
         setCustomFrames(frames);
       } else {
@@ -161,61 +163,67 @@ const EditHome = ({ route, navigation }) => {
 
   // -----------------------------------------------------------------------------------------------------
 
+  const convertFileToBase64 = async (fileUri) => {
+    const response = await RNFetchBlob.fs.readFile(fileUri, 'base64');
+    return response;
+  };
 
   // now cahnge the code
 
-  
-  
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   const captureAndShareVideoWithOverlay = async (imageSource) => {
+
+    if (videos.length != 0) {
+      
     const videoURL = selectedVideo;
     console.log("select karelo video: ", selectedVideo);
-    
+  
+    console.log("This is my image of frame", imageSource);
+  
     setIsProcessing(true);
     try {
       // Clear previous temporary files (if any)
       await clearCache();
-
+  
       // Generate unique file names for the video, image, and output
       const videoFileName = `video_${Date.now()}.mp4`;
       const imageFileName = `image_${Date.now()}.png`;
       const outputFileName = `output_${Date.now()}.mp4`;
-
+  
       // Download the video to a temporary directory with a unique name
       const videoResponse = await RNFetchBlob.config({
         fileCache: true,
         path: `${RNFetchBlob.fs.dirs.CacheDir}/${videoFileName}`,
       }).fetch('GET', videoURL);
-
+  
       const videoPath = videoResponse.path();
-
+  
       // Download the image to a temporary directory with a unique name
       const imageResponse = await RNFetchBlob.config({
         fileCache: true,
         path: `${RNFetchBlob.fs.dirs.CacheDir}/${imageFileName}`,
       }).fetch('GET', imageSource);
-
+  
       const imagePath = imageResponse.path();
-
-      // Resize the video to 300x300
+  
+      // Increase video resolution and bitrate
       const resizedVideoPath = `${RNFetchBlob.fs.dirs.CacheDir}/resizedVideo.mp4`;
-      const resizeVideoCommand = `-i ${videoPath} -vf "scale=300:300" -c:a copy ${resizedVideoPath}`;
+      const resizeVideoCommand = `-i ${videoPath} -vf "scale=1280:720" -b:v 2M -c:a copy ${resizedVideoPath}`;
       await RNFFmpeg.execute(resizeVideoCommand);
-
-      // Resize the image to 300x300
+  
+      // Increase image resolution
       const resizedImagePath = `${RNFetchBlob.fs.dirs.CacheDir}/resizedImage.png`;
-      const resizeImageCommand = `-i ${imagePath} -vf "scale=300:300" ${resizedImagePath}`;
+      const resizeImageCommand = `-i ${imagePath} -vf "scale=1280:720" ${resizedImagePath}`;
       await RNFFmpeg.execute(resizeImageCommand);
-
+  
       // Combine resized video and image using FFmpeg
       const outputPath = `${RNFetchBlob.fs.dirs.CacheDir}/${outputFileName}`;
-      const ffmpegCommand = `-i ${resizedVideoPath} -i ${resizedImagePath} -filter_complex "[0:v][1:v]overlay=0:0" -c:a copy ${outputPath}`;
+      const ffmpegCommand = `-i ${resizedVideoPath} -i ${resizedImagePath} -filter_complex "[0:v][1:v]overlay=0:0" -b:v 2M -c:a copy ${outputPath}`;
       await RNFFmpeg.execute(ffmpegCommand);
-
-    setIsProcessing(false);
-
-
+  
+      setIsProcessing(false);
+  
       // Share the video
       const shareOptions = {
         title: 'Share Video with Branding Profitable!',
@@ -223,18 +231,23 @@ const EditHome = ({ route, navigation }) => {
         type: 'video/mp4',
         failOnCancel: false,
       };
-
+  
       await Share.open(shareOptions);
       setIsProcessing(false);
-      console.log('Shared successfully');
     } catch (error) {
       console.log('Error during video sharing:', error);
-    setIsProcessing(false);
-
+      showToastWithGravity("Troubleshooting, Please try again later")
+      setIsProcessing(false);
     }
-
+  
     setIsProcessing(false);
+
+  }
+else{
+  showToastWithGravity('video not found!')
+}
   };
+  
 
   const clearCache = async () => {
     try {
@@ -378,7 +391,7 @@ const EditHome = ({ route, navigation }) => {
   if (isProcessing) {
     return (
       <LinearGradient colors={['#050505', '#1A2A3D']} locations={[0, 0.4]} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Image style={{height:200,width:200}} source={require('../assets/output-onlinegiftools(1).gif')} />
+        <Image style={{ height: 200, width: 200 }} source={require('../assets/output-onlinegiftools(1).gif')} />
       </LinearGradient >
     )
   }
@@ -472,7 +485,7 @@ const EditHome = ({ route, navigation }) => {
         <Text style={styles.headerText} onPress={() => { navigation.goBack() }}>
           {bannername}
         </Text>
-        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : ()=>{captureAndShareVideoWithOverlay('https://www.sparrowgroups.com/CDN/upload/589vecteezy_abstract-modern-elegant-blue-gold-frame-border-social-media_15314464_975.png')}}>
+        <TouchableOpacity style={{ padding: 4, backgroundColor: 'rgba(255, 0, 0, 0.5)', borderRadius: 100, marginLeft: 10 }} onPress={!displayImage ? captureAndShareImage : () => { captureAndShareVideoWithOverlay(customFrames[currentFrame].image) }}>
           <View style={{
             zIndex: 1,
             padding: 8,
@@ -527,13 +540,14 @@ const EditHome = ({ route, navigation }) => {
                   )}
 
                   {/* Swiper component for overlay images */}
-                  <Swiper loop={false} index={currentFrame} showsPagination={false}>
+                  <Swiper loop={false} index={currentFrame} showsPagination={false} onIndexChanged={(index) => setCurrentFrame(index)}>
                     {customFrames.map((frame, index) => (
                       <View key={index}>
                         <FastImage source={{ uri: frame.image }} style={styles.overlayImage} />
                       </View>
                     ))}
                   </Swiper>
+
                 </View>
 
               )}

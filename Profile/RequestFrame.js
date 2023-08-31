@@ -18,14 +18,14 @@ const { width } = Dimensions.get('window');
 const itemWidth = width / 2.3;
 
 const showToastWithGravity = (data) => {
-    ToastAndroid.showWithGravityAndOffset(
-      data,
-      ToastAndroid.SHORT,
-      ToastAndroid.BOTTOM,
-      0,
-      50,
-    );
-  };
+  ToastAndroid.showWithGravityAndOffset(
+    data,
+    ToastAndroid.SHORT,
+    ToastAndroid.BOTTOM,
+    0,
+    50,
+  );
+};
 
 const RequestFrame = ({ navigation }) => {
   const [requested, setRequested] = useState(false);
@@ -100,13 +100,15 @@ const RequestFrame = ({ navigation }) => {
   const gettingUserFrames = useCallback(async () => {
     if (profileData) {
       const userid = profileData._id;
-      const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/saveframe/frame/save/${userid}`;
+      const apiUrl = `https://b-p-k-2984aa492088.herokuapp.com/saveframe/frameimage`;
       try {
         const response = await axios.get(apiUrl, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
+        // {"data": [{"_id": "64f0515e3610f105bacefcf7", "image": "https://sparrowsofttech.in/cdn/images/64f0515e1cf90.png"}], "message": "Read All Frame", "statusCode": 200}
+        // console.log(response.data.data)
 
         setCustomFrames(response.data.data);
       } catch (e) {
@@ -124,7 +126,7 @@ const RequestFrame = ({ navigation }) => {
     fetchData();
   }, [retrieveProfileData, gettingUserFrames]);
 
-//   LOG  {"__v": 0, "_id": "64edd7473a0b18f0166b92a4", "fullName_user": "Gohel Meet", "mobileNumber_user": 8490803632, "savedFrame_user": "https://sparrowsofttech.in/cdn/images/64edd746bc759.png", "userId": "64ea11ca706ccbfd1ecbe022"}
+  //   LOG  {"__v": 0, "_id": "64edd7473a0b18f0166b92a4", "fullName_user": "Gohel Meet", "mobileNumber_user": 8490803632, "savedFrame_user": "https://sparrowsofttech.in/cdn/images/64edd746bc759.png", "userId": "64ea11ca706ccbfd1ecbe022"}
 
   const renderItem = ({ item }) => {
     return (
@@ -133,21 +135,21 @@ const RequestFrame = ({ navigation }) => {
         onPress={() => handleSelect(item)}
       >
         <View style={styles.imageInnerContainer}>
-          <FastImage source={{ uri: item.savedFrame_user }} style={styles.image} />
+          <FastImage source={{ uri: item.image }} style={styles.image} />
         </View>
       </TouchableOpacity>
     );
   };
 
   const handleSelect = (item) => {
-    navigation.navigate('CustomFrameFormProfile', { itemId: item._id });
+    navigation.navigate('CustomFrameFormProfile', { itemId: item._id, isRequest: 'yes' });
   };
 
   if (loader) {
-    return(
-        <View>
-            <ActivityIndicator color={'white'} />
-        </View>
+    return (
+      <View>
+        <ActivityIndicator color={'white'} />
+      </View>
     )
   }
 
@@ -192,9 +194,9 @@ const styles = {
     justifyContent: 'center',
   },
   buttonContainer: {
-    width: '30%',
-    padding:10,
-    paddingTop:20
+    width: '40%',
+    padding: 10,
+    paddingTop: 20
   },
   button: {
     flexDirection: 'row',

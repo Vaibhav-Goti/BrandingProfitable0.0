@@ -78,10 +78,9 @@ const AfterSubscribe = () => {
 
                 const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/abc/${profileData?.mobileNumber}`);
                 const result = response.data;
-console.log(result)
-                setUserTeamDetails(result)
+                setUserTeamDetails(result);
             } else {
-                console.log('details malti nathi!')
+                console.log('details malti nathi!');
             }
         } catch (error) {
             console.log('Error fetching data... after subscribe:', error);
@@ -93,7 +92,7 @@ console.log(result)
     })
 
     if (userTeamDetails.length == 0) {
-        return(
+        return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator color={'black'} />
             </View>
@@ -107,7 +106,7 @@ console.log(result)
                 <View style={{ height: 220, backgroundColor: 'rgba(0, 0, 0, 0.2)', borderBottomRightRadius: 20, borderBottomLeftRadius: 20, justifyContent: 'space-between', overflow: "hidden" }}>
 
                     {/* header */}
-                   <Header />
+                    <Header />
 
                     <View style={{ justifyContent: 'center', alignItems: 'center', gap: 10 }}>
 
@@ -174,7 +173,7 @@ console.log(result)
                         </Text>
 
                     </View>
-                    <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2', {'aadhar':profileData?.phone, 'id': profileData?._id}) }}>
+                    <TouchableOpacity onPress={() => { navigation.navigate('MLMScreen2', { 'aadhar': profileData?.mobileNumber, 'id': profileData?._id }) }}>
                         <Text style={{ color: '#00D3FF', fontFamily: 'Manrope-Bold', fontSize: 15, textDecorationLine: 'underline', }}>
                             Total Team
                         </Text>
@@ -269,7 +268,7 @@ console.log(result)
 
                 {/* 4 */}
 
-                <View style={{ height: 60, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.5)', marginTop: 30, borderRadius: 20, overflow: "hidden", borderWidth:1,borderColor:'white' }}>
+                <View style={{ height: 60, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.5)', marginTop: 30, borderRadius: 20, overflow: "hidden", borderWidth: 1, borderColor: 'white' }}>
                     <View style={{ alignItems: 'center', justifyContent: 'center', width: '60%' }}>
                         <Text style={{ fontFamily: 'Manrope-Bold', color: 'white', fontSize: 18 }}>
                             {profileData?.adhaar}

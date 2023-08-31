@@ -11,7 +11,6 @@ import MlmUserInReview from './MlmUserInReview';
 const MainMLMScreen = () => {
 
   const [isSubscribed, setIsSubscribed] = React.useState('')
-  console.log(isSubscribed)
 
   const [profileData, setProfileData] = React.useState(null);
   React.useEffect(() => {
@@ -33,21 +32,25 @@ const MainMLMScreen = () => {
   const [i, seti] = React.useState(0)
   const [loader, setLoader] = React.useState(true)
 
+  useEffect(()=>{
+    
+  })
+
 
 
   useEffect(() => {
     const subscriptionCheckInterval = setInterval(async () => {
       if (i < 5) {
-        seti(i+1)
+        seti(i + 1)
         try {
           if (profileData) {
             console.log('Checking subscription status...');
 
             const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/premium/${profileData?.mobileNumber}`);
             const result = response.data.statusCode;
-console.log(result)
-          setLoader(false); // Set loader to false after handling subscription status
-          setIsSubscribed(result);
+            // console.log(result, "status code of mlm registers")
+            setLoader(false); // Set loader to false after handling subscription status
+            setIsSubscribed(result);
           } else {
             console.log("No profile data available.");
           }
@@ -56,6 +59,22 @@ console.log(result)
         } finally {
           setLoader(false); // Set loader to false after handling subscription status
         }
+        try {
+          if (profileData) {
+            console.log('Checking subscription status...');
+
+            const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/wallet/paircount/${profileData?.mobileNumber}`);
+            console.log(response.data)
+            // console.log(result, "status code of mlm registers")
+          } else {
+            console.log("No profile data available.");
+          }
+        } catch (error) {
+          console.log('Error fetching subscription data:', error);
+        } finally {
+          setLoader(false); // Set loader to false after handling subscription status
+        }
+
       }
 
     }, 5000); // Run every 3 seconds

@@ -82,6 +82,8 @@ const App = ({ navigation, route }) => {
     const [rotationValue, setRotationValue] = useState(0);
     const animatedRotation = new Animated.Value(rotationValue);
 
+    const [isload, setisload] = useState(true)
+
     const [data, setData] = useState([]);
 
     const [fileUri, setFileUri] = useState('https://img.freepik.com/premium-vector/white-texture-round-striped-surface-white-soft-cover_547648-928.jpg');
@@ -98,6 +100,8 @@ const App = ({ navigation, route }) => {
             .get(apiUrl)
             .then(response => {
                 const imageData = response.data.data.cds_template;
+                console.log(imageId)
+                console.log(imageData)
                 const data = {
                     data: imageData
                 };
@@ -107,6 +111,7 @@ const App = ({ navigation, route }) => {
                 console.error('Error fetching response.data.data:', error)
             });
 
+            setisload(false)
         setImageLoader(false)
 
     }, []);
@@ -195,7 +200,9 @@ const App = ({ navigation, route }) => {
                         rotation: layer.angle || 0,
                         scaleX: layer.scaleX || 1,
                         scaleY: layer.scaleY || 1,
-                        textAlign: layer.textAlign || 'left'
+                        textAlign: layer.textAlign || 'center',
+                        width: layer.width || 200,
+                        height: layer.height || 40
                     };
                     textItems.push(newItem);
                 }
@@ -491,7 +498,9 @@ const App = ({ navigation, route }) => {
         textAlign
     }) => {
         const scaledWidth = width;
-        const scaledHeight = height;
+        const scaledHeight = height*scaleY;
+
+        console.log(scaledWidth)
 
         return (
             <TouchableOpacity onPress={onSelect} activeOpacity={0.7}>
@@ -504,14 +513,16 @@ const App = ({ navigation, route }) => {
                         borderWidth: isSelected ? 2 : 0,
                         top: top || 150,
                         left: left || 110,
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        width: scaledWidth,
+                        height: scaledHeight
                     }}
                 >
                     <Text
                         style={{
-                            width: scaledWidth,
                             fontSize,
                             color,
+                            textAlign
                         }}
                     >
                         {text}
@@ -629,6 +640,8 @@ const App = ({ navigation, route }) => {
         console.error('Error retrieving profile data:', error);
       }
     };
+
+    console.log(textItems)
 
     const fetchDetails = async () => {
         try {
@@ -775,9 +788,9 @@ const App = ({ navigation, route }) => {
             });
     };
 
-    if (loader) {
+    if (isload) {
         <View style={{ backgroundColor: 'black', flex: 1, justifyContent: "center", alignItems: 'center' }}>
-            <ActivityIndicator color={'black'} />
+            <ActivityIndicator color={'white'} />
         </View>
     }
 
@@ -856,8 +869,8 @@ const App = ({ navigation, route }) => {
                                         <TextItem
                                             text={textItem.text}
                                             isSelected={textItem.isSelected}
-                                            width={150}
-                                            height={50}
+                                            width={textItem.width || 150}
+                                            height={textItem.height || 50}
                                             rotation={textItem.rotation || 0}
                                             fontSize={textItem.fontSize}
                                             color={textItem.color} // Pass the color value for each text item

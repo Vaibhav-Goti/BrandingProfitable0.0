@@ -107,6 +107,8 @@ const MLMScreen2 = ({ navigation, route }) => {
 
   const {aadhar, id} = route.params
 
+  console.log("this is my moile number: ", aadhar)
+
   console.log("phone number from main - ", aadhar)
 
   const [isLeft, setIsLeft] = React.useState(true)
@@ -198,6 +200,8 @@ const [DirectSponser, setDirectSponser] = React.useState([])
   const fetchData = async () => {
     try {
       const response = await axios.get(`https://b-p-k-2984aa492088.herokuapp.com/user/directresponce/${aadhar}`);
+
+      console.log(`https://b-p-k-2984aa492088.herokuapp.com/user/directresponce/${aadhar}`)
 
       const result = response.data;
       setDirectSponser(result);
