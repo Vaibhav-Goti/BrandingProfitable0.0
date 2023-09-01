@@ -209,12 +209,12 @@ const EditHome = ({ route, navigation }) => {
   
       // Increase video resolution and bitrate
       const resizedVideoPath = `${RNFetchBlob.fs.dirs.CacheDir}/resizedVideo.mp4`;
-      const resizeVideoCommand = `-i ${videoPath} -vf "scale=1280:720" -b:v 2M -c:a copy ${resizedVideoPath}`;
+      const resizeVideoCommand = `-i ${videoPath} -vf "scale=720:720" -b:v 2M -c:a copy ${resizedVideoPath}`;
       await RNFFmpeg.execute(resizeVideoCommand);
   
       // Increase image resolution
       const resizedImagePath = `${RNFetchBlob.fs.dirs.CacheDir}/resizedImage.png`;
-      const resizeImageCommand = `-i ${imagePath} -vf "scale=1280:720" ${resizedImagePath}`;
+      const resizeImageCommand = `-i ${imagePath} -vf "scale=720:720" ${resizedImagePath}`;
       await RNFFmpeg.execute(resizeImageCommand);
   
       // Combine resized video and image using FFmpeg

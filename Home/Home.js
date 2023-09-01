@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, BackHandler, Modal, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, BackHandler, Modal, TouchableOpacity, Image, ScrollView, Dimensions, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -187,6 +187,11 @@ const Home = ({ navigation }) => {
     fetchPopUp()
   })
 
+  const handleClick = () => {
+    const whatsappNumber = "+91 9904128113";
+    Linking.openURL(`whatsapp://send?phone=${whatsappNumber}`);
+  };
+
   return (
     <View
       style={styles.container}>
@@ -277,6 +282,9 @@ const Home = ({ navigation }) => {
         </View>
       </Modal>
 
+      <TouchableOpacity onPress={handleClick} style={{position:'absolute', bottom:70,right:10,zIndex:10, padding:15, borderRadius:100}}>
+        <Image source={require('../assets/whatsapp2.png')} style={{height:40,width:40}} />
+      </TouchableOpacity>
 
       <LinearGradient
         colors={['#050505', '#1A2A3D']} style={{ flex: 1 }}>
