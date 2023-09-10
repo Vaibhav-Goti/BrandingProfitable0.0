@@ -605,6 +605,7 @@ const App = ({ navigation, route }) => {
   // update the user data 
   const phone = profileData?.mobileNumber;
   const username = profileData?.fullName;
+  const des = profileData?.Designation;
   const userimage = profileData?.profileImage || profileData?.businessLogo;
 
   const [run, setRun] = useState(true);
@@ -617,6 +618,9 @@ const App = ({ navigation, route }) => {
           return { ...item, text: phone }; // Update the text property
         }
         if (item.text === 'Your Name Here') {
+          return { ...item, text: username }; // Update the text property
+        }
+        if (item.text === 'Your Designation') {
           return { ...item, text: username }; // Update the text property
         }
         return item; // Keep the item as is if the condition is not met

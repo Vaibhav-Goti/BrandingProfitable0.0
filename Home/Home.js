@@ -282,7 +282,7 @@ const Home = ({ navigation }) => {
         </View>
       </Modal>
 
-      <TouchableOpacity onPress={handleClick} style={{position:'absolute', bottom:60,right:0,zIndex:10, backgroundColor:'darkgreen', padding:15, borr}}>
+      <TouchableOpacity onPress={handleClick} style={{position:'absolute', bottom:70,right:10,zIndex:10, backgroundColor:'darkgreen', padding:15, borderRadius:100}}>
         <Image source={require('../assets/whatsapp2.png')} style={{height:40,width:40}} />
       </TouchableOpacity>
 
